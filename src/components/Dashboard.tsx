@@ -237,35 +237,43 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     setErrorMsg('');
     try {
       const schoolRes = await fetch(`/api/v1/schools/${school.id}`);
-      if (schoolRes.ok) {
-        const schoolData = await schoolRes.json();
-        if (schoolData.billingNotice) {
-          setBillingNotice(schoolData.billingNotice);
-        } else {
-          setBillingNotice('');
-        }
+      if (!schoolRes.ok) {
+        const text = await schoolRes.text();
+        console.error("School API error:", schoolRes.status, text);
+        throw new Error("School API failed");
+      }
+      const schoolData = await schoolRes.json();
+      if (schoolData.billingNotice) {
+        setBillingNotice(schoolData.billingNotice);
+      } else {
+        setBillingNotice('');
       }
 
       const sRes = await fetch(`/api/v1/students?schoolId=${school.id}`);
+      if (!sRes.ok) throw new Error("Students API failed: " + await sRes.text());
       const sData = await sRes.json();
       setStudents(sData);
 
       const pRes = await fetch(`/api/v1/payments?schoolId=${school.id}`);
+      if (!pRes.ok) throw new Error("Payments API failed: " + await pRes.text());
       const pData = await pRes.json();
       setPayments(pData);
 
       const bRes = await fetch(`/api/v1/backups?schoolId=${school.id}`);
+      if (!bRes.ok) throw new Error("Backups API failed: " + await bRes.text());
       const bData = await bRes.json();
       setBackups(bData);
 
       const kRes = await fetch(`/api/v1/api-keys?schoolId=${school.id}`);
+      if (!kRes.ok) throw new Error("Keys API failed: " + await kRes.text());
       const kData = await kRes.json();
       setApiKeys(kData);
       if (kData.length > 0 && !sandboxToken) {
         setSandboxToken(kData[0].token);
       }
-    } catch (err) {
-      setErrorMsg('Failed to sync latest cloud data from GEDA servers. Using cached client state.');
+    } catch (err: any) {
+      console.error("Fetch Data Error:", err);
+      setErrorMsg(`Failed to sync latest cloud data from GEDA servers. Using cached client state. (${err.message})`);
     } finally {
       setIsLoading(false);
     }

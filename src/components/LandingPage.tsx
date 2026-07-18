@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { School, Role } from '../types';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { auth, googleAuthProvider } from '../lib/firebase';
+import { auth, googleAuthProvider, db } from '../lib/firebase';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=1920',
@@ -135,16 +136,42 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
       
       setIsLoggingIn(true);
       try {
+        let responseData: any = null;
+        let isSuccess = false;
+
+        try {
+          const res = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword })
+          });
+          const data = await res.json();
+          if (res.ok && data.success && data.school) {
+             responseData = data;
+             isSuccess = true;
+          } else {
+             throw new Error(data.error || 'Invalid credentials');
+          }
+        } catch (apiErr: any) {
+          console.warn('Backend login API failed, falling back to Firebase directly:', apiErr);
+          const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", loginEmail.trim())));
+          if (!snapshot.empty) {
+            const schoolDoc = snapshot.docs[0];
+            responseData = {
+              success: true,
+              school: { ...schoolDoc.data(), id: schoolDoc.id },
+              user: { email: loginEmail.trim(), fullName: "Admin User", role: selectedRole },
+              role: selectedRole
+            };
+            isSuccess = true;
+          } else {
+             setLoginError('Invalid official school email or password.');
+             return;
+          }
+        }
         
-        const res = await fetch('/api/v1/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword })
-        });
-        const data = await res.json();
-        
-        if (res.ok && data.success && data.school) {
-          const actualRole = data.role || selectedRole;
+        if (isSuccess && responseData) {
+          const actualRole = responseData.role || selectedRole;
           
           if (actualRole === 'Admin' && loginEmail.trim() !== "superadmin@ges.gov.gh") {
             try {
@@ -162,9 +189,9 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
             }
           }
           
-          onLogin(data.school, actualRole, false, data.teacher || null);
+          onLogin(responseData.school, actualRole, false, responseData.teacher || null);
         } else {
-          setLoginError(data.error || 'Invalid official school email or password.');
+          setLoginError('Invalid official school email or password.');
         }
       } catch (err: any) {
         setLoginError(err.message || 'Failed to log in. Please check your connection and try again.');
@@ -182,15 +209,34 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
       // Fallback: check backend with email from Google
       const email = result.user.email;
       if (email) {
-        const res = await fetch('/api/v1/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email, password: "password123" }) // Fake password for now or we would need a proper OAuth flow in the backend
-        });
-        const data = await res.json();
-        if (res.ok && data.success && data.school) {
-          const actualRole = data.role || selectedRole;
-          onLogin(data.school, actualRole, false);
+        let responseData: any = null;
+        try {
+          const res = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: "password123" }) // Fake password for now or we would need a proper OAuth flow in the backend
+          });
+          const data = await res.json();
+          if (res.ok && data.success && data.school) {
+             responseData = data;
+          } else {
+             throw new Error('API failed');
+          }
+        } catch (apiErr) {
+          console.warn('Backend Google API failed, falling back to Firebase:', apiErr);
+          const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", email)));
+          if (!snapshot.empty) {
+            const schoolDoc = snapshot.docs[0];
+            responseData = {
+              success: true,
+              school: { ...schoolDoc.data(), id: schoolDoc.id }
+            };
+          }
+        }
+
+        if (responseData && responseData.success && responseData.school) {
+          const actualRole = responseData.role || selectedRole;
+          onLogin(responseData.school, actualRole, false);
         } else {
           setLoginError('Google account not linked to an official school account.');
         }

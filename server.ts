@@ -3,7 +3,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, doc, setDoc, addDoc, query, where, updateDoc, writeBatch } from "firebase/firestore";
+import { getFirestore, collection, getDocs, doc, setDoc, addDoc, query, where, updateDoc, writeBatch, deleteDoc, getDoc } from "firebase/firestore";
 import fs from "fs";
 
 // Initialize Firebase
@@ -56,6 +56,25 @@ async function startServer() {
     } catch (e) { res.status(500).json({ error: e.message }); }
   });
 
+  app.get("/api/v1/schools/:id", async (req, res) => {
+    try {
+      const docRef = doc(db, "schools", req.params.id);
+      const snapshot = await getDoc(docRef);
+      if (snapshot.exists()) {
+        res.json({ ...snapshot.data(), id: snapshot.id });
+      } else {
+        res.status(404).json({ error: "School not found" });
+      }
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.put("/api/v1/schools/:id", async (req, res) => {
+    try {
+      await updateDoc(doc(db, "schools", req.params.id), req.body);
+      res.json({ message: "School updated" });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
   // --- AUTH ---
   app.post("/api/v1/auth/login", async (req, res) => {
     try {
@@ -73,6 +92,27 @@ async function startServer() {
   });
 
   // --- STUDENTS ---
+  app.get("/api/v1/students", async (req, res) => {
+    try {
+      const snapshot = await getDocs(query(collection(db, "students"), where("schoolId", "==", req.query.schoolId || "")));
+      res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.put("/api/v1/students/:id", async (req, res) => {
+    try {
+      await updateDoc(doc(db, "students", req.params.id), req.body);
+      res.json({ message: "Student updated" });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.delete("/api/v1/students/:id", async (req, res) => {
+    try {
+      await deleteDoc(doc(db, "students", req.params.id));
+      res.json({ message: "Student deleted" });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
   app.post("/api/v1/students", async (req, res) => {
     try {
       const student = req.body;
@@ -118,6 +158,13 @@ async function startServer() {
   });
 
   // --- PAYMENTS ---
+  app.get("/api/v1/payments", async (req, res) => {
+    try {
+      const snapshot = await getDocs(query(collection(db, "payments"), where("schoolId", "==", req.query.schoolId || "")));
+      res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
   app.post("/api/v1/payments", async (req, res) => {
     try {
       const payment = req.body;

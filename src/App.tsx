@@ -56,12 +56,12 @@ export default function App() {
           fetchedSchools = [{
             id: 'demo-school',
             name: 'GEDA Demo School Complex',
+            slug: 'geda-demo-school',
             region: 'Greater Accra',
             district: 'Accra Metropolitan',
             email: 'admin@gedaschool.edu.gh',
             status: 'Active',
             accessLevel: 'Full',
-            userId: 'demo-id',
             createdAt: new Date().toISOString()
           }];
         }
@@ -161,8 +161,8 @@ export default function App() {
          
          const school = {
            name, region, district, email,
+           slug: name.toLowerCase().replace(/\s+/g, '-'),
            status: "Active", accessLevel: "Trial",
-           userId: "admin-id",
            createdAt: new Date().toISOString()
          };
          // Note: We're not doing real auth creation here for simplicity on static demo, 

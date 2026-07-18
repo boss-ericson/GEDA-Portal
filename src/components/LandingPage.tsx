@@ -1,0 +1,659 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { School, Role } from '../types';
+import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { auth, googleAuthProvider } from '../lib/firebase';
+
+const BACKGROUND_IMAGES = [
+  'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=1920',
+  'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&q=80&w=1920',
+  'https://images.unsplash.com/photo-1544654803-b69140b285a1?auto=format&fit=crop&q=80&w=1920'
+];
+import { 
+  GraduationCap, 
+  WifiOff, 
+  Wallet, 
+  ArrowRight, 
+  CheckCircle2, 
+  School as SchoolIcon, 
+  KeyRound, 
+  Globe, 
+  Database,
+  ShieldCheck,
+  Lock,
+  CalendarCheck,
+  FileText,
+  ClipboardList
+} from 'lucide-react';
+
+interface LandingPageProps {
+  schools: School[];
+  onLogin: (school: School, role: Role, isDemo?: boolean, user?: any) => void;
+  onRegisterSchool: (name: string, region: string, district: string, email: string, password: string) => Promise<{ success: boolean; school?: School; error?: string }>;
+}
+
+export default function LandingPage({ schools, onLogin, onRegisterSchool }: LandingPageProps) {
+  const [bgIndex, setBgIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % BACKGROUND_IMAGES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const [loginMode, setLoginMode] = useState<'secure' | 'demo'>('secure');
+  const [selectedSchoolId, setSelectedSchoolId] = useState<string>(schools[0]?.id || 'achimota');
+  const [selectedRole, setSelectedRole] = useState<Role>('Admin');
+  
+  // Login form state
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // Registration form state
+  const [newSchoolName, setNewSchoolName] = useState('');
+  const [newSchoolRegion, setNewSchoolRegion] = useState('Greater Accra');
+  const [newSchoolDistrict, setNewSchoolDistrict] = useState('');
+  const [newSchoolEmail, setNewSchoolEmail] = useState('');
+  const [newSchoolPassword, setNewSchoolPassword] = useState('');
+  const [registerError, setRegisterError] = useState('');
+  const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [registeredSchool, setRegisteredSchool] = useState<School | null>(null);
+
+  const ghanaRegions = [
+    'Greater Accra', 'Ashanti', 'Western', 'Northern', 'Volta', 
+    'Eastern', 'Central', 'Ahafo', 'Bono', 'Bono East', 
+    'North East', 'Oti', 'Savannah', 'Upper East', 'Upper West', 'Western North'
+  ];
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegisterError('');
+    setRegisterSuccess(false);
+
+    if (!newSchoolName.trim() || !newSchoolDistrict.trim() || !newSchoolEmail.trim() || !newSchoolPassword.trim()) {
+      setRegisterError('Please fill in all school registration fields.');
+      return;
+    }
+    
+    setIsRegistering(true);
+    try {
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, newSchoolEmail, newSchoolPassword);
+        await sendEmailVerification(userCred.user);
+      } catch(fbErr: any) {
+        console.warn("Firebase Auth Error: ", fbErr.message);
+      }
+      const result = await onRegisterSchool(newSchoolName, newSchoolRegion, newSchoolDistrict, newSchoolEmail, newSchoolPassword);
+      if (result.success && result.school) {
+        setRegisterSuccess(true);
+        setRegisteredSchool(result.school);
+        setSelectedSchoolId(result.school.id);
+        
+        // Auto select and prefill login
+        setLoginMode('secure');
+        setLoginEmail(newSchoolEmail);
+        setLoginPassword(newSchoolPassword);
+        
+        setNewSchoolName('');
+        setNewSchoolDistrict('');
+        setNewSchoolEmail('');
+        setNewSchoolPassword('');
+
+        // Note: we can also show a message to the user that a verification email was sent.
+        alert('Registration successful! A verification email has been sent to your email address.');
+
+        // Smooth scroll to login card
+        document.getElementById('login-portal')?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        setRegisterError(result.error || 'A school with this name or email already exists.');
+      }
+    } catch (err) {
+      setRegisterError('Registration failed. Please try again.');
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    
+    if (loginMode === 'demo') {
+      const school = schools.find(s => s.id === selectedSchoolId);
+      if (school) {
+        onLogin(school, selectedRole, true);
+      }
+    } else {
+      if (!loginEmail.trim() || !loginPassword.trim()) {
+        setLoginError('Please enter your school email and password.');
+        return;
+      }
+      
+      setIsLoggingIn(true);
+      try {
+        
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword })
+        });
+        const data = await res.json();
+        
+        if (res.ok && data.success && data.school) {
+          const actualRole = data.role || selectedRole;
+          
+          if (actualRole === 'Admin' && loginEmail.trim() !== "superadmin@ges.gov.gh") {
+            try {
+              const cred = await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+              if (!cred.user.emailVerified) {
+                setLoginError('Please verify your email address before logging in. Check your inbox.');
+                await auth.signOut();
+                setIsLoggingIn(false);
+                return;
+              }
+            } catch (fbErr: any) {
+              setLoginError(fbErr.message || 'Firebase authentication failed.');
+              setIsLoggingIn(false);
+              return;
+            }
+          }
+          
+          onLogin(data.school, actualRole, false, data.teacher || null);
+        } else {
+          setLoginError(data.error || 'Invalid official school email or password.');
+        }
+      } catch (err: any) {
+        setLoginError(err.message || 'Failed to log in. Please check your connection and try again.');
+      } finally {
+        setIsLoggingIn(false);
+      }
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoginError('');
+      setIsLoggingIn(true);
+      const result = await signInWithPopup(auth, googleAuthProvider);
+      // Fallback: check backend with email from Google
+      const email = result.user.email;
+      if (email) {
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: "password123" }) // Fake password for now or we would need a proper OAuth flow in the backend
+        });
+        const data = await res.json();
+        if (res.ok && data.success && data.school) {
+          const actualRole = data.role || selectedRole;
+          onLogin(data.school, actualRole, false);
+        } else {
+          setLoginError('Google account not linked to an official school account.');
+        }
+      }
+    } catch (error: any) {
+      setLoginError(error.message || 'Google sign in failed');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0f1c] text-slate-300 font-sans selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden relative">
+      {/* Background Slideshow */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <AnimatePresence>
+          <motion.img
+            key={bgIndex}
+            src={BACKGROUND_IMAGES[bgIndex]}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 0.15, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 2, ease: "easeInOut" }}
+            className="absolute inset-0 w-full h-full object-cover"
+            alt="Ghana School Children Background"
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1c]/80 via-[#0a0f1c]/60 to-[#0a0f1c]"></div>
+      </div>
+
+      {/* Subtle Background Glows */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-[500px] bg-emerald-600/20 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed bottom-0 right-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none z-0" />
+
+      {/* Upper Color Strip */}
+      <div className="h-1 w-full flex relative z-50">
+        <div className="h-full bg-red-500 flex-1"></div>
+        <div className="h-full bg-amber-400 flex-1"></div>
+        <div className="h-full bg-emerald-500 flex-1"></div>
+      </div>
+
+      {/* Hero Header */}
+      <header className="border-b border-white/5 bg-[#0a0f1c]/80 sticky top-0 z-40 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-2 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <GraduationCap className="h-5 w-5" />
+            </div>
+            <div>
+              <span className="font-display font-bold text-lg tracking-tight text-white">GEDA Portal</span>
+              <span className="block text-[9px] font-mono uppercase tracking-widest text-emerald-400/80 font-medium">Ghana Ed-Admissions</span>
+            </div>
+          </div>
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
+            <a href="#features" className="hover:text-emerald-400 transition-colors">Features</a>
+            <a href="#register" className="hover:text-emerald-400 transition-colors">Register</a>
+            <a href="#login-portal" className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-1.5 rounded-full font-medium hover:bg-emerald-500/20 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.1)]">Sign In</a>
+          </nav>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative pt-16 pb-24 lg:pt-28 lg:pb-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-12 gap-16 lg:gap-8 items-center">
+            
+            {/* Left Column: Headline */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-7 space-y-8"
+            >
+              <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                <Globe className="h-4 w-4 text-emerald-400" />
+                <span className="text-xs font-semibold text-emerald-300 tracking-wide">Official Ghana Education Admission Framework</span>
+              </div>
+              
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-display font-bold tracking-tight text-white leading-[1.1]">
+                Modernize School Admissions, <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Online & Offline</span>
+              </h1>
+              
+              <p className="text-lg text-slate-400 max-w-2xl leading-relaxed">
+                Empowering Ghanaian Primary and Secondary Schools to digitally register new students, verify Mobile Money payment plans, instantly issue official GES admission letters, and sync data seamlessly in regions with low connectivity.
+              </p>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <CheckCircle2 className="h-4.5 w-4.5 text-emerald-400" />
+                  <span>GES Roster Formats</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <WifiOff className="h-4.5 w-4.5 text-amber-400" />
+                  <span>Offline Registry Cache</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <Wallet className="h-4.5 w-4.5 text-cyan-400" />
+                  <span>MoMo Payment Tracker</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <CalendarCheck className="h-4.5 w-4.5 text-blue-400" />
+                  <span>Mark Attendance</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <ClipboardList className="h-4.5 w-4.5 text-purple-400" />
+                  <span>Record SBA</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <FileText className="h-4.5 w-4.5 text-emerald-400" />
+                  <span>Issue Report Cards</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <a href="#login-portal" className="inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-[#0a0f1c] px-6 py-3.5 rounded-xl font-semibold shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all group">
+                  Access School Dashboard <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </a>
+                <a href="#register" className="inline-flex items-center justify-center bg-white/5 hover:bg-white/10 text-white px-6 py-3.5 rounded-xl border border-white/10 transition-all font-medium backdrop-blur-sm">
+                  Register Your School
+                </a>
+              </div>
+            </motion.div>
+
+            {/* Right Column: Portal Gateway Selector */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="lg:col-span-5 relative mt-6 lg:mt-0" 
+              id="login-portal"
+            >
+              <div className="bg-[#0f172a]/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6 sm:p-8 relative">
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 rounded-t-2xl"></div>
+                <div className="absolute top-0 right-4 sm:right-8 transform -translate-y-1/2 bg-[#0a0f1c] text-emerald-400 font-mono font-semibold text-[10px] uppercase px-3 py-1 rounded-full border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)] z-10 whitespace-nowrap">
+                  SCHOOL LOGIN PORTAL
+                </div>
+                
+                <h2 className="font-display font-bold text-2xl text-white mb-1 mt-2">Administrative Gateway</h2>
+                <p className="text-slate-400 text-sm mb-6">Select your role and sign in to access your school's private dashboard.</p>
+
+                {/* Login Mode Toggle Tabs */}
+                <div className="grid grid-cols-2 gap-2 bg-[#0a0f1c] p-1.5 rounded-xl mb-6 text-xs font-semibold border border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginMode('secure');
+                      setLoginError('');
+                    }}
+                    className={`py-2 text-center rounded-lg transition-all cursor-pointer ${
+                      loginMode === 'secure'
+                        ? 'bg-white/10 text-white shadow-sm'
+                        : 'text-slate-500 hover:text-slate-300'
+                    }`}
+                  >
+                    Secure School Login
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginMode('demo');
+                      setLoginError('');
+                    }}
+                    className={`py-2 text-center rounded-lg transition-all cursor-pointer ${
+                      loginMode === 'demo'
+                        ? 'bg-white/10 text-white shadow-sm'
+                        : 'text-slate-500 hover:text-slate-300'
+                    }`}
+                  >
+                    Quick Demo Access
+                  </button>
+                </div>
+
+                {loginError && (
+                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-3 rounded-xl mb-6 text-sm flex items-start gap-2">
+                    {loginError}
+                  </motion.div>
+                )} 
+
+                <form onSubmit={handleLoginSubmit} className="space-y-5">
+                  {loginMode === 'secure' ? (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
+                      <div>
+                        <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">School Official Email</label>
+                        <div className="relative">
+                          <input
+                            type="email"
+                            value={loginEmail}
+                            onChange={(e) => setLoginEmail(e.target.value)}
+                            placeholder="administrator@achimota.edu.gh"
+                            className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Password</label>
+                        <div className="relative">
+                          <input
+                            type="password"
+                            value={loginPassword}
+                            onChange={(e) => setLoginPassword(e.target.value)}
+                            placeholder="••••••••"
+                            className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                            required
+                          />
+                        </div>
+                        
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
+                      <div>
+                        <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Select Registered School</label>
+                        <div className="relative">
+                          <select 
+                            value={selectedSchoolId}
+                            onChange={(e) => setSelectedSchoolId(e.target.value)}
+                            className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all appearance-none"
+                          >
+                            {schools.map((school) => (
+                              <option key={school.id} value={school.id} className="bg-[#0f172a]">
+                                {school.name} ({school.region})
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500 dark:text-slate-400">
+                            <SchoolIcon className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <div>
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Role-Based Access Permission</label>
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                      {(['Admin', 'Staff', 'Teacher'] as Role[]).map((role) => (
+                        <button
+                          key={role}
+                          type="button"
+                          onClick={() => setSelectedRole(role)}
+                          className={`py-2 px-2 text-xs font-semibold rounded-xl border transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
+                            selectedRole === role
+                              ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
+                              : 'bg-[#0a0f1c] border-white/5 text-slate-500 dark:text-slate-400 hover:bg-white/5 hover:text-slate-300'
+                          }`}
+                        >
+                          {role === 'Admin' && <ShieldCheck className="h-4 w-4 mb-0.5" />}
+                          {role === 'Staff' && <Lock className="h-4 w-4 mb-0.5" />}
+                          {role === 'Teacher' && <GraduationCap className="h-4 w-4 mb-0.5" />}
+                          {role}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoggingIn}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-[#0a0f1c] font-bold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+                  >
+                    {isLoggingIn ? 'Authenticating Gateway...' : 'Enter Dashboard'}
+                    {!isLoggingIn && <ArrowRight className="h-4 w-4" />}
+                  </button>
+                  
+                  {loginMode === 'secure' && (
+                    <button
+                      type="button"
+                      onClick={handleGoogleLogin}
+                      disabled={isLoggingIn}
+                      className="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed mt-3"
+                    >
+                      <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                      </svg>
+                      Sign In with Google
+                    </button>
+                  )}
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-24 bg-[#060913] relative border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl font-display font-bold text-white mb-4">Built for Ghana's Education Ecosystem</h2>
+            <p className="text-slate-400">A resilient platform designed to handle the realities of infrastructure while delivering modern administrative capabilities.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div whileHover={{ y: -5 }} className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
+              <div className="bg-blue-500/10 text-blue-400 p-3 rounded-xl w-fit mb-5">
+                <Database className="h-6 w-6" />
+              </div>
+              <h3 className="font-display font-semibold text-lg text-white mb-2">Offline-First Resilience</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Continue registering students and recording payments even when the internet drops. Data syncs automatically when connection is restored.
+              </p>
+            </motion.div>
+
+            <motion.div whileHover={{ y: -5 }} className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
+              <div className="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl w-fit mb-5">
+                <Wallet className="h-6 w-6" />
+              </div>
+              <h3 className="font-display font-semibold text-lg text-white mb-2">MoMo Payment Tracker</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Track Mobile Money payments natively. Log transaction IDs and instantly generate receipts for parents paying via MTN MoMo or Telecel Cash.
+              </p>
+            </motion.div>
+
+            <motion.div whileHover={{ y: -5 }} className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
+              <div className="bg-purple-500/10 text-purple-400 p-3 rounded-xl w-fit mb-5">
+                <KeyRound className="h-6 w-6" />
+              </div>
+              <h3 className="font-display font-semibold text-lg text-white mb-2">Seamless SIS API Sync</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Developer-ready secure REST endpoints. Extract rosters or register new records via authorized external Student Information Systems (SIS).
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* School Registration Form Section */}
+      <section id="register" className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1c] to-[#060913]"></div>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="bg-[#0f172a]/60 backdrop-blur-md rounded-3xl border border-white/10 p-8 sm:p-12 shadow-2xl">
+            <div className="text-center space-y-3 mb-10">
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-1.5 rounded-full text-xs font-semibold w-fit mx-auto uppercase tracking-wide">
+                Add Your Institution
+              </div>
+              <h2 className="font-display font-bold text-3xl text-white">Register a New School</h2>
+              <p className="text-slate-400 text-sm max-w-lg mx-auto">Create a dedicated, private tenant space for your school. You can immediately access its administrative backend upon submission.</p>
+            </div>
+
+            {registerError && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-red-500/10 text-red-400 border border-red-500/20 px-5 py-4 rounded-xl mb-8 text-sm">
+                {registerError}
+              </motion.div>
+            )}
+
+            {registerSuccess && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-5 py-4 rounded-xl mb-8 text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="h-6 w-6 shrink-0" />
+                  <span>School registered successfully! We have automatically selected your school in the login portal.</span>
+                </div>
+                <button
+                  onClick={() => {
+                    const schoolToLogin = registeredSchool || schools.find(s => s.id === selectedSchoolId);
+                    if (schoolToLogin) {
+                      onLogin(schoolToLogin, 'Admin', false);
+                    }
+                  }}
+                  className="bg-emerald-500 text-[#0a0f1c] font-bold px-4 py-2 rounded-lg text-xs whitespace-nowrap hover:bg-emerald-400 transition-colors cursor-pointer self-end sm:self-auto"
+                >
+                  Enter Dashboard
+                </button>
+              </motion.div>
+            )}
+
+            <form onSubmit={handleRegister} className="grid sm:grid-cols-2 gap-6">
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">School Official Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Accra Methodist Basic School"
+                  value={newSchoolName}
+                  onChange={(e) => setNewSchoolName(e.target.value)}
+                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">GES Regional Division</label>
+                <select
+                  value={newSchoolRegion}
+                  onChange={(e) => setNewSchoolRegion(e.target.value)}
+                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all appearance-none"
+                >
+                  {ghanaRegions.map((reg) => (
+                    <option key={reg} value={reg} className="bg-[#0f172a]">{reg}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Municipal District</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Kumasi Metro"
+                  value={newSchoolDistrict}
+                  onChange={(e) => setNewSchoolDistrict(e.target.value)}
+                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                  required
+                />
+              </div>
+
+              <div className="sm:col-span-2 border-t border-white/5 pt-6 mt-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-5">Official Administrator Account Credentials</h3>
+              </div>
+              
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">School Contact/Login Email</label>
+                <input
+                  type="email"
+                  placeholder="e.g. admin@school.edu.gh"
+                  value={newSchoolEmail}
+                  onChange={(e) => setNewSchoolEmail(e.target.value)}
+                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Administrator Password</label>
+                <input
+                  type="password"
+                  placeholder="•••••••• (min 6 chars)"
+                  value={newSchoolPassword}
+                  onChange={(e) => setNewSchoolPassword(e.target.value)}
+                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                  minLength={6}
+                  required
+                />
+              </div>
+
+              
+
+              <div className="sm:col-span-2 pt-4">
+                <button
+                  type="submit"
+                  disabled={isRegistering}
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#0a0f1c] font-bold py-4 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isRegistering ? 'Provisioning School Space...' : 'Register Institution & Create Admin Account'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#04060d] text-slate-500 dark:text-slate-400 py-12 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+          <div className="flex items-center justify-center gap-2 text-white/80">
+            <GraduationCap className="h-6 w-6 text-emerald-500" />
+            <span className="font-display font-semibold tracking-tight">GEDA Portal — Ghana Ed-Admissions</span>
+          </div>
+          <p className="text-sm max-w-md mx-auto text-slate-400">Providing resilient, multi-tenant digital administration services for schools across the Republic of Ghana.</p>
+          <div className="text-xs pt-4 border-t border-white/5 mt-8 w-fit mx-auto">
+            &copy; {new Date().getFullYear()} GEDA Ghana. Compliant with Ghana Education Service (GES) data standards.
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

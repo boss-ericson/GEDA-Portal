@@ -1,0 +1,8 @@
+{
+  "name": "Ghana School Admission & Digital Portal",
+  "description": "Multi-tenant student admission, offline registration, Mobile Money fee payments, and API integration for Ghanaian schools.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

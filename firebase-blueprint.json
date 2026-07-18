@@ -1,0 +1,128 @@
+{
+  "collections": [
+    {
+      "name": "users",
+      "path": "users/{userId}",
+      "schema": {
+        "email": "string",
+        "createdAt": "timestamp"
+      },
+      "rules": [
+        {
+          "operations": ["read", "write"],
+          "condition": "request.auth != null && request.auth.uid == userId"
+        }
+      ]
+    },
+    {
+      "name": "schools",
+      "path": "schools/{schoolId}",
+      "schema": {
+        "name": "string",
+        "region": "string",
+        "district": "string",
+        "headTeacherName": "string",
+        "email": "string",
+        "slug": "string",
+        "status": "string",
+        "userId": "string",
+        "createdAt": "timestamp"
+      },
+      "rules": [
+        {
+          "operations": ["read"],
+          "condition": "request.auth != null"
+        },
+        {
+          "operations": ["write"],
+          "condition": "request.auth != null && (resource == null || resource.data.userId == request.auth.uid) && request.resource.data.userId == request.auth.uid"
+        }
+      ]
+    },
+    {
+      "name": "students",
+      "path": "students/{studentId}",
+      "schema": {
+        "schoolId": "string",
+        "fullName": "string",
+        "dob": "string?",
+        "gender": "string?",
+        "classLevel": "string?",
+        "guardianName": "string?",
+        "guardianPhone": "string?",
+        "admissionNo": "string?",
+        "status": "string",
+        "feeTotal": "number",
+        "feePaid": "number",
+        "paymentStatus": "string",
+        "admissionStatus": "string",
+        "healthConditions": "string?",
+        "attendanceTotal": "number",
+        "examScore": "number?",
+        "sbaScore": "number?",
+        "syncStatus": "string",
+        "createdAt": "timestamp"
+      },
+      "rules": [
+        {
+          "operations": ["read", "write"],
+          "condition": "request.auth != null && exists(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)) && get(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)).data.userId == request.auth.uid"
+        }
+      ]
+    },
+    {
+      "name": "payments",
+      "path": "payments/{paymentId}",
+      "schema": {
+        "schoolId": "string",
+        "studentId": "string",
+        "amount": "number",
+        "method": "string",
+        "transactionId": "string",
+        "status": "string",
+        "timestamp": "timestamp"
+      },
+      "rules": [
+        {
+          "operations": ["read", "write"],
+          "condition": "request.auth != null && exists(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)) && get(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)).data.userId == request.auth.uid"
+        }
+      ]
+    },
+    {
+      "name": "apiKeys",
+      "path": "apiKeys/{apiKeyId}",
+      "schema": {
+        "schoolId": "string",
+        "token": "string",
+        "name": "string",
+        "status": "string",
+        "createdAt": "timestamp"
+      },
+      "rules": [
+        {
+          "operations": ["read", "write"],
+          "condition": "request.auth != null && exists(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)) && get(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)).data.userId == request.auth.uid"
+        }
+      ]
+    },
+    {
+      "name": "backupLogs",
+      "path": "backupLogs/{backupLogId}",
+      "schema": {
+        "schoolId": "string",
+        "recordsCount": "number",
+        "fileName": "string",
+        "status": "string",
+        "type": "string",
+        "timestamp": "timestamp"
+      },
+      "rules": [
+        {
+          "operations": ["read", "write"],
+          "condition": "request.auth != null && exists(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)) && get(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)).data.userId == request.auth.uid"
+        }
+      ]
+    }
+  ]
+}

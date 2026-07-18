@@ -1,0 +1,1031 @@
+{
+  "schools": [
+    {
+      "id": "achimota",
+      "name": "Achimota Basic School",
+      "slug": "achimota-basic-school",
+      "region": "Greater Accra",
+      "district": "Accra Metropolitan",
+      "email": "achimota@geda.edu.gh",
+      "password": "password123",
+      "createdAt": "2026-07-16T23:58:57.840Z",
+      "status": "Deactivated"
+    },
+    {
+      "id": "accra-methodist",
+      "name": "Accra Methodist Basic School",
+      "slug": "accra-methodist-basic",
+      "region": "Greater Accra",
+      "district": "Accra West",
+      "email": "methodist@geda.edu.gh",
+      "password": "password123",
+      "createdAt": "2026-07-16T23:58:57.840Z"
+    },
+    {
+      "id": "kumasi-presby",
+      "name": "Kumasi Presbyterian Basic School",
+      "slug": "kumasi-presby-basic",
+      "region": "Ashanti",
+      "district": "Kumasi Metropolitan",
+      "email": "kumasi.presby@geda.edu.gh",
+      "password": "password123",
+      "createdAt": "2026-07-16T23:58:57.840Z"
+    },
+    {
+      "id": "methodist-jhs",
+      "name": "Methodist JHS",
+      "slug": "methodist-jhs",
+      "region": "Greater Accra",
+      "district": "GA East",
+      "email": "meth@gmail.com",
+      "password": "1234567890",
+      "createdAt": "2026-07-17T00:00:25.813Z",
+      "logo": "",
+      "primaryColor": "#0f172a",
+      "emisCode": "",
+      "yearOfEstablishment": "1965",
+      "headTeacherName": "Mr. Eric Yeboah",
+      "headTeacherStaffId": "2345643",
+      "headTeacherPhone": "0243542342",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third",
+      "reopeningDate": "2026-05-05",
+      "vacationDate": "2026-07-21"
+    }
+  ],
+  "teachers": [
+    {
+      "id": "t-achimota-1",
+      "schoolId": "achimota",
+      "fullName": "Kofi Mensah",
+      "email": "teacher@achimota.edu.gh",
+      "password": "password123",
+      "subject": "Science & Mathematics",
+      "createdAt": "2026-07-16T23:58:57.840Z"
+    },
+    {
+      "id": "t-kumasi-1",
+      "schoolId": "kumasi-presby",
+      "fullName": "Ama Serwaa",
+      "email": "teacher@kumasi.edu.gh",
+      "password": "password123",
+      "subject": "English & Social Studies",
+      "createdAt": "2026-07-16T23:58:57.840Z"
+    }
+  ],
+  "students": [
+    {
+      "id": "achimota-1",
+      "schoolId": "achimota",
+      "admissionNo": "ACH-2026-001",
+      "fullName": "Kwaku Mensah",
+      "dob": "2014-04-12",
+      "gender": "Male",
+      "classLevel": "JHS 2",
+      "boardingStatus": "Day",
+      "guardianName": "Emmanuel Mensah",
+      "guardianPhone": "0244123456",
+      "admissionStatus": "Admitted",
+      "feePaid": 1500,
+      "feeTotal": 2500,
+      "paymentStatus": "Partial",
+      "syncStatus": "synced",
+      "remarks": "Outstanding academic background.",
+      "createdAt": "2026-07-11T23:58:57.840Z",
+      "updatedAt": "2026-07-17T02:35:03.907Z"
+    },
+    {
+      "id": "achimota-2",
+      "schoolId": "achimota",
+      "admissionNo": "ACH-2026-002",
+      "fullName": "Abena Osei",
+      "dob": "2013-08-22",
+      "gender": "Female",
+      "classLevel": "JHS 2",
+      "boardingStatus": "Day",
+      "guardianName": "Grace Osei",
+      "guardianPhone": "0209556677",
+      "admissionStatus": "Admitted",
+      "feePaid": 1200,
+      "feeTotal": 1200,
+      "paymentStatus": "Paid",
+      "syncStatus": "synced",
+      "remarks": "Excels in Science and Mathematics.",
+      "createdAt": "2026-07-12T23:58:57.840Z"
+    },
+    {
+      "id": "achimota-3",
+      "schoolId": "achimota",
+      "admissionNo": "ACH-2026-003",
+      "fullName": "Yaw Boateng",
+      "dob": "2015-01-05",
+      "gender": "Male",
+      "classLevel": "Class 6",
+      "boardingStatus": "Day",
+      "guardianName": "Frank Boateng",
+      "guardianPhone": "0553998877",
+      "admissionStatus": "Pending",
+      "feePaid": 0,
+      "feeTotal": 2500,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "Awaiting Mobile Money fee payment confirmation.",
+      "createdAt": "2026-07-14T23:58:57.840Z"
+    },
+    {
+      "id": "achimota-4",
+      "schoolId": "achimota",
+      "admissionNo": "ACH-2026-004",
+      "fullName": "Afia Ansah",
+      "dob": "2012-11-15",
+      "gender": "Female",
+      "classLevel": "JHS 3",
+      "boardingStatus": "Day",
+      "guardianName": "Dr. Kofi Ansah",
+      "guardianPhone": "0243112233",
+      "admissionStatus": "Admitted",
+      "feePaid": 2500,
+      "feeTotal": 2500,
+      "paymentStatus": "Paid",
+      "syncStatus": "synced",
+      "remarks": "Class prefect candidate.",
+      "createdAt": "2026-07-06T23:58:57.840Z"
+    },
+    {
+      "id": "achimota-5",
+      "schoolId": "achimota",
+      "admissionNo": "ACH-2026-005",
+      "fullName": "Kofi Owusu",
+      "dob": "2016-05-30",
+      "gender": "Male",
+      "classLevel": "Class 5",
+      "boardingStatus": "Day",
+      "guardianName": "Mary Owusu",
+      "guardianPhone": "0544889900",
+      "admissionStatus": "Admitted",
+      "feePaid": 400,
+      "feeTotal": 1200,
+      "paymentStatus": "Partial",
+      "syncStatus": "synced",
+      "remarks": "Outstanding football player.",
+      "createdAt": "2026-07-15T23:58:57.840Z"
+    },
+    {
+      "id": "kumasi-presby-1",
+      "schoolId": "kumasi-presby",
+      "admissionNo": "KUM-2026-001",
+      "fullName": "Kwame Asante",
+      "dob": "2014-02-14",
+      "gender": "Male",
+      "classLevel": "JHS 1",
+      "boardingStatus": "Day",
+      "guardianName": "Charles Asante",
+      "guardianPhone": "0244778899",
+      "admissionStatus": "Admitted",
+      "feePaid": 2500,
+      "feeTotal": 2500,
+      "paymentStatus": "Paid",
+      "syncStatus": "synced",
+      "remarks": "Top score in Kumasi district entrance assessment.",
+      "createdAt": "2026-07-13T23:58:57.840Z"
+    },
+    {
+      "id": "methodist-jhs-1784246473375",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-001",
+      "fullName": "Evans Appiah",
+      "dob": "2010-12-12",
+      "gender": "Male",
+      "classLevel": "JHS 1",
+      "boardingStatus": "Day",
+      "guardianName": "Yaw Manu",
+      "guardianPhone": "025432543",
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 311,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "",
+      "createdAt": "2026-07-17T00:01:13.375Z"
+    },
+    {
+      "id": "methodist-jhs-1784246513414",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-002",
+      "fullName": "Judith Korang",
+      "dob": "2009-01-02",
+      "gender": "Female",
+      "classLevel": "JHS 1",
+      "boardingStatus": "Day",
+      "guardianName": "Isaac Asare",
+      "guardianPhone": "053423142",
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 311,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "",
+      "createdAt": "2026-07-17T00:01:53.414Z"
+    },
+    {
+      "id": "methodist-jhs-1784246552445",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-003",
+      "fullName": "Samuel Nsiah",
+      "dob": "2011-05-06",
+      "gender": "Male",
+      "classLevel": "JHS 1",
+      "boardingStatus": "Day",
+      "guardianName": "Ivy Asare",
+      "guardianPhone": "034536754",
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 1200,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "",
+      "createdAt": "2026-07-17T00:02:32.445Z"
+    },
+    {
+      "id": "methodist-jhs-1784247286590-4",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-004",
+      "fullName": "Adu Jacob",
+      "dob": 40310,
+      "gender": "Male",
+      "classLevel": "JHS 1",
+      "boardingStatus": "Day",
+      "guardianName": "Aba Mina",
+      "guardianPhone": 242456789,
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 1200,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "new student",
+      "createdAt": "2026-07-17T00:14:46.590Z"
+    },
+    {
+      "id": "methodist-jhs-1784247286590-5",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-005",
+      "fullName": "Asare Derrick",
+      "dob": 40822,
+      "gender": "Male",
+      "classLevel": "JHS 1",
+      "boardingStatus": "Day",
+      "guardianName": "Frank Asare",
+      "guardianPhone": 25442278,
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 1200,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "new student",
+      "createdAt": "2026-07-17T00:14:46.590Z"
+    },
+    {
+      "id": "methodist-jhs-1784247286590-6",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-006",
+      "fullName": "Annor Janet",
+      "dob": "13-07-2011",
+      "gender": "Female",
+      "classLevel": "JHS 1",
+      "boardingStatus": "Day",
+      "guardianName": "Victoria Avi",
+      "guardianPhone": 247675876,
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 1200,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "new student",
+      "createdAt": "2026-07-17T00:14:46.590Z"
+    },
+    {
+      "id": "methodist-jhs-1784247992378",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-007",
+      "fullName": "Blessing Sarfo",
+      "dob": "2011-08-17",
+      "gender": "Female",
+      "classLevel": "JHS 1",
+      "boardingStatus": "Day",
+      "guardianName": "Vida Ashong",
+      "guardianPhone": "0243123467",
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 311,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "",
+      "createdAt": "2026-07-17T00:26:32.378Z"
+    },
+    {
+      "id": "methodist-jhs-1784248516241-8",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-008",
+      "fullName": "Eric Asare",
+      "dob": "13-12-2009",
+      "gender": "Male",
+      "classLevel": "JHS 2",
+      "boardingStatus": "Day",
+      "guardianName": "Awuah Sam",
+      "guardianPhone": "244567890",
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 259,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "new student",
+      "createdAt": "2026-07-17T00:35:16.241Z"
+    },
+    {
+      "id": "methodist-jhs-1784248516241-9",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-009",
+      "fullName": "Lucy Nuwordzu",
+      "dob": "17-08-2009",
+      "gender": "Female",
+      "classLevel": "JHS 2",
+      "boardingStatus": "Day",
+      "guardianName": "Martha Doe",
+      "guardianPhone": "53456789",
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 259,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "new student",
+      "createdAt": "2026-07-17T00:35:16.241Z"
+    },
+    {
+      "id": "methodist-jhs-1784248516241-10",
+      "schoolId": "methodist-jhs",
+      "admissionNo": "MET-2026-010",
+      "fullName": "Evans Appiah",
+      "dob": "27-09-2008",
+      "gender": "Male",
+      "classLevel": "JHS 3",
+      "boardingStatus": "Day",
+      "guardianName": "Sarah Siaw",
+      "guardianPhone": "234216754",
+      "admissionStatus": "Admitted",
+      "feePaid": 0,
+      "feeTotal": 259,
+      "paymentStatus": "Unpaid",
+      "syncStatus": "synced",
+      "remarks": "new student",
+      "createdAt": "2026-07-17T00:35:16.241Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": "p-1",
+      "studentId": "achimota-1",
+      "schoolId": "achimota",
+      "amount": 1500,
+      "method": "MTN MoMo",
+      "transactionId": "MOMO-99382101",
+      "status": "Success",
+      "timestamp": "2026-07-11T23:58:57.840Z"
+    },
+    {
+      "id": "p-2",
+      "studentId": "achimota-2",
+      "schoolId": "achimota",
+      "amount": 1200,
+      "method": "Telecel Cash",
+      "transactionId": "TELE-44129302",
+      "status": "Success",
+      "timestamp": "2026-07-12T23:58:57.840Z"
+    },
+    {
+      "id": "p-3",
+      "studentId": "achimota-5",
+      "schoolId": "achimota",
+      "amount": 400,
+      "method": "AT Money",
+      "transactionId": "ATM-55123902",
+      "status": "Success",
+      "timestamp": "2026-07-15T23:58:57.840Z"
+    },
+    {
+      "id": "p-4",
+      "studentId": "kumasi-presby-1",
+      "schoolId": "kumasi-presby",
+      "amount": 2500,
+      "method": "MTN MoMo",
+      "transactionId": "MOMO-77283912",
+      "status": "Success",
+      "timestamp": "2026-07-13T23:58:57.840Z"
+    }
+  ],
+  "backupLogs": [
+    {
+      "id": "b-1",
+      "schoolId": "achimota",
+      "timestamp": "2026-07-15T23:58:57.840Z",
+      "recordsCount": 5,
+      "fileName": "backup_achimota_20260715_auto.json",
+      "status": "Completed",
+      "type": "Automatic"
+    }
+  ],
+  "apiKeys": [
+    {
+      "id": "k-1",
+      "schoolId": "achimota",
+      "token": "geda_tok_achimota2026demo",
+      "name": "SIS Integration Client",
+      "createdAt": "2026-06-16T23:58:57.840Z",
+      "status": "Active"
+    }
+  ],
+  "academicRecords": [
+    {
+      "id": "ar-1784250545785",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-10",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third",
+      "classLevel": "JHS 3",
+      "scores": [
+        {
+          "subject": "English Language",
+          "cat1": 12,
+          "groupWork": 14,
+          "cat2": 15,
+          "projectWork": 14,
+          "exam": 89
+        },
+        {
+          "subject": "Mathematics",
+          "cat1": 14,
+          "groupWork": 14,
+          "cat2": 15,
+          "projectWork": 12,
+          "exam": 76
+        },
+        {
+          "subject": "Science",
+          "cat1": 11,
+          "groupWork": 10,
+          "cat2": 11,
+          "projectWork": 11,
+          "exam": 85
+        },
+        {
+          "subject": "Social Studies",
+          "cat1": 15,
+          "groupWork": 11,
+          "cat2": 13,
+          "projectWork": 10,
+          "exam": 70
+        },
+        {
+          "subject": "Religious and Moral Education",
+          "cat1": 15,
+          "groupWork": 14,
+          "cat2": 15,
+          "projectWork": 15,
+          "exam": 94
+        },
+        {
+          "subject": "Computing",
+          "cat1": 12,
+          "groupWork": 10,
+          "cat2": 9,
+          "projectWork": 11,
+          "exam": 65
+        },
+        {
+          "subject": "Creative Arts and Design",
+          "cat1": 14,
+          "groupWork": 15,
+          "cat2": 12,
+          "projectWork": 11,
+          "exam": 80
+        },
+        {
+          "subject": "Career Technology",
+          "cat1": 10,
+          "groupWork": 11,
+          "cat2": 15,
+          "projectWork": 14,
+          "exam": 77
+        },
+        {
+          "subject": "French",
+          "cat1": 12,
+          "groupWork": 11,
+          "cat2": 13,
+          "projectWork": 11,
+          "exam": 65
+        },
+        {
+          "subject": "Ghanaian Language",
+          "cat1": 15,
+          "groupWork": 6,
+          "cat2": 13,
+          "projectWork": 15,
+          "exam": 80
+        }
+      ],
+      "attitude": "Attentive and focused",
+      "conduct": "Good behavior",
+      "interest": "Arts and Crafts",
+      "updatedAt": "2026-07-17T01:37:00.421Z"
+    },
+    {
+      "id": "ar-1784253674041",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third",
+      "classLevel": "JHS 2",
+      "scores": [
+        {
+          "subject": "English Language",
+          "cat1": 11,
+          "groupWork": 14,
+          "cat2": 12,
+          "projectWork": 10,
+          "exam": 85
+        },
+        {
+          "subject": "Mathematics",
+          "cat1": 9,
+          "groupWork": 11,
+          "cat2": 15,
+          "exam": 42,
+          "projectWork": 6
+        },
+        {
+          "subject": "Science",
+          "cat1": 11,
+          "groupWork": 10,
+          "cat2": 12,
+          "projectWork": 11,
+          "exam": 52
+        },
+        {
+          "subject": "Social Studies",
+          "cat1": 9,
+          "groupWork": 7,
+          "cat2": 5,
+          "projectWork": 10,
+          "exam": 44
+        },
+        {
+          "subject": "Religious and Moral Education",
+          "cat1": 10,
+          "groupWork": 14,
+          "cat2": 11,
+          "projectWork": 12,
+          "exam": 67
+        },
+        {
+          "subject": "Computing",
+          "cat1": 8,
+          "groupWork": 7,
+          "cat2": 8,
+          "projectWork": 9,
+          "exam": 32
+        },
+        {
+          "subject": "Creative Arts and Design",
+          "cat1": 12,
+          "groupWork": 13,
+          "cat2": 11,
+          "projectWork": 10,
+          "exam": 65
+        },
+        {
+          "subject": "Career Technology",
+          "cat1": 9,
+          "groupWork": 11,
+          "cat2": 10,
+          "projectWork": 9,
+          "exam": 33
+        },
+        {
+          "subject": "French",
+          "cat1": 8,
+          "groupWork": 10,
+          "cat2": 11,
+          "projectWork": 5,
+          "exam": 40
+        },
+        {
+          "subject": "Ghanaian Language",
+          "cat1": 9,
+          "groupWork": 12,
+          "cat2": 11,
+          "projectWork": 10,
+          "exam": 77
+        }
+      ],
+      "attitude": "Respectful and courteous",
+      "conduct": "Excellent behavior",
+      "interest": "Science and Nature",
+      "teacherRemarks": "Can do better",
+      "updatedAt": "2026-07-17T02:01:14.042Z"
+    },
+    {
+      "id": "ar-1784253862581",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third",
+      "classLevel": "JHS 2",
+      "scores": [
+        {
+          "subject": "English Language",
+          "cat1": 10,
+          "groupWork": 11,
+          "cat2": 12,
+          "projectWork": 12,
+          "exam": 75
+        },
+        {
+          "subject": "Mathematics",
+          "cat1": 9,
+          "groupWork": 14,
+          "cat2": 12,
+          "projectWork": 11,
+          "exam": 66
+        },
+        {
+          "subject": "Science",
+          "cat1": 10,
+          "groupWork": 14,
+          "cat2": 11,
+          "projectWork": 12,
+          "exam": 87
+        },
+        {
+          "subject": "Social Studies",
+          "cat1": 12,
+          "groupWork": 14,
+          "cat2": 14,
+          "projectWork": 15,
+          "exam": 79
+        },
+        {
+          "subject": "Religious and Moral Education",
+          "cat1": 12,
+          "groupWork": 11,
+          "cat2": 8,
+          "projectWork": 9,
+          "exam": 72
+        },
+        {
+          "subject": "Computing",
+          "cat1": 6,
+          "groupWork": 10,
+          "cat2": 11,
+          "projectWork": 12,
+          "exam": 56
+        },
+        {
+          "subject": "Creative Arts and Design",
+          "cat1": 12,
+          "groupWork": 13,
+          "cat2": 11,
+          "projectWork": 10,
+          "exam": 8
+        },
+        {
+          "subject": "Career Technology",
+          "cat1": 11,
+          "groupWork": 10,
+          "cat2": 12,
+          "projectWork": 8,
+          "exam": 50
+        },
+        {
+          "subject": "French",
+          "cat1": 10,
+          "groupWork": 11,
+          "cat2": 13,
+          "projectWork": 7,
+          "exam": 67
+        },
+        {
+          "subject": "Ghanaian Language",
+          "cat1": 11,
+          "groupWork": 10,
+          "cat2": 8,
+          "projectWork": 9,
+          "exam": 48
+        }
+      ],
+      "attitude": "Easily distracted",
+      "conduct": "Needs improvement",
+      "interest": "Reading and Literature",
+      "teacherRemarks": "Should back up",
+      "updatedAt": "2026-07-17T02:04:22.581Z"
+    }
+  ],
+  "attendanceRecords": [
+    {
+      "id": "att-1784252137774886",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-10",
+      "date": "2026-07-17",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252160126640",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-10",
+      "date": "2026-07-14",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252301407841",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-10",
+      "date": "2026-07-07",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252308117956",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-10",
+      "date": "2026-07-06",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252314694229",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-10",
+      "date": "2026-07-08",
+      "status": "Absent",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252327337670",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-10",
+      "date": "2026-07-09",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252897402640",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784246473375",
+      "date": "2026-07-17",
+      "status": "Absent",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252897402491",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784246513414",
+      "date": "2026-07-17",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252897402334",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784246552445",
+      "date": "2026-07-17",
+      "status": "Absent",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252897402968",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784247286590-4",
+      "date": "2026-07-17",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252897402974",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784247286590-5",
+      "date": "2026-07-17",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252897402836",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784247286590-6",
+      "date": "2026-07-17",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252897402637",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784247992378",
+      "date": "2026-07-17",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252910122240",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-17",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784252910122881",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-17",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253368607325",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-06",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253368607282",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-06",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253384292846",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-07",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253384292783",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-07",
+      "status": "Absent",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253397387936",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-08",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253397387161",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-08",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253413587859",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-09",
+      "status": "Absent",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253413587960",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-09",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253428248653",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-10",
+      "status": "Absent",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253428248465",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-10",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253441728453",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-13",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253441728627",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-13",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253463289372",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-14",
+      "status": "Absent",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253463289524",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-14",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253472050214",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-15",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253472050461",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-15",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253487427164",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-8",
+      "date": "2026-07-16",
+      "status": "Present",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    },
+    {
+      "id": "att-1784253487427382",
+      "schoolId": "methodist-jhs",
+      "studentId": "methodist-jhs-1784248516241-9",
+      "date": "2026-07-16",
+      "status": "Absent",
+      "academicYear": "2025/2026",
+      "academicTerm": "Third"
+    }
+  ]
+}

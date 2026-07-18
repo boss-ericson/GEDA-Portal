@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-brand-green-50: #fffbeb;
+  --color-brand-green-100: #fef3c7;
+  --color-brand-green-200: #fde68a;
+  --color-brand-green-600: #d97706;
+  --color-brand-green-700: #f59e0b;
+  --color-brand-green-800: #d97706;
+  --color-brand-green-900: #78350f;
+  
+  --color-brand-gold-50: #fffbeb;
+  --color-brand-gold-100: #fef3c7;
+  --color-brand-gold-200: #fde68a;
+  --color-brand-gold-500: #f59e0b;
+  --color-brand-gold-600: #d97706;
+  --color-brand-gold-700: #b45309;
+
+  --radius-xl: 0.25rem;
+  --radius-2xl: 0.375rem;
+  --radius-3xl: 0.375rem;
+  --radius-lg: 0.25rem;
+}
+
+/* Print Styles for Admission Letter */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+  body {
+    background-color: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    zoom: 0.95;
+  }
+  /* Reduce excessive spacing in print to ensure one page fit */
+  .print-card .space-y-6 > * + * {
+    margin-top: 1rem !important;
+  }
+  .print-card .space-y-4 > * + * {
+    margin-top: 0.5rem !important;
+  }
+  .print-card .leading-relaxed {
+    line-height: 1.4 !important;
+  }
+}
+
+/* Custom fade transitions */
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@custom-variant dark (&:is(.dark *));

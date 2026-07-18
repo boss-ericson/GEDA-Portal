@@ -11,6 +11,8 @@ import AnalyticsCenter from './AnalyticsCenter';
 import NewsFeed from './NewsFeed';
 import PastStudents from './PastStudents';
 import BillingComponent from './BillingComponent';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import { 
   BarChart3, Users, PlusCircle, CreditCard, ShieldCheck, 
   Database, Terminal, LogOut, Wifi, WifiOff, FileText, 
@@ -237,11 +239,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     setErrorMsg('');
     try {
       const schoolRes = await fetch(`/api/v1/schools/${school.id}`);
-      if (!schoolRes.ok) {
-        const text = await schoolRes.text();
-        console.error("School API error:", schoolRes.status, text);
-        throw new Error("School API failed");
-      }
+      if (!schoolRes.ok) throw new Error("School API failed");
       const schoolData = await schoolRes.json();
       if (schoolData.billingNotice) {
         setBillingNotice(schoolData.billingNotice);
@@ -250,30 +248,55 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       }
 
       const sRes = await fetch(`/api/v1/students?schoolId=${school.id}`);
-      if (!sRes.ok) throw new Error("Students API failed: " + await sRes.text());
+      if (!sRes.ok) throw new Error("Students API failed");
       const sData = await sRes.json();
       setStudents(sData);
 
       const pRes = await fetch(`/api/v1/payments?schoolId=${school.id}`);
-      if (!pRes.ok) throw new Error("Payments API failed: " + await pRes.text());
+      if (!pRes.ok) throw new Error("Payments API failed");
       const pData = await pRes.json();
       setPayments(pData);
 
       const bRes = await fetch(`/api/v1/backups?schoolId=${school.id}`);
-      if (!bRes.ok) throw new Error("Backups API failed: " + await bRes.text());
+      if (!bRes.ok) throw new Error("Backups API failed");
       const bData = await bRes.json();
       setBackups(bData);
 
       const kRes = await fetch(`/api/v1/api-keys?schoolId=${school.id}`);
-      if (!kRes.ok) throw new Error("Keys API failed: " + await kRes.text());
+      if (!kRes.ok) throw new Error("Keys API failed");
       const kData = await kRes.json();
       setApiKeys(kData);
       if (kData.length > 0 && !sandboxToken) {
         setSandboxToken(kData[0].token);
       }
     } catch (err: any) {
-      console.error("Fetch Data Error:", err);
-      setErrorMsg(`Failed to sync latest cloud data from GEDA servers. Using cached client state. (${err.message})`);
+      console.warn("Backend API failed, falling back to Firebase directly:", err);
+      try {
+        const schoolDoc = await getDoc(doc(db, "schools", school.id));
+        if (schoolDoc.exists()) {
+          const sData = schoolDoc.data();
+          setBillingNotice(sData.billingNotice || '');
+        }
+
+        const sSnap = await getDocs(query(collection(db, "students"), where("schoolId", "==", school.id)));
+        setStudents(sSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)));
+
+        const pSnap = await getDocs(query(collection(db, "payments"), where("schoolId", "==", school.id)));
+        setPayments(pSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)));
+
+        const bSnap = await getDocs(query(collection(db, "backupLogs"), where("schoolId", "==", school.id)));
+        setBackups(bSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)));
+
+        const kSnap = await getDocs(query(collection(db, "apiKeys"), where("schoolId", "==", school.id)));
+        const keys = kSnap.docs.map(d => ({ ...d.data(), id: d.id } as any));
+        setApiKeys(keys);
+        if (keys.length > 0 && !sandboxToken) {
+          setSandboxToken(keys[0].token);
+        }
+      } catch (fbErr: any) {
+        console.error("Firebase fallback failed:", fbErr);
+        setErrorMsg(`Failed to sync latest cloud data. (${fbErr.message})`);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -287,9 +310,17 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       if (res.ok) {
         const data = await res.json();
         setTeachers(data);
+      } else {
+        throw new Error("Failed to load teachers via API");
       }
     } catch (err) {
-      console.error('Failed to load teachers', err);
+      console.warn('API failed to load teachers, falling back to Firebase:', err);
+      try {
+        const tSnap = await getDocs(query(collection(db, "teachers"), where("schoolId", "==", school.id)));
+        setTeachers(tSnap.docs.map(d => ({ ...d.data(), id: d.id } as any)));
+      } catch (fbErr) {
+        console.error('Failed to load teachers from Firebase:', fbErr);
+      }
     } finally {
       setLoadingTeachers(false);
     }

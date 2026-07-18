@@ -58,6 +58,19 @@ async function startServer() {
 
   app.get("/api/v1/schools/:id", async (req, res) => {
     try {
+      if (req.params.id === "demo-school") {
+        return res.json({
+          id: 'demo-school',
+          name: 'GEDA Demo School Complex',
+          slug: 'geda-demo-school',
+          region: 'Greater Accra',
+          district: 'Accra Metropolitan',
+          email: 'admin@gedaschool.edu.gh',
+          status: 'Active',
+          accessLevel: 'Full',
+          createdAt: new Date().toISOString()
+        });
+      }
       const docRef = doc(db, "schools", req.params.id);
       const snapshot = await getDoc(docRef);
       if (snapshot.exists()) {

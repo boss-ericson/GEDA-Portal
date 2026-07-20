@@ -79,19 +79,6 @@ async function startServer() {
 
   app.get("/api/v1/schools/:id", async (req, res) => {
     try {
-      if (req.params.id === "demo-school") {
-        return res.json({
-          id: 'demo-school',
-          name: 'GEDA Demo School Complex',
-          slug: 'geda-demo-school',
-          region: 'Greater Accra',
-          district: 'Accra Metropolitan',
-          email: 'admin@gedaschool.edu.gh',
-          status: 'Active',
-          accessLevel: 'Full',
-          createdAt: new Date().toISOString()
-        });
-      }
       const docRef = doc(getDb(), "schools", req.params.id);
       const snapshot = await getDoc(docRef);
       if (snapshot.exists()) {
@@ -131,23 +118,7 @@ async function startServer() {
           role: "SuperAdmin"
         });
       }
-      if (email === "admin@gedaschool.edu.gh") {
-        return res.json({
-          success: true,
-          user: { email, fullName: "Admin User", role },
-          school: {
-            id: 'demo-school',
-            name: 'GEDA Demo School Complex',
-            slug: 'geda-demo-school',
-            region: 'Greater Accra',
-            district: 'Accra Metropolitan',
-            email: 'admin@gedaschool.edu.gh',
-            status: 'Active',
-            accessLevel: 'Full',
-            createdAt: new Date().toISOString()
-          }
-        });
-      }
+
       const snapshot = await getDocs(query(collection(getDb(), "schools"), where("email", "==", email)));
       if (snapshot.empty) {
         return res.status(401).json({ error: "Invalid credentials" });
@@ -161,14 +132,10 @@ async function startServer() {
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
-  const demoStudents: any[] = [];
 
   // --- STUDENTS ---
   app.get("/api/v1/students", async (req, res) => {
     try {
-      if (req.query.schoolId === "demo-school") {
-        return res.json(demoStudents);
-      }
       const snapshot = await getDocs(query(collection(getDb(), "students"), where("schoolId", "==", req.query.schoolId || "")));
       res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -176,11 +143,7 @@ async function startServer() {
 
   app.put("/api/v1/students/:id", async (req, res) => {
     try {
-      if (req.body.schoolId === "demo-school") {
-        const index = demoStudents.findIndex(s => s.id === req.params.id);
-        if (index !== -1) demoStudents[index] = { ...demoStudents[index], ...req.body };
-        return res.json({ message: "Student updated" });
-      }
+
       await updateDoc(doc(getDb(), "students", req.params.id), req.body);
       res.json({ message: "Student updated" });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -188,12 +151,7 @@ async function startServer() {
 
   app.delete("/api/v1/students/:id", async (req, res) => {
     try {
-      // For demo, we don't have schoolId in query easily, but we can just filter it out
-      const index = demoStudents.findIndex(s => s.id === req.params.id);
-      if (index !== -1) {
-        demoStudents.splice(index, 1);
-        return res.json({ message: "Student deleted" });
-      }
+
       
       const docRef = doc(getDb(), "students", req.params.id);
       const docSnap = await getDoc(docRef);
@@ -219,11 +177,7 @@ async function startServer() {
     try {
       const student = req.body;
       student.createdAt = new Date().toISOString();
-      if (student.schoolId === "demo-school") {
-        student.id = "demo-stu-" + Date.now();
-        demoStudents.push(student);
-        return res.status(201).json(student);
-      }
+
       if (!student.admissionNo || student.admissionNo === "PENDING-SYNC") {
         student.admissionNo = `ADM-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
       }
@@ -247,16 +201,7 @@ async function startServer() {
   app.post("/api/v1/students/bulk", async (req, res) => {
     try {
       const { students } = req.body;
-      if (students.length > 0 && students[0].schoolId === "demo-school") {
-        const results = [];
-        for (const s of students) {
-          s.createdAt = new Date().toISOString();
-          s.id = "demo-stu-" + Date.now() + Math.random();
-          demoStudents.push(s);
-          results.push(s);
-        }
-        return res.status(201).json(results);
-      }
+
       const batch = writeBatch(getDb());
       const results = [];
       for (const s of students) {
@@ -304,7 +249,6 @@ async function startServer() {
   // --- PAYMENTS ---
   app.get("/api/v1/payments", async (req, res) => {
     try {
-      if (req.query.schoolId === "demo-school") return res.json([]);
       const snapshot = await getDocs(query(collection(getDb(), "payments"), where("schoolId", "==", req.query.schoolId || "")));
       res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -314,10 +258,7 @@ async function startServer() {
     try {
       const payment = req.body;
       payment.timestamp = new Date().toISOString();
-      if (payment.schoolId === "demo-school") {
-        payment.id = "demo-pay-" + Date.now();
-        return res.status(201).json(payment);
-      }
+
       const docRef = await addDoc(collection(getDb(), "payments"), payment);
       res.status(201).json({ ...payment, id: docRef.id });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -326,7 +267,6 @@ async function startServer() {
   // --- BACKUPS ---
   app.get("/api/v1/backups", async (req, res) => {
     try {
-      if (req.query.schoolId === "demo-school") return res.json([]);
       const snapshot = await getDocs(query(collection(getDb(), "backupLogs"), where("schoolId", "==", req.query.schoolId || "")));
       res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -339,9 +279,6 @@ async function startServer() {
         schoolId, type: type || "Manual", timestamp: new Date().toISOString(),
         recordsCount: 0, fileName: `backup_${schoolId}_${Date.now()}.json`, status: "Completed"
       };
-      if (schoolId === "demo-school") {
-        return res.status(201).json({ log: { ...log, id: "demo-backup-" + Date.now() } });
-      }
       const docRef = await addDoc(collection(getDb(), "backupLogs"), log);
       res.status(201).json({ log: { ...log, id: docRef.id } });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -350,7 +287,6 @@ async function startServer() {
   // --- API KEYS ---
   app.get("/api/v1/api-keys", async (req, res) => {
     try {
-      if (req.query.schoolId === "demo-school") return res.json([]);
       const snapshot = await getDocs(query(collection(getDb(), "apiKeys"), where("schoolId", "==", req.query.schoolId || "")));
       res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -364,9 +300,6 @@ async function startServer() {
         token: `geda_tok_${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date().toISOString()
       };
-      if (schoolId === "demo-school") {
-        return res.status(201).json({ ...key, id: "demo-key-" + Date.now() });
-      }
       const docRef = await addDoc(collection(getDb(), "apiKeys"), key);
       res.status(201).json({ ...key, id: docRef.id });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -396,9 +329,6 @@ async function startServer() {
   app.post("/api/v1/attendance/batch", async (req, res) => {
     try {
       const { schoolId, records } = req.body;
-      if (schoolId === "demo-school") {
-        return res.json({ message: "Attendance marked" });
-      }
       const batch = writeBatch(getDb());
       for (const r of records) {
         if (r.id) {
@@ -417,16 +347,6 @@ async function startServer() {
     try {
       const { schoolId, students } = req.body;
       let syncedCount = 0;
-      
-      if (schoolId === "demo-school") {
-        for (const s of students) {
-          s.id = "demo-stu-" + Date.now() + Math.random();
-          s.createdAt = s.createdAt || new Date().toISOString();
-          demoStudents.push(s);
-          syncedCount++;
-        }
-        return res.json({ message: "Sync complete", syncedCount, students: demoStudents });
-      }
 
       const batch = writeBatch(getDb());
       for (const s of students) {
@@ -481,10 +401,7 @@ async function startServer() {
     try {
       const record = req.body;
       record.createdAt = new Date().toISOString();
-      if (record.schoolId === "demo-school") {
-        record.id = "demo-rec-" + Date.now();
-        return res.status(201).json(record);
-      }
+
       
       let existingId = record.id;
       if (!existingId) {

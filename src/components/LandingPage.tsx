@@ -262,7 +262,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
           } catch (fbErr) {
             console.error('Firebase fallback failed:', fbErr);
             alert("Database not configured. Please use 'admin@gedaschool.edu.gh' to try the demo.");
-            setGoogleAuthLoading(false);
+            setIsLoggingIn(false);
             return;
           }
         }

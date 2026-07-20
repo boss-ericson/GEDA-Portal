@@ -11,7 +11,7 @@ import AnalyticsCenter from './AnalyticsCenter';
 import NewsFeed from './NewsFeed';
 import PastStudents from './PastStudents';
 import BillingComponent from './BillingComponent';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { 
   BarChart3, Users, PlusCircle, CreditCard, ShieldCheck, 
@@ -368,7 +368,28 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         setErrorMsg(data.error || 'Synchronization failed.');
       }
     } catch (err) {
-      setErrorMsg('Failed to establish hand-shake with GES Cloud servers. Try again later.');
+      console.warn("Falling back to Firebase for offline sync");
+      try {
+        let syncedCount = 0;
+        for (const stu of offlineQueue) {
+          const docRef = await addDoc(collection(db, "students"), { ...stu, syncStatus: 'synced' });
+          syncedCount++;
+        }
+        
+        const schoolRef = doc(db, "schools", school.id);
+        const schoolSnap = await getDoc(schoolRef);
+        if (schoolSnap.exists()) {
+          const currentCount = schoolSnap.data().studentCount || 0;
+          await updateDoc(schoolRef, { studentCount: currentCount + syncedCount });
+        }
+        
+        setOfflineQueue([]);
+        setSuccessMsg(`Synchronization complete! ${syncedCount} offline registration records pushed to cloud database.`);
+        setTimeout(() => setSuccessMsg(''), 5000);
+        fetchData();
+      } catch (fbErr) {
+        setErrorMsg('Failed to establish hand-shake with GES Cloud servers and Firebase fallback failed.');
+      }
     } finally {
       setIsSyncing(false);
     }
@@ -403,12 +424,13 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
     const reader = new FileReader();
     reader.onload = async (event) => {
+      let parsedData: any[] = [];
       try {
         const data = event.target?.result;
         const workbook = XLSX.read(data, { type: 'binary' });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const parsedData = XLSX.utils.sheet_to_json(sheet) as any[];
+        parsedData = XLSX.utils.sheet_to_json(sheet) as any[];
 
         if (parsedData.length === 0) {
           setErrorMsg('The uploaded Excel file is empty.');
@@ -431,12 +453,50 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           setStudents((prev) => [...prev, ...newStudents]);
           setSuccessMsg(`Successfully onboarded ${newStudents.length} students in bulk.`);
         } else {
-          const err = await res.json();
-          setErrorMsg(err.error || 'Bulk upload failed.');
+          throw new Error('API failed');
         }
       } catch (err) {
-        console.error(err);
-        setErrorMsg('Error parsing Excel file. Please use the provided template.');
+        console.warn("Falling back to bulk upload via Firebase");
+        try {
+          const newStudents = [];
+          for (const rawData of parsedData) {
+            const price = rawData['Fee Total'] ? Number(rawData['Fee Total']) : (rawData['Boarding Status'] === 'Boarding' ? 2500 : 1200);
+            const stu = {
+              schoolId: school.id,
+              admissionNo: 'PENDING-SYNC',
+              fullName: rawData['Full Name'] || 'Unknown',
+              dob: rawData['Date of Birth'] || '2010-01-01',
+              gender: rawData['Gender'] || 'Male',
+              classLevel: rawData['Class'] || 'JHS 1',
+              boardingStatus: rawData['Boarding Status'] || 'Day',
+              guardianName: rawData['Guardian Name'] || 'Unknown',
+              guardianPhone: rawData['Guardian Phone'] || 'Unknown',
+              passportPicture: '',
+              admissionStatus: 'Admitted',
+              feePaid: 0,
+              feeTotal: price,
+              paymentStatus: 'Unpaid',
+              syncStatus: 'synced',
+              remarks: '',
+              createdAt: new Date().toISOString()
+            };
+            const docRef = await addDoc(collection(db, "students"), stu);
+            newStudents.push({ ...stu, id: docRef.id });
+          }
+          
+          const schoolRef = doc(db, "schools", school.id);
+          const schoolSnap = await getDoc(schoolRef);
+          if (schoolSnap.exists()) {
+            const currentCount = schoolSnap.data().studentCount || 0;
+            await updateDoc(schoolRef, { studentCount: currentCount + newStudents.length });
+          }
+          
+          setStudents(prev => [...prev, ...newStudents]);
+          setSuccessMsg(`Successfully onboarded ${newStudents.length} students directly to database.`);
+        } catch (fbErr) {
+          console.error(fbErr);
+          setErrorMsg('Error processing bulk upload.');
+        }
       }
       
       // Reset input
@@ -591,9 +651,24 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           setErrorMsg(data.error || 'Failed to submit registration');
         }
       } catch (err) {
-        setErrorMsg('Network error. Switched registration to offline cache.');
-        setOfflineQueue(prev => [...prev, newStudentTemp]);
-        resetRegisterForm();
+        try {
+          // Firebase fallback
+          const docRef = await addDoc(collection(db, "students"), newStudentTemp);
+          const schoolRef = doc(db, "schools", school.id);
+          const schoolSnap = await getDoc(schoolRef);
+          if (schoolSnap.exists()) {
+            const currentCount = schoolSnap.data().studentCount || 0;
+            await updateDoc(schoolRef, { studentCount: currentCount + 1 });
+          }
+          const savedStudent = { ...newStudentTemp, id: docRef.id, syncStatus: 'synced' };
+          setStudents(prev => [...prev, savedStudent as any]);
+          setSuccessMsg(`SUCCESS: student ${savedStudent.fullName} registered directly to database. Admission No: ${savedStudent.admissionNo}. Fee: GH₵ ${(price || 0).toLocaleString()}`);
+          resetRegisterForm();
+        } catch (fbErr) {
+          setErrorMsg('Network and database error. Switched registration to offline cache.');
+          setOfflineQueue(prev => [...prev, newStudentTemp]);
+          resetRegisterForm();
+        }
       }
     }
   };
@@ -639,7 +714,13 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         alert(data.error || 'Failed to update student');
       }
     } catch (err) {
-      alert('Network error while updating student.');
+      try {
+        await updateDoc(doc(db, "students", editingStudent.id), editingStudent as any);
+        setStudents(prev => prev.map(s => s.id === editingStudent.id ? editingStudent : s));
+        setEditingStudent(null);
+      } catch (fbErr) {
+        alert('Network and database error while updating student.');
+      }
     }
   };
 
@@ -662,7 +743,19 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         alert(data.error || 'Failed to delete student');
       }
     } catch (err) {
-      alert('Network error while deleting student.');
+      try {
+        await deleteDoc(doc(db, "students", id));
+        setStudents(prev => prev.filter(s => s.id !== id));
+        
+        const schoolRef = doc(db, "schools", school.id);
+        const schoolSnap = await getDoc(schoolRef);
+        if (schoolSnap.exists()) {
+          const currentCount = schoolSnap.data().studentCount || 0;
+          await updateDoc(schoolRef, { studentCount: Math.max(0, currentCount - 1) });
+        }
+      } catch (fbErr) {
+        alert('Network and database error while deleting student.');
+      }
     }
   };
 

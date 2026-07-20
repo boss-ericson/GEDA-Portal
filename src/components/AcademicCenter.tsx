@@ -858,7 +858,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
               </button>
             </div>
             
-            <form onSubmit={handleSave} className="flex flex-col flex-1 overflow-hidden">
+            <form onSubmit={handleSave} className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden relative">
               <div className="p-4 pb-2 shrink-0">
                 <div className="bg-amber-50 border border-amber-100 rounded-xl p-2.5 sm:p-3 flex gap-2 sm:gap-3 text-[11px] sm:text-xs text-amber-800 items-start">
                   <Award className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
@@ -869,9 +869,9 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                 </div>
               </div>
 
-              <div className="flex-1 w-full overflow-hidden relative">
-                <div className="absolute inset-0 overflow-auto px-4 sm:px-6 pb-4">
-                <div className="min-w-[800px] sm:min-w-[900px]">
+              <div className="w-full px-4 sm:px-6 pb-4 shrink-0">
+                <div className="overflow-x-auto w-full border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm">
+                  <div className="min-w-[800px] sm:min-w-[900px]">
                   <table className="w-full text-left text-sm border-collapse">
                     <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 text-[9px] sm:text-[10px] uppercase font-bold tracking-wider sticky top-0 z-20 shadow-[0_1px_2px_rgba(0,0,0,0.1)] before:content-[''] before:absolute before:inset-0 before:bg-slate-50 dark:bg-slate-950 before:-z-10">
                       <tr>
@@ -916,8 +916,9 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                           </tr>
                         );
                       })}
-                    </tbody>
+                                        </tbody>
                   </table>
+                  </div>
                 </div>
               </div>
 
@@ -970,9 +971,8 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                   />
                                 </div>
               </div>
-              </div>
 
-              <div className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 p-3 sm:p-4 flex justify-end gap-2.5 sm:gap-3 shrink-0">
+              <div className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 p-3 sm:p-4 flex justify-end gap-2.5 sm:gap-3 shrink-0 sticky bottom-0 z-50">
                 <button type="button" onClick={() => setSelectedStudent(null)} className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition cursor-pointer">
                   Cancel
                 </button>

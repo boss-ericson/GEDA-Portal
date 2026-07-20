@@ -165,6 +165,9 @@ const validateApiKey = (req: any, res: any, next: any) => {
     try {
       const student = req.body;
       student.createdAt = new Date().toISOString();
+      if (!student.admissionNo || student.admissionNo === "PENDING-SYNC") {
+        student.admissionNo = `ADM-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
+      }
       delete student.id;
       const docRef = await addDoc(collection(getDb(), "students"), student);
       res.status(201).json({ ...student, id: docRef.id });

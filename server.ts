@@ -190,6 +190,9 @@ async function startServer() {
         demoStudents.push(student);
         return res.status(201).json(student);
       }
+      if (!student.admissionNo || student.admissionNo === "PENDING-SYNC") {
+        student.admissionNo = `ADM-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
+      }
       delete student.id;
       const docRef = await addDoc(collection(getDb(), "students"), student);
       res.status(201).json({ ...student, id: docRef.id });

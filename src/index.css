@@ -82,3 +82,9 @@
 }
 
 @custom-variant dark (&:is(.dark *));
+
+/* Fix iOS Safari disabled input colors */
+input:disabled, textarea:disabled, select:disabled {
+  -webkit-text-fill-color: currentColor;
+  opacity: 1;
+}

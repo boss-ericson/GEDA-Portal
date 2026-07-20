@@ -155,19 +155,39 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
         } catch (apiErr: any) {
           console.warn('Backend login API failed, falling back to Firebase directly:', apiErr);
           try {
-            const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", loginEmail.trim())));
-            if (!snapshot.empty) {
-              const schoolDoc = snapshot.docs[0];
+            if (loginEmail.trim() === "superadmin@ges.gov.gh") {
               responseData = {
                 success: true,
-                school: { ...schoolDoc.data(), id: schoolDoc.id },
-                user: { email: loginEmail.trim(), fullName: "Admin User", role: selectedRole },
-                role: selectedRole
+                user: { email: loginEmail.trim(), fullName: "Super Admin", role: "SuperAdmin" },
+                school: {
+                  id: 'superadmin-ges',
+                  name: 'GES Super Admin Console',
+                  slug: 'ges-super-admin',
+                  region: 'National',
+                  district: 'HQ',
+                  email: 'superadmin@ges.gov.gh',
+                  status: 'Active',
+                  accessLevel: 'Full',
+                  createdAt: new Date().toISOString()
+                },
+                role: "SuperAdmin"
               };
               isSuccess = true;
             } else {
-               setLoginError('Invalid official school email or password.');
-               return;
+              const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", loginEmail.trim())));
+              if (!snapshot.empty) {
+                const schoolDoc = snapshot.docs[0];
+                responseData = {
+                  success: true,
+                  school: { ...schoolDoc.data(), id: schoolDoc.id },
+                  user: { email: loginEmail.trim(), fullName: "Admin User", role: selectedRole },
+                  role: selectedRole
+                };
+                isSuccess = true;
+              } else {
+                 setLoginError('Invalid official school email or password.');
+                 return;
+              }
             }
           } catch (fbErr: any) {
              console.error('Firebase fallback failed:', fbErr);

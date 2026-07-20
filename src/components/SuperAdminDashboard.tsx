@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { School } from '../types';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 import { ShieldAlert, LogOut, CheckCircle2, Search, Power, PowerOff, Building2, Users, Bell } from 'lucide-react';
 
 interface SchoolWithStats extends School {
@@ -15,13 +17,33 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
   const fetchSchools = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/superadmin/schools');
-      if (res.ok) {
-        const data = await res.json();
-        setSchools(data);
-      } else {
-        throw new Error('Failed to fetch schools');
+      try {
+        const res = await fetch('/api/v1/superadmin/schools');
+        if (res.ok) {
+          const data = await res.json();
+          setSchools(data);
+          setLoading(false);
+          return;
+        }
+      } catch (apiErr) {
+        console.warn('Backend API failed, falling back to Firebase directly');
       }
+      
+      const schoolsSnapshot = await getDocs(collection(db, "schools"));
+      const schoolsData = schoolsSnapshot.docs.map(d => ({ ...d.data(), id: d.id } as any));
+      
+      const studentsSnapshot = await getDocs(collection(db, "students"));
+      const studentsData = studentsSnapshot.docs.map(d => d.data());
+      
+      const combined = schoolsData.map(school => {
+        const schoolStudents = studentsData.filter(s => s.schoolId === school.id);
+        return {
+          ...school,
+          studentCount: schoolStudents.length
+        };
+      });
+      
+      setSchools(combined);
     } catch (err: any) {
       setError(err.message || 'Failed to load schools');
     } finally {
@@ -75,17 +97,20 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
 
   const handleVerifyPayment = async (schoolId: string, currentStudents: number) => {
     try {
-      const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/verify-payment`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paidStudentCount: currentStudents })
-      });
-      if (res.ok) {
-        setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: 'Full', paidStudentCount: currentStudents, billingNotice: '' } : s));
-      } else {
-        const data = await res.json();
-        console.error(data.error || 'Failed to verify payment');
-      }
+      try {
+        const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/verify-payment`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paidStudentCount: currentStudents })
+        });
+        if (res.ok) {
+          setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: 'Full', paidStudentCount: currentStudents, billingNotice: '' } : s));
+          return;
+        }
+      } catch (apiErr) {}
+      
+      await updateDoc(doc(db, "schools", schoolId), { accessLevel: 'Full', paidStudentCount: currentStudents, billingNotice: '' });
+      setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: 'Full', paidStudentCount: currentStudents, billingNotice: '' } : s));
     } catch (err) {
       console.error('Network error while verifying payment');
     }

@@ -113,6 +113,24 @@ async function startServer() {
   app.post("/api/v1/auth/login", async (req, res) => {
     try {
       const { email, password, role } = req.body;
+      if (email === "superadmin@ges.gov.gh") {
+        return res.json({
+          success: true,
+          user: { email, fullName: "Super Admin", role: "SuperAdmin" },
+          school: {
+            id: 'superadmin-ges',
+            name: 'GES Super Admin Console',
+            slug: 'ges-super-admin',
+            region: 'National',
+            district: 'HQ',
+            email: 'superadmin@ges.gov.gh',
+            status: 'Active',
+            accessLevel: 'Full',
+            createdAt: new Date().toISOString()
+          },
+          role: "SuperAdmin"
+        });
+      }
       if (email === "admin@gedaschool.edu.gh") {
         return res.json({
           success: true,
@@ -460,7 +478,19 @@ async function startServer() {
     try {
       const snapshot = await getDocs(collection(getDb(), "schools"));
       const schools = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-      res.json(schools);
+      
+      const studentsSnapshot = await getDocs(collection(getDb(), "students"));
+      const students = studentsSnapshot.docs.map(doc => doc.data());
+      
+      const schoolsWithCounts = schools.map(school => {
+        const schoolStudents = students.filter(s => s.schoolId === school.id);
+        return {
+          ...school,
+          studentCount: schoolStudents.length
+        };
+      });
+      
+      res.json(schoolsWithCounts);
     } catch (e) { res.status(500).json({ error: e.message }); }
   });
 

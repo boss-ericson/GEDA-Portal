@@ -77,7 +77,7 @@ export default function App() {
         setLoading(false);
       }
 
-      const storedAuth = localStorage.getItem('geda_auth');
+      const storedAuth = sessionStorage.getItem('geda_auth');
       if (storedAuth) {
         try {
           const parsed = JSON.parse(storedAuth);
@@ -123,7 +123,7 @@ export default function App() {
     setActiveRole(role);
     setActiveUser(user || null);
     setIsDemo(isDemoSession);
-    localStorage.setItem('geda_auth', JSON.stringify({ school, role, isDemo: isDemoSession, user: user || null }));
+    sessionStorage.setItem('geda_auth', JSON.stringify({ school, role, isDemo: isDemoSession, user: user || null }));
   };
 
   const handleLogout = () => {
@@ -131,7 +131,7 @@ export default function App() {
     setActiveRole('Admin');
     setActiveUser(null);
     setIsDemo(true);
-    localStorage.removeItem('geda_auth');
+    sessionStorage.removeItem('geda_auth');
   };
 
   const handleRoleChange = (newRole: Role) => {

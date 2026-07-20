@@ -37,9 +37,11 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
       
       const combined = schoolsData.map(school => {
         const schoolStudents = studentsData.filter(s => s.schoolId === school.id);
+        const paidCount = schoolStudents.filter(s => s.paymentStatus === 'Paid' || (s.feeTotal > 0 && s.feePaid >= s.feeTotal)).length;
         return {
           ...school,
-          studentCount: schoolStudents.length
+          studentCount: schoolStudents.length,
+          paidStudentCount: paidCount
         };
       });
       

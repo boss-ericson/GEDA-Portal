@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { School, Student, AcademicRecord, SubjectScore, Role } from '../types';
-import { Award, PlusCircle, Printer, Search, RefreshCw, ChevronDown, ChevronRight, FileText } from 'lucide-react';
+import { Award, PlusCircle, Printer, Search, RefreshCw, ChevronDown, ChevronRight, FileText, Download } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 
 interface AcademicCenterProps {
   school: School;
@@ -581,7 +582,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
   };
 
   
-  const printBroadSheet = () => {
+  const handleBroadSheetAction = (action: 'print' | 'pdf') => {
     const classStudentIds = classStudents.map(s => s.id);
     const classRecords = records.filter(r => classStudentIds.includes(r.studentId));
     
@@ -650,14 +651,27 @@ export default function AcademicCenter({ school, students, isOffline, user, role
       </html>
     `;
 
-    const win = window.open('', '_blank');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
+    if (action === 'pdf') {
+      const element = document.createElement('div');
+      element.innerHTML = html;
+      const opt = {
+        margin:       0.5,
+        filename:     `Broadsheet_${activeClass.replace(/\s+/g, '_')}_${term}_${year.replace('/', '-')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+      };
+      html2pdf().set(opt).from(element).save();
+    } else {
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(html);
+        win.document.close();
+      }
     }
   };
 
-  const printBulkReports = () => {
+  const handleBulkReportsAction = (action: 'print' | 'pdf') => {
     let combinedHTML = '';
     classStudents.forEach((student, index) => {
       const record = records.find(r => r.studentId === student.id);
@@ -766,20 +780,40 @@ export default function AcademicCenter({ school, students, isOffline, user, role
             <h3 className="font-display font-bold text-slate-900 dark:text-white text-base sm:text-lg">{activeClass} Students</h3>
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <button
-                onClick={printBroadSheet}
+                onClick={() => handleBroadSheetAction('print')}
                 disabled={classStudents.length === 0}
                 className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                title="Print Broadsheet"
               >
                 <Printer className="h-3 w-3" />
-                <span>Broad Sheet</span>
+                <span className="hidden sm:inline">Broad Sheet</span>
               </button>
               <button
-                onClick={printBulkReports}
+                onClick={() => handleBroadSheetAction('pdf')}
+                disabled={classStudents.length === 0}
+                className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                title="Save Broadsheet as PDF"
+              >
+                <Download className="h-3 w-3" />
+                <span className="hidden sm:inline">Save PDF</span>
+              </button>
+              <button
+                onClick={() => handleBulkReportsAction('print')}
                 disabled={classStudents.length === 0}
                 className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                title="Print Bulk Reports"
               >
                 <Printer className="h-3 w-3" />
-                <span>Bulk Reports</span>
+                <span className="hidden sm:inline">Bulk Reports</span>
+              </button>
+              <button
+                onClick={() => handleBulkReportsAction('pdf')}
+                disabled={classStudents.length === 0}
+                className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-2.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                title="Save Bulk Reports as PDF"
+              >
+                <Download className="h-3 w-3" />
+                <span className="hidden sm:inline">Save PDF</span>
               </button>
               <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap">{classStudents.length} Total</span>
             </div>

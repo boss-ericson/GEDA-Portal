@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { School, Student, AcademicRecord } from '../types';
-import { Printer, Search, FileText } from 'lucide-react';
+import { Printer, Search, FileText, Download } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 
 interface Props {
   school: School;
@@ -60,7 +61,7 @@ export default function StudentTranscripts({ school, students }: Props) {
     }
   }, [school.id, selectedStudent]);
 
-  const printTranscript = () => {
+  const handleTranscriptAction = (action: 'print' | 'pdf') => {
     if (!selectedStudent || records.length === 0) return;
 
     let html = `
@@ -156,22 +157,35 @@ export default function StudentTranscripts({ school, students }: Props) {
       </div>
     `;
 
-    const win = window.open('', '_blank');
-    if (win) {
-      win.document.write(`
-        <html>
-          <head>
-            <title>Transcript - ${selectedStudent.fullName}</title>
-          </head>
-          <body>
-            ${html}
-            <script>
-              window.onload = () => { window.print(); window.close(); }
-            </script>
-          </body>
-        </html>
-      `);
-      win.document.close();
+    if (action === 'pdf') {
+      const element = document.createElement('div');
+      element.innerHTML = html;
+      const opt = {
+        margin:       0.5,
+        filename:     `Transcript_${selectedStudent.fullName.replace(/\s+/g, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    } else {
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(`
+          <html>
+            <head>
+              <title>Transcript - ${selectedStudent.fullName}</title>
+            </head>
+            <body>
+              ${html}
+              <script>
+                window.onload = () => { window.print(); window.close(); }
+              </script>
+            </body>
+          </html>
+        `);
+        win.document.close();
+      }
     }
   };
 
@@ -229,14 +243,24 @@ export default function StudentTranscripts({ school, students }: Props) {
                     {selectedStudent.admissionNo} | {selectedStudent.classLevel} | {selectedStudent.gender}
                   </p>
                 </div>
+                <div className="flex items-center gap-2">
                 <button
-                  onClick={printTranscript}
+                  onClick={() => handleTranscriptAction('print')}
                   disabled={loading || records.length === 0}
-                  className="flex items-center gap-2 bg-brand-green-700 hover:bg-brand-green-800 disabled:bg-slate-300 text-white px-4 py-2 rounded-xl text-sm font-semibold transition"
+                  className="flex items-center gap-2 bg-brand-green-700 hover:bg-brand-green-800 disabled:bg-slate-300 text-white px-4 py-2 rounded-xl text-sm font-semibold transition cursor-pointer"
                 >
                   <Printer className="h-4 w-4" />
-                  Print Transcript
+                  Print
                 </button>
+                <button
+                  onClick={() => handleTranscriptAction('pdf')}
+                  disabled={loading || records.length === 0}
+                  className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white px-4 py-2 rounded-xl text-sm font-semibold transition cursor-pointer"
+                >
+                  <Download className="h-4 w-4" />
+                  Save PDF
+                </button>
+                </div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-6">

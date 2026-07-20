@@ -834,8 +834,8 @@ export default function AcademicCenter({ school, students, isOffline, user, role
 
       {/* MODAL: Edit Scores */}
       {selectedStudent && editRecord && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl max-w-4xl w-full max-h-[92vh] border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl max-w-4xl w-full max-h-[92vh] my-auto border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col min-h-0">
             <div className="bg-slate-50 dark:bg-slate-950 py-3.5 px-5 sm:py-4 sm:px-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0">
               <div>
                 <h3 className="font-display font-bold text-slate-900 dark:text-white text-sm sm:text-base">Academic Records - {selectedStudent.fullName}</h3>
@@ -846,7 +846,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
               </button>
             </div>
             
-            <form onSubmit={handleSave} className="flex flex-col flex-1 overflow-hidden">
+            <form onSubmit={handleSave} className="flex flex-col flex-1 overflow-hidden min-h-0">
               <div className="p-4 pb-2 shrink-0">
                 <div className="bg-amber-50 border border-amber-100 rounded-xl p-2.5 sm:p-3 flex gap-2 sm:gap-3 text-[11px] sm:text-xs text-amber-800 items-start">
                   <Award className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />

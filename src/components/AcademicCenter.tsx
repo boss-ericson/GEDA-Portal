@@ -845,8 +845,8 @@ export default function AcademicCenter({ school, students, isOffline, user, role
 
       {/* MODAL: Edit Scores */}
       {selectedStudent && editRecord && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex flex-col justify-end sm:justify-center p-0 sm:p-4 overflow-hidden">
-          <div className="bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-3xl max-w-4xl w-full h-[95vh] sm:h-auto sm:max-h-[92vh] border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-in slide-in-from-bottom-4 sm:fade-in sm:zoom-in duration-200 flex flex-col">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-0 sm:p-4">
+          <div className="bg-white dark:bg-slate-900 w-full h-[100dvh] sm:h-auto sm:max-h-[92vh] sm:rounded-3xl sm:max-w-4xl border-0 sm:border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col">
             <div className="bg-slate-50 dark:bg-slate-950 py-3.5 px-5 sm:py-4 sm:px-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0">
               <div>
                 <h3 className="font-display font-bold text-slate-900 dark:text-white text-sm sm:text-base">Academic Records - {selectedStudent.fullName}</h3>

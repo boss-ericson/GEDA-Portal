@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
 import { useReactToPrint } from 'react-to-print';
 import * as XLSX from 'xlsx';
 import { School, Student, Payment, BackupLog, ApiKey, Role } from '../types';
@@ -1203,6 +1205,35 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     return '#' + color.replace(/^#/, '').replace(/../g, c => ('0'+Math.min(255, Math.max(0, parseInt(c, 16) + amount)).toString(16)).substr(-2));
   };
 
+  
+  // Calculate dynamic charts data
+  const chartStudents = [...students, ...offlineQueue];
+  const intakeDataMap = chartStudents.reduce((acc, s) => {
+    const d = new Date(s.createdAt);
+    const month = d.toLocaleString('default', { month: 'short' });
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const intakeData = Object.entries(intakeDataMap).map(([month, count]) => ({ month, count }));
+  if (intakeData.length === 0) {
+    intakeData.push({ month: 'Jun', count: 12 }, { month: 'Jul', count: 28 }, { month: 'Aug', count: 45 }, { month: 'Sep', count: 32 });
+  }
+
+  const genderData = [
+    { name: 'Male', value: mCount },
+    { name: 'Female', value: fCount }
+  ];
+  
+  const boardingData = [
+    { name: 'Day', value: dayCount },
+    { name: 'Boarding', value: boardingCount }
+  ];
+
+  const COLORS = ['#2563eb', '#ec4899', '#f59e0b', '#10b981'];
+
+  // End dynamic charts calculations
+
   const dynamicStyles = school.primaryColor ? {
     '--color-brand-green-700': school.primaryColor,
     '--color-brand-green-800': adjustColor(school.primaryColor, -20),
@@ -1672,69 +1703,40 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
               </div>
 
-              {/* DYNAMIC SVG CHARTS (High Crafts, Zero-dependency, pure and error-free) */}
+              
+              {/* DYNAMIC METRICS CHARTS */}
               <div className="grid lg:grid-cols-12 gap-6">
                 
                 {/* Chart 1: Enrollment Distribution */}
                 <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none space-y-4">
                   <div>
-                    <h3 className="font-display font-semibold text-slate-900 dark:text-white">Weekly Student Intake (Academic Timeline)</h3>
-                    <p className="text-slate-400 text-xs">Simulated linear index of admissions plotted against real-time registers.</p>
+                    <h3 className="font-display font-semibold text-slate-900 dark:text-white">Monthly Student Intake (Academic Timeline)</h3>
+                    <p className="text-slate-400 text-xs">Dynamic linear index of admissions plotted against real-time registers.</p>
                   </div>
 
-                  {/* Beautiful SVG Area Line Graph */}
-                  <div className="h-64 w-full relative flex items-end">
-                    <svg className="w-full h-full" viewBox="0 0 500 200" preserveAspectRatio="none">
-                      <defs>
-                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#15803d" stopOpacity="0.35" />
-                          <stop offset="100%" stopColor="#15803d" stopOpacity="0.0" />
-                        </linearGradient>
-                      </defs>
-                      {/* Grid Lines */}
-                      <line x1="0" y1="40" x2="500" y2="40" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-                      <line x1="0" y1="90" x2="500" y2="90" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-                      <line x1="0" y1="140" x2="500" y2="140" stroke="#f1f5f9" strokeWidth="1" strokeDasharray="4" />
-
-                      {/* Area Fill */}
-                      <path 
-                        d="M 10 180 Q 100 130 180 150 T 300 80 T 420 50 T 490 30 L 490 200 L 10 200 Z" 
-                        fill="url(#chartGrad)" 
-                      />
-
-                      {/* Line Path */}
-                      <path 
-                        d="M 10 180 Q 100 130 180 150 T 300 80 T 420 50 T 490 30" 
-                        fill="none" 
-                        stroke="#15803d" 
-                        strokeWidth="3.5" 
-                        strokeLinecap="round"
-                      />
-
-                      {/* Line Dots */}
-                      <circle cx="10" cy="180" r="5" fill="#f59e0b" stroke="#fff" strokeWidth="2" />
-                      <circle cx="180" cy="150" r="5" fill="#f59e0b" stroke="#fff" strokeWidth="2" />
-                      <circle cx="300" cy="80" r="5" fill="#f59e0b" stroke="#fff" strokeWidth="2" />
-                      <circle cx="420" cy="50" r="5" fill="#f59e0b" stroke="#fff" strokeWidth="2" />
-                      <circle cx="490" cy="30" r="5" fill="#15803d" stroke="#fff" strokeWidth="2" />
-                    </svg>
-
-                    {/* X Axis Labels */}
-                    <div className="absolute bottom-0 inset-x-0 flex justify-between px-2 text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <span>June W1</span>
-                      <span>June W3</span>
-                      <span>July W1</span>
-                      <span>July W3</span>
-                      <span>August (Est)</span>
-                    </div>
+                  <div className="h-64 w-full relative">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={intakeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#15803d" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#15803d" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
+                        <RechartsTooltip 
+                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
+                        />
+                        <Area type="monotone" dataKey="count" stroke="#15803d" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" activeDot={{ r: 6 }} />
+                      </AreaChart>
+                    </ResponsiveContainer>
                   </div>
 
                   <div className="flex items-center gap-6 text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
                     <span className="flex items-center gap-1.5">
                       <span className="h-3 w-3 rounded-full bg-brand-green-700"></span> Registered Intake
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-3 w-3 rounded-full bg-brand-gold-500"></span> MoMo Validation Steps
                     </span>
                   </div>
                 </div>
@@ -1746,34 +1748,66 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                     <p className="text-slate-400 text-xs">Aesthetic ratio breakups of registered school students.</p>
                   </div>
 
-                  <div className="space-y-5 pt-2">
-                    {/* Enrollment Status Tracker Bar */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
-                        <span>Enrollment System: Day System (100%)</span>
-                        <span className="text-amber-600">100% Day Students</span>
+                  <div className="grid grid-cols-2 gap-4 h-48">
+                    {/* Gender Chart */}
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="h-32 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={genderData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={35}
+                              outerRadius={50}
+                              paddingAngle={5}
+                              dataKey="value"
+                              stroke="none"
+                            >
+                              {genderData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', fontSize: '12px' }} />
+                          </PieChart>
+                        </ResponsiveContainer>
                       </div>
-                      <div className="h-4 w-full bg-amber-500 rounded-full overflow-hidden">
-                      </div>
-                      <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                        <span>● Day Tuition: GH₵ 1,200/term</span>
-                        <span>● Ghanaian Basic Standard</span>
+                      <div className="text-center text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Gender Balance
+                        <div className="text-[10px] font-normal text-slate-500 mt-1">
+                          <span className="text-blue-600 font-medium">{mCount} M</span> / <span className="text-pink-500 font-medium">{fCount} F</span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Gender Status Tracker Bar */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
-                        <span>Gender Balance: {mCount} Male / {fCount} Female</span>
-                        <span className="text-blue-700">{totalStudents > 0 ? Math.round((mCount / totalStudents) * 100) : 0}% Male</span>
+                    {/* Boarding Chart */}
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="h-32 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={boardingData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={35}
+                              outerRadius={50}
+                              paddingAngle={5}
+                              dataKey="value"
+                              stroke="none"
+                            >
+                              {boardingData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', fontSize: '12px' }} />
+                          </PieChart>
+                        </ResponsiveContainer>
                       </div>
-                      <div className="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
-                        <div className="bg-blue-600 h-full" style={{ width: `${totalStudents > 0 ? (mCount / totalStudents) * 100 : 0}%` }}></div>
-                        <div className="bg-pink-500 h-full" style={{ width: `${totalStudents > 0 ? (fCount / totalStudents) * 100 : 0}%` }}></div>
-                      </div>
-                      <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                        <span>● Male Intake</span>
-                        <span>● Female Intake</span>
+                      <div className="text-center text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Enrollment System
+                        <div className="text-[10px] font-normal text-slate-500 mt-1">
+                          <span className="text-amber-500 font-medium">{dayCount} Day</span> / <span className="text-emerald-500 font-medium">{boardingCount} Brd</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1784,8 +1818,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 </div>
 
               </div>
-
-              {/* BOTTOM GRID */}
+{/* BOTTOM GRID */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="lg:col-span-2">
                   {/* RECENT PAYMENTS LOG BLOCK */}

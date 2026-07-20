@@ -177,9 +177,14 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
               const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", loginEmail.trim())));
               if (!snapshot.empty) {
                 const schoolDoc = snapshot.docs[0];
+                const schoolData = schoolDoc.data();
+                if (schoolData.status === 'Deactivated') {
+                  setLoginError('Your school account has been deactivated. Please contact the administrator.');
+                  return;
+                }
                 responseData = {
                   success: true,
-                  school: { ...schoolDoc.data(), id: schoolDoc.id },
+                  school: { ...schoolData, id: schoolDoc.id },
                   user: { email: loginEmail.trim(), fullName: "Admin User", role: selectedRole },
                   role: selectedRole
                 };
@@ -254,9 +259,15 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
             const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", email)));
             if (!snapshot.empty) {
               const schoolDoc = snapshot.docs[0];
+              const schoolData = schoolDoc.data();
+              if (schoolData.status === 'Deactivated') {
+                setLoginError('Your school account has been deactivated. Please contact the administrator.');
+                setIsLoggingIn(false);
+                return;
+              }
               responseData = {
                 success: true,
-                school: { ...schoolDoc.data(), id: schoolDoc.id }
+                school: { ...schoolData, id: schoolDoc.id }
               };
             }
           } catch (fbErr) {

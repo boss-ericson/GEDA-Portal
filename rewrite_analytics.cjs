@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+const fs = require('fs');
+const content = `import React, { useEffect, useState } from 'react';
 import { School, Student, AcademicRecord } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
 
@@ -11,7 +12,7 @@ export default function AnalyticsCenter({ school, students, isOffline }: { schoo
       if (isOffline) return;
       setLoading(true);
       try {
-        const res = await fetch(`/api/v1/academic-records?schoolId=${school.id}`);
+        const res = await fetch(\`/api/v1/academic-records?schoolId=\${school.id}\`);
         if (res.ok) {
           const data = await res.json();
           setRecords(data);
@@ -92,7 +93,7 @@ function PerformanceTrendsChart({ records }: { records: AcademicRecord[] }) {
     const termScores: Record<string, { total: number; count: number }> = {};
     
     records.forEach(r => {
-      const termKey = `${r.academicYear} ${r.academicTerm}`;
+      const termKey = \`\${r.academicYear} \${r.academicTerm}\`;
       r.scores.forEach(s => {
         const total = (s.cat1 || 0) + (s.cat2 || 0) + (s.groupWork || 0) + (s.projectWork || 0) + (s.exam || 0);
         if (!termScores[termKey]) {
@@ -174,3 +175,5 @@ function SubjectScoreDistributionChart({ records }: { records: AcademicRecord[] 
     </div>
   );
 }
+`;
+fs.writeFileSync('src/components/AnalyticsCenter.tsx', content);

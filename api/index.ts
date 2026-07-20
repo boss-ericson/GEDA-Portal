@@ -131,10 +131,14 @@ const validateApiKey = (req: any, res: any, next: any) => {
         return res.status(401).json({ error: "Invalid credentials" });
       }
       const schoolDoc = snapshot.docs[0];
+      const schoolData = schoolDoc.data();
+      if (schoolData.status === 'Deactivated') {
+        return res.status(401).json({ error: "Your school account has been deactivated. Please contact the administrator." });
+      }
       res.json({
         success: true,
         user: { email, fullName: "Admin User", role },
-        school: { ...schoolDoc.data(), id: schoolDoc.id }
+        school: { ...schoolData, id: schoolDoc.id }
       });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });

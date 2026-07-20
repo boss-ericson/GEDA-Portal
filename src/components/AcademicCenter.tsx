@@ -55,6 +55,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
   const [records, setRecords] = useState<AcademicRecord[]>([]);
   const [termAttendance, setTermAttendance] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [activeClass, setActiveClass] = useState<string>('JHS 1');
   const [term, setTerm] = useState<string>(school.academicTerm || 'First');
   const [year, setYear] = useState<string>(school.academicYear || '2026/2027');
@@ -238,7 +239,12 @@ export default function AcademicCenter({ school, students, isOffline, user, role
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editRecord || isOffline) return;
+    if (!editRecord) return;
+    if (isOffline) {
+      alert('Cannot save academic records in offline mode.');
+      return;
+    }
+    setIsSaving(true);
     try {
       const res = await fetch('/api/v1/academic-records', {
         method: 'POST',
@@ -258,10 +264,15 @@ export default function AcademicCenter({ school, students, isOffline, user, role
         });
         setEditRecord(null);
         setSelectedStudent(null);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Failed to save: ${errData.error || res.statusText}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Failed to save academic records');
+      alert(`Network error: ${err.message}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -834,8 +845,8 @@ export default function AcademicCenter({ school, students, isOffline, user, role
 
       {/* MODAL: Edit Scores */}
       {selectedStudent && editRecord && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl max-w-4xl w-full max-h-[92vh] my-auto border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col min-h-0">
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex flex-col justify-end sm:justify-center p-0 sm:p-4 overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-3xl max-w-4xl w-full h-[95vh] sm:h-auto sm:max-h-[92vh] border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-in slide-in-from-bottom-4 sm:fade-in sm:zoom-in duration-200 flex flex-col">
             <div className="bg-slate-50 dark:bg-slate-950 py-3.5 px-5 sm:py-4 sm:px-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0">
               <div>
                 <h3 className="font-display font-bold text-slate-900 dark:text-white text-sm sm:text-base">Academic Records - {selectedStudent.fullName}</h3>
@@ -962,8 +973,8 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                 <button type="button" onClick={() => setSelectedStudent(null)} className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition cursor-pointer">
                   Cancel
                 </button>
-                <button type="submit" className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 dark:text-white transition cursor-pointer shadow-sm dark:shadow-none">
-                  Save Academic Records
+                <button disabled={isSaving} type="submit" className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 dark:text-white transition cursor-pointer shadow-sm dark:shadow-none disabled:opacity-75 disabled:cursor-not-allowed">
+                  {isSaving ? 'Saving...' : 'Save Academic Records'}
                 </button>
               </div>
             </form>

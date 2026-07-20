@@ -141,6 +141,17 @@ export default function App() {
   const handleSchoolUpdate = (updatedSchool: School) => {
     setActiveSchool(updatedSchool);
     setSchools((prev) => prev.map((s) => s.id === updatedSchool.id ? updatedSchool : s));
+    
+    // Update session storage
+    const storedAuth = sessionStorage.getItem('geda_auth');
+    if (storedAuth) {
+      try {
+        const parsed = JSON.parse(storedAuth);
+        sessionStorage.setItem('geda_auth', JSON.stringify({ ...parsed, school: updatedSchool }));
+      } catch (e) {
+        console.error("Failed to update session storage", e);
+      }
+    }
   };
 
   const handleRegisterSchool = async (name: string, region: string, district: string, email: string, password: string): Promise<{ success: boolean; school?: School; error?: string }> => {

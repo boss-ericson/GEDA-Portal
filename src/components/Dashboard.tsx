@@ -241,6 +241,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       const schoolRes = await fetch(`/api/v1/schools/${school.id}`);
       if (!schoolRes.ok) throw new Error("School API failed");
       const schoolData = await schoolRes.json();
+      if (onSchoolUpdate) {
+        onSchoolUpdate(schoolData);
+      }
       if (schoolData.billingNotice) {
         setBillingNotice(schoolData.billingNotice);
       } else {
@@ -275,6 +278,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         const schoolDoc = await getDoc(doc(db, "schools", school.id));
         if (schoolDoc.exists()) {
           const sData = schoolDoc.data();
+          if (onSchoolUpdate) {
+            onSchoolUpdate({ ...sData, id: school.id } as any);
+          }
           setBillingNotice(sData.billingNotice || '');
         }
 

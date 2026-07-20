@@ -194,7 +194,23 @@ async function startServer() {
         demoStudents.splice(index, 1);
         return res.json({ message: "Student deleted" });
       }
-      await deleteDoc(doc(getDb(), "students", req.params.id));
+      
+      const docRef = doc(getDb(), "students", req.params.id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const student = docSnap.data();
+        await deleteDoc(docRef);
+        
+        if (student.schoolId) {
+          const schoolRef = doc(getDb(), "schools", student.schoolId);
+          const schoolSnap = await getDoc(schoolRef);
+          if (schoolSnap.exists()) {
+            const currentCount = schoolSnap.data().studentCount || 0;
+            await updateDoc(schoolRef, { studentCount: Math.max(0, currentCount - 1) });
+          }
+        }
+      }
+      
       res.json({ message: "Student deleted" });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
@@ -213,6 +229,17 @@ async function startServer() {
       }
       delete student.id;
       const docRef = await addDoc(collection(getDb(), "students"), student);
+      
+      // Update school student count
+      if (student.schoolId) {
+        const schoolRef = doc(getDb(), "schools", student.schoolId);
+        const schoolSnap = await getDoc(schoolRef);
+        if (schoolSnap.exists()) {
+          const currentCount = schoolSnap.data().studentCount || 0;
+          await updateDoc(schoolRef, { studentCount: currentCount + 1 });
+        }
+      }
+      
       res.status(201).json({ ...student, id: docRef.id });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
@@ -240,6 +267,17 @@ async function startServer() {
         results.push({ ...s, id: docRef.id });
       }
       await batch.commit();
+      
+      // Update school count
+      if (students.length > 0 && students[0].schoolId) {
+        const schoolRef = doc(getDb(), "schools", students[0].schoolId);
+        const schoolSnap = await getDoc(schoolRef);
+        if (schoolSnap.exists()) {
+          const currentCount = schoolSnap.data().studentCount || 0;
+          await updateDoc(schoolRef, { studentCount: currentCount + students.length });
+        }
+      }
+      
       res.status(201).json(results);
     } catch (e) { res.status(500).json({ error: e.message }); }
   });

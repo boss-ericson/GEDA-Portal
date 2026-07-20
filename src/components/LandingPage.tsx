@@ -154,18 +154,24 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
           }
         } catch (apiErr: any) {
           console.warn('Backend login API failed, falling back to Firebase directly:', apiErr);
-          const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", loginEmail.trim())));
-          if (!snapshot.empty) {
-            const schoolDoc = snapshot.docs[0];
-            responseData = {
-              success: true,
-              school: { ...schoolDoc.data(), id: schoolDoc.id },
-              user: { email: loginEmail.trim(), fullName: "Admin User", role: selectedRole },
-              role: selectedRole
-            };
-            isSuccess = true;
-          } else {
-             setLoginError('Invalid official school email or password.');
+          try {
+            const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", loginEmail.trim())));
+            if (!snapshot.empty) {
+              const schoolDoc = snapshot.docs[0];
+              responseData = {
+                success: true,
+                school: { ...schoolDoc.data(), id: schoolDoc.id },
+                user: { email: loginEmail.trim(), fullName: "Admin User", role: selectedRole },
+                role: selectedRole
+              };
+              isSuccess = true;
+            } else {
+               setLoginError('Invalid official school email or password.');
+               return;
+            }
+          } catch (fbErr: any) {
+             console.error('Firebase fallback failed:', fbErr);
+             setLoginError('Invalid official school email or password. (Database not configured)');
              return;
           }
         }
@@ -224,13 +230,20 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
           }
         } catch (apiErr) {
           console.warn('Backend Google API failed, falling back to Firebase:', apiErr);
-          const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", email)));
-          if (!snapshot.empty) {
-            const schoolDoc = snapshot.docs[0];
-            responseData = {
-              success: true,
-              school: { ...schoolDoc.data(), id: schoolDoc.id }
-            };
+          try {
+            const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", email)));
+            if (!snapshot.empty) {
+              const schoolDoc = snapshot.docs[0];
+              responseData = {
+                success: true,
+                school: { ...schoolDoc.data(), id: schoolDoc.id }
+              };
+            }
+          } catch (fbErr) {
+            console.error('Firebase fallback failed:', fbErr);
+            alert("Database not configured. Please use 'admin@gedaschool.edu.gh' to try the demo.");
+            setGoogleAuthLoading(false);
+            return;
           }
         }
 

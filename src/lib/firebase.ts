@@ -15,15 +15,30 @@ try {
 
 // Fallback to environment variables (for Vercel/production)
 const finalConfig = {
-  projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId,
-  appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || firebaseConfig.appId,
-  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
-  authDomain: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain,
-  firestoreDatabaseId: (import.meta as any).env?.VITE_FIREBASE_DATABASE_ID || firebaseConfig.firestoreDatabaseId,
+  projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId || 'demo-project',
+  appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || firebaseConfig.appId || '1:1234567890:web:1234567890',
+  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey || 'demo-api-key',
+  authDomain: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain || 'demo-project.firebaseapp.com',
+  firestoreDatabaseId: (import.meta as any).env?.VITE_FIREBASE_DATABASE_ID || firebaseConfig.firestoreDatabaseId || '(default)',
 };
 
 const app = initializeApp(finalConfig);
-export const auth = getAuth(app);
+let authInstance: any;
+try {
+  if (finalConfig.apiKey === 'demo-api-key') {
+    authInstance = {
+      signOut: async () => {},
+      currentUser: { email: 'demo@example.com' },
+      onAuthStateChanged: (cb: any) => { cb({ email: 'demo@example.com' }); return () => {}; }
+    } as any;
+  } else {
+    authInstance = getAuth(app);
+  }
+} catch (e) {
+  console.error("Firebase auth init error:", e);
+  authInstance = {} as any;
+}
+export const auth = authInstance;
 export const googleAuthProvider = new GoogleAuthProvider();
 export const db = getFirestore(app, finalConfig.firestoreDatabaseId);
 

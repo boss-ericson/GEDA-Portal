@@ -47,8 +47,12 @@ export default function App() {
           }
         } catch (err) {
           console.warn('API fetch failed, falling back to Firebase directly:', err);
-          const snapshot = await getDocs(collection(db, "schools"));
-          fetchedSchools = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as School));
+          try {
+            const snapshot = await getDocs(collection(db, "schools"));
+            fetchedSchools = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as School));
+          } catch (fbErr) {
+            console.warn('Firebase fallback also failed (likely unconfigured):', fbErr);
+          }
         }
 
         if (fetchedSchools.length === 0) {

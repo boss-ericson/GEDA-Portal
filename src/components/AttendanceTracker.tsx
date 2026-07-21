@@ -30,17 +30,26 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
     return true; // Primary teachers have full access to attendance
   };
 
-  const fetchAttendance = async () => {
+  const fetchAttendance = async (currentDate: string) => {
     if (isOffline) return;
     setLoading(true);
     setAttendance({}); // Clear stale data before fetch
     try {
-      const res = await fetch(`/api/v1/attendance?schoolId=${school.id}&date=${date}`);
+      const res = await fetch(`/api/v1/attendance?schoolId=${school.id}&date=${currentDate}`);
       if (res.ok) {
         const data: AttendanceRecord[] = await res.json();
+        console.log("Fetched attendance for date", currentDate, data);
         const map: Record<string, AttendanceRecord> = {};
         data.forEach(r => map[r.studentId] = r);
-        setAttendance(map);
+        // Only update if the date hasn't changed while fetching
+        setDate((latestDate) => {
+          if (latestDate === currentDate) {
+            setAttendance(map);
+          }
+          return latestDate;
+        });
+      } else {
+        console.error("Failed to fetch attendance:", res.status, res.statusText);
       }
     } catch (err) {
       console.error(err);
@@ -50,14 +59,14 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
   };
 
   useEffect(() => {
-    fetchAttendance();
+    fetchAttendance(date);
   }, [school.id, date, isOffline]);
 
   const classStudents = students.filter(s => s.classLevel === activeClass);
 
   useEffect(() => {
     setSelectedStudents([]);
-  }, [activeClass]);
+  }, [activeClass, date]);
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
@@ -139,7 +148,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
       });
       if (res.ok) {
         alert('Attendance saved successfully');
-        fetchAttendance();
+        fetchAttendance(date);
       }
     } catch (err) {
       console.error(err);
@@ -163,7 +172,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
             onChange={e => setDate(e.target.value)} 
             className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 outline-none focus:ring-1 focus:ring-amber-500" 
           />
-          <button onClick={fetchAttendance} disabled={loading} className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950 cursor-pointer">
+          <button onClick={() => fetchAttendance(date)} disabled={loading} className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950 cursor-pointer">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>

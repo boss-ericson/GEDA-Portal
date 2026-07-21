@@ -239,17 +239,17 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
   // Load backend data
   const fetchData = async () => {
-    if (isOffline) return;
+    if (isOffline || !school || !school.id) return;
     setIsLoading(true);
     setErrorMsg('');
     try {
       const schoolRes = await fetch(`/api/v1/schools/${school.id}`);
       if (!schoolRes.ok) throw new Error("School API failed");
       const schoolData = await schoolRes.json();
-      if (onSchoolUpdate) {
+      if (schoolData && schoolData.id && onSchoolUpdate) {
         onSchoolUpdate(schoolData);
       }
-      if (schoolData.billingNotice) {
+      if (schoolData && schoolData.billingNotice) {
         setBillingNotice(schoolData.billingNotice);
       } else {
         setBillingNotice('');
@@ -279,6 +279,10 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       }
     } catch (err: any) {
       console.warn("Backend API failed, falling back to Firebase directly:", err);
+      if (!school || !school.id) {
+        setIsLoading(false);
+        return;
+      }
       try {
         const schoolDoc = await getDoc(doc(db, "schools", school.id));
         if (schoolDoc.exists()) {
@@ -994,47 +998,64 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
   const handleSaveSchoolSettings = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!school || !school.id) {
+      setSettingsError("Invalid school session. Please log in again.");
+      return;
+    }
     setSavingSettings(true);
     setSettingsSuccess('');
     setSettingsError('');
 
-    try {
-      const res = await fetch(`/api/v1/schools/${school.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: settingsName,
-          region: settingsRegion,
-          district: settingsDistrict,
-          logo: settingsLogo,
-          primaryColor: settingsPrimaryColor,
-          emisCode: settingsEmisCode,
-          yearOfEstablishment: settingsYearOfEstablishment,
-          headTeacherName: settingsHeadTeacherName,
-          headTeacherStaffId: settingsHeadTeacherStaffId,
-          headTeacherPhone: settingsHeadTeacherPhone,
-          academicYear: settingsAcademicYear,
-          academicTerm: settingsAcademicTerm,
-          reopeningDate: settingsReopeningDate,
-          vacationDate: settingsVacationDate,
-        }),
-      });
+    const settingsPayload = {
+      name: settingsName,
+      region: settingsRegion,
+      district: settingsDistrict,
+      logo: settingsLogo,
+      primaryColor: settingsPrimaryColor,
+      emisCode: settingsEmisCode,
+      yearOfEstablishment: settingsYearOfEstablishment,
+      headTeacherName: settingsHeadTeacherName,
+      headTeacherStaffId: settingsHeadTeacherStaffId,
+      headTeacherPhone: settingsHeadTeacherPhone,
+      academicYear: settingsAcademicYear,
+      academicTerm: settingsAcademicTerm,
+      reopeningDate: settingsReopeningDate,
+      vacationDate: settingsVacationDate,
+    };
 
-      const data = await res.json();
-      if (res.ok) {
+    try {
+      let updatedSchoolData: School | null = null;
+      try {
+        const res = await fetch(`/api/v1/schools/${school.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(settingsPayload),
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          updatedSchoolData = (data && data.id) ? data : { ...school, ...settingsPayload, id: school.id };
+        } else {
+          throw new Error(data.error || 'Failed to update school settings.');
+        }
+      } catch (apiErr: any) {
+        console.warn('Backend API failed for settings update, falling back to Firebase:', apiErr);
+        await updateDoc(doc(db, "schools", school.id), settingsPayload);
+        updatedSchoolData = { ...school, ...settingsPayload, id: school.id };
+      }
+
+      if (updatedSchoolData) {
         setSettingsSuccess('School profile and configurations updated successfully!');
         if (onSchoolUpdate) {
-          onSchoolUpdate(data);
+          onSchoolUpdate(updatedSchoolData);
         }
         setTimeout(() => setSettingsSuccess(''), 5000);
-      } else {
-        setSettingsError(data.error || 'Failed to update school settings.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setSettingsError('A network error occurred. Please try again.');
+      setSettingsError(err.message || 'A network error occurred. Please try again.');
     } finally {
       setSavingSettings(false);
     }

@@ -139,6 +139,10 @@ export default function App() {
   };
 
   const handleSchoolUpdate = (updatedSchool: School) => {
+    if (!updatedSchool || !updatedSchool.id) {
+      console.warn("Attempted to update active school with invalid payload:", updatedSchool);
+      return;
+    }
     setActiveSchool(updatedSchool);
     setSchools((prev) => prev.map((s) => s.id === updatedSchool.id ? updatedSchool : s));
     

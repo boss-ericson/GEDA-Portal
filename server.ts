@@ -92,8 +92,13 @@ async function startServer() {
   app.put("/api/v1/schools/:id", async (req, res) => {
     try {
       await updateDoc(doc(getDb(), "schools", req.params.id), req.body);
-      res.json({ message: "School updated" });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+      const docSnap = await getDoc(doc(getDb(), "schools", req.params.id));
+      if (docSnap.exists()) {
+        res.json({ ...docSnap.data(), id: docSnap.id });
+      } else {
+        res.json({ ...req.body, id: req.params.id });
+      }
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
   // --- AUTH ---
@@ -143,9 +148,13 @@ async function startServer() {
 
   app.put("/api/v1/students/:id", async (req, res) => {
     try {
-
       await updateDoc(doc(getDb(), "students", req.params.id), req.body);
-      res.json({ message: "Student updated" });
+      const docSnap = await getDoc(doc(getDb(), "students", req.params.id));
+      if (docSnap.exists()) {
+        res.json({ ...docSnap.data(), id: docSnap.id });
+      } else {
+        res.json({ ...req.body, id: req.params.id });
+      }
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 

@@ -30,6 +30,9 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
     return true; // Primary teachers have full access to attendance
   };
 
+  const dateRef = React.useRef(date);
+  dateRef.current = date;
+
   const fetchAttendance = async (currentDate: string) => {
     if (isOffline) return;
     setLoading(true);
@@ -39,22 +42,20 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
       if (res.ok) {
         const data: AttendanceRecord[] = await res.json();
         console.log("Fetched attendance for date", currentDate, data);
-        const map: Record<string, AttendanceRecord> = {};
-        data.forEach(r => map[r.studentId] = r);
-        // Only update if the date hasn't changed while fetching
-        setDate((latestDate) => {
-          if (latestDate === currentDate) {
-            setAttendance(map);
-          }
-          return latestDate;
-        });
+        if (currentDate === dateRef.current) {
+          const map: Record<string, AttendanceRecord> = {};
+          data.forEach(r => map[r.studentId] = r);
+          setAttendance(map);
+        }
       } else {
         console.error("Failed to fetch attendance:", res.status, res.statusText);
       }
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      if (currentDate === dateRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -86,61 +87,77 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
 
   const handleMarkSelected = (status: 'Present' | 'Absent' | 'Late') => {
     if (selectedStudents.length === 0) return;
-    const newAtt = { ...attendance };
-    selectedStudents.forEach(id => {
-      newAtt[id] = {
-        ...newAtt[id],
-        id: newAtt[id]?.id || '',
-        schoolId: school.id,
-        studentId: id,
-        date,
-        status,
-        academicYear: year,
-        academicTerm: term,
-      };
+    setAttendance(prev => {
+      const newAtt = { ...prev };
+      selectedStudents.forEach(id => {
+        const existing = prev[id];
+        // Only preserve existing ID if it belongs to the current date we are marking
+        const recordId = (existing && existing.date === date) ? existing.id : '';
+        newAtt[id] = {
+          id: recordId,
+          schoolId: school.id,
+          studentId: id,
+          date,
+          status,
+          academicYear: year,
+          academicTerm: term,
+        };
+      });
+      return newAtt;
     });
-    setAttendance(newAtt);
-    // setSelectedStudents([]); // optionally clear selection
   };
 
   const handleStatusChange = (studentId: string, status: 'Present' | 'Absent' | 'Late') => {
-    setAttendance(prev => ({
-      ...prev,
-      [studentId]: {
-        ...prev[studentId],
-        id: prev[studentId]?.id || '',
-        schoolId: school.id,
-        studentId,
-        date,
-        status,
-        academicYear: year,
-        academicTerm: term,
-      }
-    }));
+    setAttendance(prev => {
+      const existing = prev[studentId];
+      // Only preserve existing ID if it belongs to the current date we are marking
+      const recordId = (existing && existing.date === date) ? existing.id : '';
+      return {
+        ...prev,
+        [studentId]: {
+          id: recordId,
+          schoolId: school.id,
+          studentId,
+          date,
+          status,
+          academicYear: year,
+          academicTerm: term,
+        }
+      };
+    });
   };
 
   const handleMarkAll = (status: 'Present' | 'Absent') => {
-    const newAtt = { ...attendance };
-    classStudents.forEach(s => {
-      newAtt[s.id] = {
-        ...newAtt[s.id],
-        id: newAtt[s.id]?.id || '',
-        schoolId: school.id,
-        studentId: s.id,
-        date,
-        status,
-        academicYear: year,
-        academicTerm: term,
-      };
+    setAttendance(prev => {
+      const newAtt = { ...prev };
+      classStudents.forEach(s => {
+        const existing = prev[s.id];
+        // Only preserve existing ID if it belongs to the current date we are marking
+        const recordId = (existing && existing.date === date) ? existing.id : '';
+        newAtt[s.id] = {
+          id: recordId,
+          schoolId: school.id,
+          studentId: s.id,
+          date,
+          status,
+          academicYear: year,
+          academicTerm: term,
+        };
+      });
+      return newAtt;
     });
-    setAttendance(newAtt);
   };
 
   const handleSave = async () => {
     if (isOffline) return;
     setSaving(true);
     try {
-      const recordsToSave = classStudents.map(s => attendance[s.id]).filter(Boolean);
+      // Defensively ensure we only send records for the currently selected date
+      const recordsToSave = classStudents
+        .map(s => attendance[s.id])
+        .filter(Boolean)
+        .filter(r => r.date === date);
+
       const res = await fetch('/api/v1/attendance/batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

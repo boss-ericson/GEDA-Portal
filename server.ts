@@ -320,11 +320,12 @@ async function startServer() {
       const q = req.query;
       let conditions = [where("schoolId", "==", q.schoolId || "")];
       if (q.date) conditions.push(where("date", "==", q.date));
+      if (q.studentId) conditions.push(where("studentId", "==", q.studentId));
       if (q.academicYear) conditions.push(where("academicYear", "==", q.academicYear));
       if (q.academicTerm) conditions.push(where("academicTerm", "==", q.academicTerm));
       const snapshot = await getDocs(query(collection(getDb(), "attendance"), ...conditions));
       res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
   app.post("/api/v1/attendance/batch", async (req, res) => {
@@ -332,16 +333,14 @@ async function startServer() {
       const { schoolId, records } = req.body;
       const batch = writeBatch(getDb());
       for (const r of records) {
-        if (r.id) {
-          batch.update(doc(getDb(), "attendance", r.id), r);
-        } else {
-          const docRef = doc(collection(getDb(), "attendance"));
-          batch.set(docRef, r);
-        }
+        // Enforce deterministic ID based on student and date to prevent any cross-contamination, leakage or duplicates
+        const docId = `${r.studentId}_${r.date}`;
+        const docRef = doc(getDb(), "attendance", docId);
+        batch.set(docRef, { ...r, id: docId }, { merge: true });
       }
       await batch.commit();
       res.json({ message: "Attendance marked" });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
   app.post("/api/v1/sync", async (req, res) => {

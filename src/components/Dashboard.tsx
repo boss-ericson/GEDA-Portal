@@ -55,7 +55,12 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     }
     return true;
   });
-  const isOffline = false;
+  const [isOffline, setIsOffline] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('geda_offline_mode') === 'true';
+    }
+    return false;
+  });
 
   // Client states
   const [students, setStudents] = useState<Student[]>([]);

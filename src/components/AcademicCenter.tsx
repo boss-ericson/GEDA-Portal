@@ -657,9 +657,9 @@ export default function AcademicCenter({ school, students, isOffline, user, role
       const opt = {
         margin:       0.5,
         filename:     `Broadsheet_${activeClass.replace(/\s+/g, '_')}_${term}_${year.replace('/', '-')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
+        image:        { type: 'jpeg' as const, quality: 0.98 },
         html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' as const }
       };
       html2pdf().set(opt).from(element).save();
     } else {

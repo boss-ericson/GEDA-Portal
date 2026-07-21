@@ -33,7 +33,7 @@ export default function App() {
   const toggleTheme = () => setIsDark(!isDark);
   
 
-  // Load registered schools on mount
+  // Load registered schools on mount - Triggers sync
   useEffect(() => {
     async function init() {
       try {

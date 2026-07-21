@@ -319,6 +319,7 @@ async function startServer() {
     try {
       const q = req.query;
       let conditions = [where("schoolId", "==", q.schoolId || "")];
+      if (q.date) conditions.push(where("date", "==", q.date));
       if (q.academicYear) conditions.push(where("academicYear", "==", q.academicYear));
       if (q.academicTerm) conditions.push(where("academicTerm", "==", q.academicTerm));
       const snapshot = await getDocs(query(collection(getDb(), "attendance"), ...conditions));

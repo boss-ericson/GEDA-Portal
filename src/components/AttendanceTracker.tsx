@@ -33,6 +33,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
   const fetchAttendance = async () => {
     if (isOffline) return;
     setLoading(true);
+    setAttendance({}); // Clear stale data before fetch
     try {
       const res = await fetch(`/api/v1/attendance?schoolId=${school.id}&date=${date}`);
       if (res.ok) {
@@ -200,23 +201,23 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                       <span className="text-xs font-medium text-slate-500 dark:text-slate-400 self-center mr-2">
                         {selectedStudents.length} selected
                       </span>
-                      <button onClick={() => handleMarkSelected('Present')} className="text-xs font-semibold px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition">
+                      <button onClick={() => handleMarkSelected('Present')} disabled={loading} className="text-xs font-semibold px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition disabled:opacity-50">
                         Mark Selected Present
                       </button>
-                      <button onClick={() => handleMarkSelected('Late')} className="text-xs font-semibold px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition">
+                      <button onClick={() => handleMarkSelected('Late')} disabled={loading} className="text-xs font-semibold px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition disabled:opacity-50">
                         Mark Selected Late
                       </button>
-                      <button onClick={() => handleMarkSelected('Absent')} className="text-xs font-semibold px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition">
+                      <button onClick={() => handleMarkSelected('Absent')} disabled={loading} className="text-xs font-semibold px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition disabled:opacity-50">
                         Mark Selected Absent
                       </button>
                     </>
                   )}
                   {selectedStudents.length === 0 && (
                     <>
-                      <button onClick={() => handleMarkAll('Present')} className="text-xs font-semibold px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition">
+                      <button onClick={() => handleMarkAll('Present')} disabled={loading} className="text-xs font-semibold px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition disabled:opacity-50">
                         Mark All Present
                       </button>
-                      <button onClick={() => handleMarkAll('Absent')} className="text-xs font-semibold px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition">
+                      <button onClick={() => handleMarkAll('Absent')} disabled={loading} className="text-xs font-semibold px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition disabled:opacity-50">
                         Mark All Absent
                       </button>
                     </>
@@ -236,7 +237,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                       className="rounded border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 disabled:opacity-50"
                       checked={classStudents.length > 0 && selectedStudents.length === classStudents.length}
                       onChange={handleSelectAll}
-                      disabled={!isAttendanceEditable()}
+                      disabled={!isAttendanceEditable() || loading}
                     />
                   </th>
                   <th className="py-3 px-4">Student Name</th>
@@ -255,7 +256,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                           className="rounded border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 disabled:opacity-50"
                           checked={selectedStudents.includes(student.id)}
                           onChange={() => handleSelectStudent(student.id)}
-                          disabled={!isAttendanceEditable()}
+                          disabled={!isAttendanceEditable() || loading}
                         />
                       </td>
                       <td className="py-3 px-4 font-medium text-slate-900 dark:text-white">
@@ -280,21 +281,24 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                           <div className="flex justify-end gap-1">
                             <button
                               onClick={() => handleStatusChange(student.id, 'Present')}
-                              className={`p-1.5 rounded-lg transition ${record?.status === 'Present' ? 'bg-green-100 text-green-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
+                              disabled={loading}
+                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${record?.status === 'Present' ? 'bg-green-100 text-green-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
                               title="Present"
                             >
                               <CheckCircle2 className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleStatusChange(student.id, 'Late')}
-                              className={`p-1.5 rounded-lg transition ${record?.status === 'Late' ? 'bg-amber-100 text-amber-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
+                              disabled={loading}
+                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${record?.status === 'Late' ? 'bg-amber-100 text-amber-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
                               title="Late"
                             >
                               <Clock className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleStatusChange(student.id, 'Absent')}
-                              className={`p-1.5 rounded-lg transition ${record?.status === 'Absent' ? 'bg-red-100 text-red-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
+                              disabled={loading}
+                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${record?.status === 'Absent' ? 'bg-red-100 text-red-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
                               title="Absent"
                             >
                               <XCircle className="h-4 w-4" />

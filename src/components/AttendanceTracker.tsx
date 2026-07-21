@@ -34,9 +34,9 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
   dateRef.current = date;
 
   const fetchAttendance = async (currentDate: string) => {
+    setAttendance({}); // Clear stale data immediately on date change
     if (isOffline) return;
     setLoading(true);
-    setAttendance({}); // Clear stale data before fetch
     try {
       const res = await fetch(`/api/v1/attendance?schoolId=${school.id}&date=${currentDate}`);
       if (res.ok) {
@@ -274,6 +274,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
               <tbody className="divide-y divide-slate-100">
                 {classStudents.map(student => {
                   const record = attendance[student.id];
+                  const isCurrentRecord = record && record.date === date;
                   return (
                     <tr key={student.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/50">
                       <td className="py-3 px-4 text-center">
@@ -290,7 +291,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                         <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-mono">{student.admissionNo}</span>
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {record ? (
+                        {isCurrentRecord ? (
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                             record.status === 'Present' ? 'bg-green-50 text-green-700 border-green-200' : 
                             record.status === 'Absent' ? 'bg-red-50 text-red-700 border-red-200' :
@@ -308,7 +309,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                             <button
                               onClick={() => handleStatusChange(student.id, 'Present')}
                               disabled={loading}
-                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${record?.status === 'Present' ? 'bg-green-100 text-green-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
+                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${isCurrentRecord && record.status === 'Present' ? 'bg-green-100 text-green-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
                               title="Present"
                             >
                               <CheckCircle2 className="h-4 w-4" />
@@ -316,7 +317,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                             <button
                               onClick={() => handleStatusChange(student.id, 'Late')}
                               disabled={loading}
-                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${record?.status === 'Late' ? 'bg-amber-100 text-amber-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
+                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${isCurrentRecord && record.status === 'Late' ? 'bg-amber-100 text-amber-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
                               title="Late"
                             >
                               <Clock className="h-4 w-4" />
@@ -324,7 +325,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                             <button
                               onClick={() => handleStatusChange(student.id, 'Absent')}
                               disabled={loading}
-                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${record?.status === 'Absent' ? 'bg-red-100 text-red-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
+                              className={`p-1.5 rounded-lg transition disabled:opacity-50 ${isCurrentRecord && record.status === 'Absent' ? 'bg-red-100 text-red-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800'}`}
                               title="Absent"
                             >
                               <XCircle className="h-4 w-4" />

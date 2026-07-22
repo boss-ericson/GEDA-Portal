@@ -453,10 +453,12 @@ async function startServer() {
       
       const schoolsWithCounts = schools.map(school => {
         const schoolStudents = students.filter(s => s.schoolId === school.id);
+        const calcCount = schoolStudents.length > 0 ? schoolStudents.length : ((school as any).studentCount || 0);
+        const paidCount = (school as any).paidStudentCount !== undefined && (school as any).paidStudentCount !== null ? Number((school as any).paidStudentCount) : 0;
         return {
           ...school,
-          studentCount: schoolStudents.length,
-          paidStudentCount: (school as any).paidStudentCount !== undefined ? (school as any).paidStudentCount : 0
+          studentCount: calcCount,
+          paidStudentCount: paidCount
         };
       });
       

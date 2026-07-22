@@ -71,25 +71,32 @@ export default function App() {
         }
         
         setSchools(fetchedSchools);
+
+        const storedAuth = sessionStorage.getItem('geda_auth');
+        if (storedAuth) {
+          try {
+            const parsed = JSON.parse(storedAuth);
+            if (parsed.school && parsed.role) {
+              const freshMatch = fetchedSchools.find(s => s.id === parsed.school.id);
+              const updatedSchool = freshMatch ? { ...parsed.school, ...freshMatch } : parsed.school;
+              setActiveSchool(updatedSchool);
+              setActiveRole(parsed.role);
+              setActiveUser(parsed.user || null);
+              setIsDemo(parsed.isDemo ?? false);
+              
+              sessionStorage.setItem('geda_auth', JSON.stringify({
+                ...parsed,
+                school: updatedSchool
+              }));
+            }
+          } catch(e) {
+            console.error("Failed to parse auth", e);
+          }
+        }
       } catch (err) {
         console.error('Failed to load school tenants.', err);
       } finally {
         setLoading(false);
-      }
-
-      const storedAuth = sessionStorage.getItem('geda_auth');
-      if (storedAuth) {
-        try {
-          const parsed = JSON.parse(storedAuth);
-          if (parsed.school && parsed.role) {
-            setActiveSchool(parsed.school);
-            setActiveRole(parsed.role);
-            setActiveUser(parsed.user || null);
-            setIsDemo(parsed.isDemo ?? false);
-          }
-        } catch(e) {
-          console.error("Failed to parse auth", e);
-        }
       }
     }
     init();

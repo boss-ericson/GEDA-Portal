@@ -17,33 +17,59 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
   const fetchSchools = async () => {
     setLoading(true);
     try {
+      let schoolsData: any[] = [];
+      let studentsData: any[] = [];
+
       try {
         const res = await fetch('/api/v1/superadmin/schools');
         if (res.ok) {
-          const data = await res.json();
-          setSchools(data);
-          setLoading(false);
-          return;
+          schoolsData = await res.json();
         }
       } catch (apiErr) {
         console.warn('Backend API failed, falling back to Firebase directly');
       }
-      
-      const schoolsSnapshot = await getDocs(collection(db, "schools"));
-      const schoolsData = schoolsSnapshot.docs.map(d => ({ ...d.data(), id: d.id } as any));
-      
-      const studentsSnapshot = await getDocs(collection(db, "students"));
-      const studentsData = studentsSnapshot.docs.map(d => d.data());
-      
+
+      // Fetch directly from Client Firestore SDK as well to guarantee fresh data
+      try {
+        const schoolsSnapshot = await getDocs(collection(db, "schools"));
+        const fbSchools = schoolsSnapshot.docs.map(d => ({ ...d.data(), id: d.id }));
+        
+        if (schoolsData.length === 0) {
+          schoolsData = fbSchools;
+        } else {
+          // Merge client Firestore properties in case client SDK written data is fresher
+          schoolsData = schoolsData.map(s => {
+            const fbMatch: any = fbSchools.find(f => f.id === s.id);
+            if (fbMatch) {
+              return {
+                ...s,
+                ...fbMatch,
+                paidStudentCount: fbMatch.paidStudentCount !== undefined ? Number(fbMatch.paidStudentCount) : s.paidStudentCount
+              };
+            }
+            return s;
+          });
+        }
+      } catch (fbErr) {
+        console.warn('Firebase direct fetch failed in SuperAdminDashboard:', fbErr);
+      }
+
+      try {
+        const studentsSnapshot = await getDocs(collection(db, "students"));
+        studentsData = studentsSnapshot.docs.map(d => d.data());
+      } catch (stErr) {}
+
       const combined = schoolsData.map(school => {
         const schoolStudents = studentsData.filter(s => s.schoolId === school.id);
+        const calcCount = schoolStudents.length > 0 ? schoolStudents.length : (school.studentCount || 0);
+        const paidCount = school.paidStudentCount !== undefined && school.paidStudentCount !== null ? Number(school.paidStudentCount) : 0;
         return {
           ...school,
-          studentCount: schoolStudents.length,
-          paidStudentCount: school.paidStudentCount !== undefined ? school.paidStudentCount : 0
+          studentCount: calcCount,
+          paidStudentCount: paidCount
         };
       });
-      
+
       setSchools(combined);
     } catch (err: any) {
       setError(err.message || 'Failed to load schools');
@@ -60,19 +86,18 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
     const newStatus = currentStatus === 'Deactivated' ? 'Active' : 'Deactivated';
 
     try {
-      let success = false;
       try {
-        const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/status`, {
+        await setDoc(doc(db, "schools", schoolId), { status: newStatus }, { merge: true });
+      } catch (fbErr) {}
+
+      try {
+        await fetch(`/api/v1/superadmin/schools/${schoolId}/status`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: newStatus })
         });
-        if (res.ok) success = true;
       } catch (apiErr) {}
 
-      if (!success) {
-        await setDoc(doc(db, "schools", schoolId), { status: newStatus }, { merge: true });
-      }
       setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, status: newStatus } : s));
     } catch (err) {
       console.error('Network error while updating status');
@@ -83,19 +108,18 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
     const newAccess = currentAccess === 'Restricted' ? 'Full' : 'Restricted';
 
     try {
-      let success = false;
       try {
-        const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/access`, {
+        await setDoc(doc(db, "schools", schoolId), { accessLevel: newAccess }, { merge: true });
+      } catch (fbErr) {}
+
+      try {
+        await fetch(`/api/v1/superadmin/schools/${schoolId}/access`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accessLevel: newAccess })
         });
-        if (res.ok) success = true;
       } catch (apiErr) {}
 
-      if (!success) {
-        await setDoc(doc(db, "schools", schoolId), { accessLevel: newAccess }, { merge: true });
-      }
       setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: newAccess } : s));
     } catch (err) {
       console.error('Network error while updating access level');
@@ -103,26 +127,37 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
   };
 
   const handleVerifyPayment = async (schoolId: string, currentStudents: number) => {
+    const paidCount = Number(currentStudents || 0);
     try {
-      let success = false;
+      // 1. Unconditionally update Client Firestore SDK
       try {
-        const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/verify-payment`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paidStudentCount: currentStudents })
-        });
-        if (res.ok) success = true;
-      } catch (apiErr) {}
-      
-      if (!success) {
         await setDoc(doc(db, "schools", schoolId), { 
           accessLevel: 'Full', 
-          paidStudentCount: currentStudents, 
+          paidStudentCount: paidCount, 
           billingNotice: '' 
         }, { merge: true });
+      } catch (fbErr) {
+        console.warn('Direct Firestore setDoc failed:', fbErr);
       }
 
-      setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: 'Full', paidStudentCount: currentStudents, billingNotice: '' } : s));
+      // 2. Unconditionally update Backend API
+      try {
+        await fetch(`/api/v1/superadmin/schools/${schoolId}/verify-payment`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paidStudentCount: paidCount })
+        });
+      } catch (apiErr) {
+        console.warn('Backend API verify-payment failed:', apiErr);
+      }
+
+      // 3. Update React state immediately
+      setSchools(prev => prev.map(s => s.id === schoolId ? { 
+        ...s, 
+        accessLevel: 'Full', 
+        paidStudentCount: paidCount, 
+        billingNotice: '' 
+      } : s));
     } catch (err) {
       console.error('Error while verifying payment:', err);
     }
@@ -132,19 +167,17 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
     if (unpaidStudents <= 0) return;
     const message = `Notice: You have ${unpaidStudents} new student(s) unpaid for. Please make payment to avoid access restriction.`;
     try {
-      let success = false;
       try {
-        const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/billing-notice`, {
+        await setDoc(doc(db, "schools", schoolId), { billingNotice: message }, { merge: true });
+      } catch (fbErr) {}
+
+      try {
+        await fetch(`/api/v1/superadmin/schools/${schoolId}/billing-notice`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ billingNotice: message })
         });
-        if (res.ok) success = true;
       } catch (apiErr) {}
-
-      if (!success) {
-        await setDoc(doc(db, "schools", schoolId), { billingNotice: message }, { merge: true });
-      }
 
       setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, billingNotice: message } : s));
       alert('Notice sent successfully to the school dashboard.');

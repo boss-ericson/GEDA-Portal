@@ -880,8 +880,8 @@ export default function AcademicCenter({ school, students, isOffline, user, role
 
       {/* MODAL: Edit Scores */}
       {selectedStudent && editRecord && (
-        <div className="fixed inset-0 bg-slate-900/60 z-[100] flex sm:items-center sm:justify-center p-0 sm:p-4">
-          <div className="absolute inset-0 sm:relative sm:inset-auto bg-white dark:bg-slate-900 w-full sm:h-auto sm:max-h-[92vh] sm:rounded-3xl sm:max-w-5xl border-0 sm:border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col">
+        <div className="fixed inset-0 bg-slate-900/60 z-[100] flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="relative bg-white dark:bg-slate-900 w-full max-w-5xl h-[92vh] sm:h-auto max-h-[92vh] sm:max-h-[88vh] my-auto rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col min-h-0">
             <div className="bg-slate-50 dark:bg-slate-950 py-3.5 px-5 sm:py-4 sm:px-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0">
               <div>
                 <h3 className="font-display font-bold text-slate-900 dark:text-white text-sm sm:text-base">Academic Records - {selectedStudent.fullName}</h3>
@@ -892,8 +892,8 @@ export default function AcademicCenter({ school, students, isOffline, user, role
               </button>
             </div>
             
-            <form onSubmit={handleSave} className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden relative">
-              <div className="p-4 pb-2 shrink-0">
+            <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0 overflow-hidden relative">
+              <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 p-4 sm:p-6 space-y-4">
                 <div className="bg-amber-50 border border-amber-100 rounded-xl p-2.5 sm:p-3 flex gap-2 sm:gap-3 text-[11px] sm:text-xs text-amber-800 items-start">
                   <Award className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
                   <p>
@@ -901,112 +901,110 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                     <strong>Exam:</strong> Raw score out of 100 scaled to 50%.
                   </p>
                 </div>
-              </div>
 
-              <div className="w-full px-4 sm:px-6 pb-4 shrink-0">
-                <div className="overflow-x-auto w-full border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm">
+                <div className="w-full border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-x-auto">
                   <div className="min-w-[800px] sm:min-w-[900px]">
-                  <table className="w-full text-left text-sm border-collapse">
-                    <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 text-[9px] sm:text-[10px] uppercase font-bold tracking-wider sticky top-0 z-20 shadow-[0_1px_2px_rgba(0,0,0,0.1)] before:content-[''] before:absolute before:inset-0 before:bg-slate-50 dark:bg-slate-950 before:-z-10">
-                      <tr>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700">Subject</th>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Class Assessment Task 1 (Max 15)">CAT 1<br/>(15)</th>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Group Work (Max 15)">Grp Work<br/>(15)</th>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Class Assessment Task 2 (Max 15)">CAT 2<br/>(15)</th>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Project Work (Max 15)">Project<br/>(15)</th>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 w-16 sm:w-20 text-center">SBA<br/>(50%)</th>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700 w-20 sm:w-24 text-center" title="Exam Score (Max 100)">Exam<br/>(100)</th>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 w-16 sm:w-20 text-center">Exam<br/>(50%)</th>
-                        <th className="p-2 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white w-20 sm:w-24 text-center">Total<br/>(100%)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {editRecord.scores.map((score, idx) => {
-                        const sbaTotal = calculateSbaTotal(score);
-                        const examTotal = calculateExamTotal(score);
-                        const finalTotal = sbaTotal + examTotal;
-                        
-                        return (
-                          <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/30">
-                            <td className="p-2 border border-slate-200 dark:border-slate-700 font-semibold text-slate-900 dark:text-white text-[11px] sm:text-xs">{score.subject}</td>
-                            <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat1 ?? ''} onChange={e => handleScoreChange(idx, 'cat1', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                            </td>
-                            <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.groupWork ?? ''} onChange={e => handleScoreChange(idx, 'groupWork', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                            </td>
-                            <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat2 ?? ''} onChange={e => handleScoreChange(idx, 'cat2', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                            </td>
-                            <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.projectWork ?? ''} onChange={e => handleScoreChange(idx, 'projectWork', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                            </td>
-                            <td className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 text-center font-bold text-slate-700 dark:text-slate-300 text-xs">{sbaTotal}</td>
-                            <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.exam ?? ''} onChange={e => handleScoreChange(idx, 'exam', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                            </td>
-                            <td className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 text-center font-bold text-slate-700 dark:text-slate-300 text-xs">{examTotal}</td>
-                            <td className="p-2 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-center font-bold text-slate-900 dark:text-white text-xs">{finalTotal} <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400 ml-1">({getGrade(finalTotal)})</span></td>
-                          </tr>
-                        );
-                      })}
-                                        </tbody>
-                  </table>
+                    <table className="w-full text-left text-sm border-collapse">
+                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 text-[9px] sm:text-[10px] uppercase font-bold tracking-wider sticky top-0 z-20 shadow-[0_1px_2px_rgba(0,0,0,0.1)] before:content-[''] before:absolute before:inset-0 before:bg-slate-50 dark:bg-slate-950 before:-z-10">
+                        <tr>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700">Subject</th>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Class Assessment Task 1 (Max 15)">CAT 1<br/>(15)</th>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Group Work (Max 15)">Grp Work<br/>(15)</th>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Class Assessment Task 2 (Max 15)">CAT 2<br/>(15)</th>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Project Work (Max 15)">Project<br/>(15)</th>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 w-16 sm:w-20 text-center">SBA<br/>(50%)</th>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-20 sm:w-24 text-center" title="Exam Score (Max 100)">Exam<br/>(100)</th>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 w-16 sm:w-20 text-center">Exam<br/>(50%)</th>
+                          <th className="p-2 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white w-20 sm:w-24 text-center">Total<br/>(100%)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {editRecord.scores.map((score, idx) => {
+                          const sbaTotal = calculateSbaTotal(score);
+                          const examTotal = calculateExamTotal(score);
+                          const finalTotal = sbaTotal + examTotal;
+                          
+                          return (
+                            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/30">
+                              <td className="p-2 border border-slate-200 dark:border-slate-700 font-semibold text-slate-900 dark:text-white text-[11px] sm:text-xs">{score.subject}</td>
+                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
+                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat1 ?? ''} onChange={e => handleScoreChange(idx, 'cat1', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
+                              </td>
+                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
+                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.groupWork ?? ''} onChange={e => handleScoreChange(idx, 'groupWork', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
+                              </td>
+                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
+                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat2 ?? ''} onChange={e => handleScoreChange(idx, 'cat2', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
+                              </td>
+                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
+                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.projectWork ?? ''} onChange={e => handleScoreChange(idx, 'projectWork', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
+                              </td>
+                              <td className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 text-center font-bold text-slate-700 dark:text-slate-300 text-xs">{sbaTotal}</td>
+                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
+                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.exam ?? ''} onChange={e => handleScoreChange(idx, 'exam', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
+                              </td>
+                              <td className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 text-center font-bold text-slate-700 dark:text-slate-300 text-xs">{examTotal}</td>
+                              <td className="p-2 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-center font-bold text-slate-900 dark:text-white text-xs">{finalTotal} <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400 ml-1">({getGrade(finalTotal)})</span></td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-slate-50/50 dark:bg-slate-950/50">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Attitude</label>
+                    <select 
+                      disabled={!isOtherFieldsEditable()}
+                      value={editRecord.attitude || ''} 
+                      onChange={e => setEditRecord({...editRecord, attitude: e.target.value})}
+                      className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100 bg-white dark:bg-slate-900"
+                    >
+                      <option value="">Select Attitude...</option>
+                      {ATTITUDES.map(a => <option key={a} value={a}>{a}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Conduct</label>
+                    <select 
+                      disabled={!isOtherFieldsEditable()}
+                      value={editRecord.conduct || ''} 
+                      onChange={e => setEditRecord({...editRecord, conduct: e.target.value})}
+                      className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100 bg-white dark:bg-slate-900"
+                    >
+                      <option value="">Select Conduct...</option>
+                      {CONDUCTS.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Interest</label>
+                    <select 
+                      disabled={!isOtherFieldsEditable()}
+                      value={editRecord.interest || ''} 
+                      onChange={e => setEditRecord({...editRecord, interest: e.target.value})}
+                      className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100 bg-white dark:bg-slate-900"
+                    >
+                      <option value="">Select Interest...</option>
+                      {INTERESTS.map(i => <option key={i} value={i}>{i}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Teacher Remarks</label>
+                    <input 
+                      disabled={!isOtherFieldsEditable()}
+                      type="text"
+                      value={editRecord.teacherRemarks || ''} 
+                      onChange={e => setEditRecord({...editRecord, teacherRemarks: e.target.value})}
+                      className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100 bg-white dark:bg-slate-900"
+                      placeholder="Enter custom remarks..."
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-slate-50 dark:bg-slate-950 shrink-0">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Attitude</label>
-                  <select 
-                    disabled={!isOtherFieldsEditable()}
-                    value={editRecord.attitude || ''} 
-                    onChange={e => setEditRecord({...editRecord, attitude: e.target.value})}
-                    className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100"
-                  >
-                    <option value="">Select Attitude...</option>
-                    {ATTITUDES.map(a => <option key={a} value={a}>{a}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Conduct</label>
-                  <select 
-                    disabled={!isOtherFieldsEditable()}
-                    value={editRecord.conduct || ''} 
-                    onChange={e => setEditRecord({...editRecord, conduct: e.target.value})}
-                    className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100"
-                  >
-                    <option value="">Select Conduct...</option>
-                    {CONDUCTS.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Interest</label>
-                  <select 
-                    disabled={!isOtherFieldsEditable()}
-                    value={editRecord.interest || ''} 
-                    onChange={e => setEditRecord({...editRecord, interest: e.target.value})}
-                    className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100"
-                  >
-                    <option value="">Select Interest...</option>
-                    {INTERESTS.map(i => <option key={i} value={i}>{i}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Teacher Remarks</label>
-                  <input 
-                    disabled={!isOtherFieldsEditable()}
-                    type="text"
-                    value={editRecord.teacherRemarks || ''} 
-                    onChange={e => setEditRecord({...editRecord, teacherRemarks: e.target.value})}
-                    className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100"
-                    placeholder="Enter custom remarks..."
-                  />
-                                </div>
-              </div>
-
-              <div className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 p-3 sm:p-4 flex justify-end gap-2.5 sm:gap-3 shrink-0 sticky bottom-0 z-50">
+              <div className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 p-3 sm:p-4 flex justify-end gap-2.5 sm:gap-3 shrink-0">
                 <button type="button" onClick={() => setSelectedStudent(null)} className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition cursor-pointer">
                   Cancel
                 </button>

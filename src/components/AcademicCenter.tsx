@@ -880,140 +880,148 @@ export default function AcademicCenter({ school, students, isOffline, user, role
 
       {/* MODAL: Edit Scores */}
       {selectedStudent && editRecord && (
-        <div className="fixed inset-0 bg-slate-900/60 z-[100] flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-          <div className="relative bg-white dark:bg-slate-900 w-full max-w-5xl h-[92vh] sm:h-auto max-h-[92vh] sm:max-h-[88vh] my-auto rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col min-h-0">
-            <div className="bg-slate-50 dark:bg-slate-950 py-3.5 px-5 sm:py-4 sm:px-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center shrink-0">
+        <div className="fixed inset-0 bg-white dark:bg-slate-900 z-[100] flex flex-col w-screen h-screen overflow-hidden animate-in fade-in duration-200">
+          {/* Header */}
+          <div className="bg-slate-900 text-white py-3 px-4 sm:px-6 flex justify-between items-center shrink-0 border-b border-slate-800 shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="bg-amber-500 text-slate-950 p-2 rounded-xl font-bold shadow-sm">
+                <Award className="h-5 w-5" />
+              </div>
               <div>
-                <h3 className="font-display font-bold text-slate-900 dark:text-white text-sm sm:text-base">Academic Records - {selectedStudent.fullName}</h3>
-                <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">{activeClass} | {term} Term, {year}</p>
+                <h3 className="font-display font-bold text-white text-base sm:text-lg leading-tight">Academic Records &mdash; {selectedStudent.fullName}</h3>
+                <p className="text-xs text-amber-400 font-medium mt-0.5">{activeClass} &bull; {term} Term, {year} &bull; Admission No: {selectedStudent.admissionNo || 'N/A'}</p>
               </div>
-              <button onClick={() => setSelectedStudent(null)} className="p-1.5 sm:p-2 hover:bg-slate-200 dark:bg-slate-700 rounded-full cursor-pointer text-slate-500 dark:text-slate-400 transition text-lg leading-none">
-                &times;
-              </button>
             </div>
-            
-            <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0 overflow-hidden relative">
-              <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 p-4 sm:p-6 space-y-4">
-                <div className="bg-amber-50 border border-amber-100 rounded-xl p-2.5 sm:p-3 flex gap-2 sm:gap-3 text-[11px] sm:text-xs text-amber-800 items-start">
-                  <Award className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
-                  <p>
-                    <strong>SBA:</strong> CAT 1, Grp Work, CAT 2, Project (Max 15 each). Total 60 scaled to 50%.<br/>
-                    <strong>Exam:</strong> Raw score out of 100 scaled to 50%.
-                  </p>
-                </div>
-
-                <div className="w-full border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm overflow-x-auto">
-                  <div className="min-w-[800px] sm:min-w-[900px]">
-                    <table className="w-full text-left text-sm border-collapse">
-                      <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 dark:text-slate-400 text-[9px] sm:text-[10px] uppercase font-bold tracking-wider sticky top-0 z-20 shadow-[0_1px_2px_rgba(0,0,0,0.1)] before:content-[''] before:absolute before:inset-0 before:bg-slate-50 dark:bg-slate-950 before:-z-10">
-                        <tr>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700">Subject</th>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Class Assessment Task 1 (Max 15)">CAT 1<br/>(15)</th>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Group Work (Max 15)">Grp Work<br/>(15)</th>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Class Assessment Task 2 (Max 15)">CAT 2<br/>(15)</th>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-16 sm:w-20 text-center" title="Project Work (Max 15)">Project<br/>(15)</th>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 w-16 sm:w-20 text-center">SBA<br/>(50%)</th>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700 w-20 sm:w-24 text-center" title="Exam Score (Max 100)">Exam<br/>(100)</th>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 w-16 sm:w-20 text-center">Exam<br/>(50%)</th>
-                          <th className="p-2 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white w-20 sm:w-24 text-center">Total<br/>(100%)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {editRecord.scores.map((score, idx) => {
-                          const sbaTotal = calculateSbaTotal(score);
-                          const examTotal = calculateExamTotal(score);
-                          const finalTotal = sbaTotal + examTotal;
-                          
-                          return (
-                            <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/30">
-                              <td className="p-2 border border-slate-200 dark:border-slate-700 font-semibold text-slate-900 dark:text-white text-[11px] sm:text-xs">{score.subject}</td>
-                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat1 ?? ''} onChange={e => handleScoreChange(idx, 'cat1', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                              </td>
-                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.groupWork ?? ''} onChange={e => handleScoreChange(idx, 'groupWork', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                              </td>
-                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat2 ?? ''} onChange={e => handleScoreChange(idx, 'cat2', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                              </td>
-                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.projectWork ?? ''} onChange={e => handleScoreChange(idx, 'projectWork', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                              </td>
-                              <td className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 text-center font-bold text-slate-700 dark:text-slate-300 text-xs">{sbaTotal}</td>
-                              <td className="p-1 sm:p-1.5 border border-slate-200 dark:border-slate-700">
-                                <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.exam ?? ''} onChange={e => handleScoreChange(idx, 'exam', e.target.value)} className="w-full p-2 sm:p-1 text-center text-base sm:text-xs border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100" />
-                              </td>
-                              <td className="p-2 border border-slate-200 dark:border-slate-700 bg-amber-50 text-center font-bold text-slate-700 dark:text-slate-300 text-xs">{examTotal}</td>
-                              <td className="p-2 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-center font-bold text-slate-900 dark:text-white text-xs">{finalTotal} <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400 ml-1">({getGrade(finalTotal)})</span></td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 bg-slate-50/50 dark:bg-slate-950/50">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Attitude</label>
-                    <select 
-                      disabled={!isOtherFieldsEditable()}
-                      value={editRecord.attitude || ''} 
-                      onChange={e => setEditRecord({...editRecord, attitude: e.target.value})}
-                      className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100 bg-white dark:bg-slate-900"
-                    >
-                      <option value="">Select Attitude...</option>
-                      {ATTITUDES.map(a => <option key={a} value={a}>{a}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Conduct</label>
-                    <select 
-                      disabled={!isOtherFieldsEditable()}
-                      value={editRecord.conduct || ''} 
-                      onChange={e => setEditRecord({...editRecord, conduct: e.target.value})}
-                      className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100 bg-white dark:bg-slate-900"
-                    >
-                      <option value="">Select Conduct...</option>
-                      {CONDUCTS.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Interest</label>
-                    <select 
-                      disabled={!isOtherFieldsEditable()}
-                      value={editRecord.interest || ''} 
-                      onChange={e => setEditRecord({...editRecord, interest: e.target.value})}
-                      className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100 bg-white dark:bg-slate-900"
-                    >
-                      <option value="">Select Interest...</option>
-                      {INTERESTS.map(i => <option key={i} value={i}>{i}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Teacher Remarks</label>
-                    <input 
-                      disabled={!isOtherFieldsEditable()}
-                      type="text"
-                      value={editRecord.teacherRemarks || ''} 
-                      onChange={e => setEditRecord({...editRecord, teacherRemarks: e.target.value})}
-                      className="w-full p-2 sm:p-2 border border-slate-200 dark:border-slate-700 rounded text-base sm:text-xs outline-none focus:ring-1 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 disabled:opacity-100 bg-white dark:bg-slate-900"
-                      placeholder="Enter custom remarks..."
-                    />
-                  </div>
+            <button onClick={() => setSelectedStudent(null)} className="p-2 hover:bg-slate-800 rounded-xl cursor-pointer text-slate-300 hover:text-white transition text-2xl leading-none w-10 h-10 flex items-center justify-center">
+              &times;
+            </button>
+          </div>
+          
+          <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0 overflow-hidden relative bg-slate-50 dark:bg-slate-950">
+            <div className="flex-1 overflow-y-auto min-h-0 p-3 sm:p-5 space-y-3 sm:space-y-4">
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-2 flex items-center justify-between gap-3 text-xs text-amber-900 dark:text-amber-300 shrink-0">
+                <div className="flex items-center gap-2">
+                  <Award className="h-4 w-4 shrink-0 text-amber-500" />
+                  <span><strong>SBA:</strong> CAT 1 (15) + Grp Work (15) + CAT 2 (15) + Project (15) = 60 scaled to 50% &bull; <strong>Exam:</strong> Raw score out of 100 scaled to 50%</span>
                 </div>
               </div>
 
-              <div className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-700 p-3 sm:p-4 flex justify-end gap-2.5 sm:gap-3 shrink-0">
-                <button type="button" onClick={() => setSelectedStudent(null)} className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition cursor-pointer">
+              <div className="w-full border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs overflow-x-auto bg-white dark:bg-slate-900">
+                <div className="min-w-[780px]">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 text-[10px] sm:text-xs uppercase font-bold tracking-wider sticky top-0 z-20 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                      <tr>
+                        <th className="p-2 border border-slate-200 dark:border-slate-800">Subject</th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-16 text-center" title="Class Assessment Task 1 (Max 15)">CAT 1<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-16 text-center" title="Group Work (Max 15)">Grp Work<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-16 text-center" title="Class Assessment Task 2 (Max 15)">CAT 2<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-16 text-center" title="Project Work (Max 15)">Project<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 bg-amber-500/10 w-16 text-center text-amber-700 dark:text-amber-300">SBA<br/><span className="text-[9px] font-normal">(50%)</span></th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-20 text-center" title="Exam Score (Max 100)">Exam<br/><span className="text-[9px] text-slate-400 font-normal">(100)</span></th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 bg-amber-500/10 w-16 text-center text-amber-700 dark:text-amber-300">Exam<br/><span className="text-[9px] font-normal">(50%)</span></th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white w-20 text-center">Total<br/><span className="text-[9px] font-normal">(100%)</span></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {editRecord.scores.map((score, idx) => {
+                        const sbaTotal = calculateSbaTotal(score);
+                        const examTotal = calculateExamTotal(score);
+                        const finalTotal = sbaTotal + examTotal;
+                        
+                        return (
+                          <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 font-semibold text-slate-900 dark:text-white text-xs">{score.subject}</td>
+                            <td className="p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat1 ?? ''} onChange={e => handleScoreChange(idx, 'cat1', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            </td>
+                            <td className="p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.groupWork ?? ''} onChange={e => handleScoreChange(idx, 'groupWork', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            </td>
+                            <td className="p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat2 ?? ''} onChange={e => handleScoreChange(idx, 'cat2', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            </td>
+                            <td className="p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.projectWork ?? ''} onChange={e => handleScoreChange(idx, 'projectWork', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            </td>
+                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 bg-amber-50 dark:bg-amber-950/30 text-center font-bold text-amber-900 dark:text-amber-300 text-xs sm:text-sm">{sbaTotal}</td>
+                            <td className="p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.exam ?? ''} onChange={e => handleScoreChange(idx, 'exam', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            </td>
+                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 bg-amber-50 dark:bg-amber-950/30 text-center font-bold text-amber-900 dark:text-amber-300 text-xs sm:text-sm">{examTotal}</td>
+                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-center font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{finalTotal} <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400 ml-0.5">({getGrade(finalTotal)})</span></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 bg-white dark:bg-slate-900 shadow-xs">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Attitude</label>
+                  <select 
+                    disabled={!isOtherFieldsEditable()}
+                    value={editRecord.attitude || ''} 
+                    onChange={e => setEditRecord({...editRecord, attitude: e.target.value})}
+                    className="w-full h-8 py-1 px-2 border border-slate-200 dark:border-slate-700 rounded text-xs outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 bg-white dark:bg-slate-900"
+                  >
+                    <option value="">Select Attitude...</option>
+                    {ATTITUDES.map(a => <option key={a} value={a}>{a}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Conduct</label>
+                  <select 
+                    disabled={!isOtherFieldsEditable()}
+                    value={editRecord.conduct || ''} 
+                    onChange={e => setEditRecord({...editRecord, conduct: e.target.value})}
+                    className="w-full h-8 py-1 px-2 border border-slate-200 dark:border-slate-700 rounded text-xs outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 bg-white dark:bg-slate-900"
+                  >
+                    <option value="">Select Conduct...</option>
+                    {CONDUCTS.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Interest</label>
+                  <select 
+                    disabled={!isOtherFieldsEditable()}
+                    value={editRecord.interest || ''} 
+                    onChange={e => setEditRecord({...editRecord, interest: e.target.value})}
+                    className="w-full h-8 py-1 px-2 border border-slate-200 dark:border-slate-700 rounded text-xs outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 bg-white dark:bg-slate-900"
+                  >
+                    <option value="">Select Interest...</option>
+                    {INTERESTS.map(i => <option key={i} value={i}>{i}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Teacher Remarks</label>
+                  <input 
+                    disabled={!isOtherFieldsEditable()}
+                    type="text"
+                    value={editRecord.teacherRemarks || ''} 
+                    onChange={e => setEditRecord({...editRecord, teacherRemarks: e.target.value})}
+                    className="w-full h-8 py-1 px-2 border border-slate-200 dark:border-slate-700 rounded text-xs outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 bg-white dark:bg-slate-900"
+                    placeholder="Enter custom remarks..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-3 px-4 sm:px-6 flex justify-between items-center shrink-0">
+              <div className="hidden sm:block text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Student: <span className="font-bold text-slate-700 dark:text-slate-200">{selectedStudent.fullName}</span>
+              </div>
+              <div className="flex gap-3 ml-auto">
+                <button type="button" onClick={() => setSelectedStudent(null)} className="px-5 py-2 rounded-xl font-semibold text-xs sm:text-sm border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
                   Cancel
                 </button>
-                <button disabled={isSaving} type="submit" className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-semibold text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 dark:text-white transition cursor-pointer shadow-sm dark:shadow-none disabled:opacity-75 disabled:cursor-not-allowed">
+                <button disabled={isSaving} type="submit" className="px-6 py-2 rounded-xl font-bold text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-slate-950 transition cursor-pointer shadow-md disabled:opacity-75 disabled:cursor-not-allowed">
                   {isSaving ? 'Saving...' : 'Save Academic Records'}
                 </button>
               </div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       )}
     </div>

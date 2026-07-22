@@ -907,19 +907,19 @@ export default function AcademicCenter({ school, students, isOffline, user, role
               </div>
 
               <div className="w-full border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs overflow-x-auto bg-white dark:bg-slate-900">
-                <div className="min-w-[780px]">
-                  <table className="w-full text-left text-xs border-collapse">
+                <div className="w-full">
+                  <table className="w-full text-left text-xs border-collapse table-fixed">
                     <thead className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 text-[10px] sm:text-xs uppercase font-bold tracking-wider sticky top-0 z-20 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                       <tr>
-                        <th className="p-2 border border-slate-200 dark:border-slate-800">Subject</th>
-                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-16 text-center" title="Class Assessment Task 1 (Max 15)">CAT 1<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
-                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-16 text-center" title="Group Work (Max 15)">Grp Work<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
-                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-16 text-center" title="Class Assessment Task 2 (Max 15)">CAT 2<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
-                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-16 text-center" title="Project Work (Max 15)">Project<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
-                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 bg-amber-500/10 w-16 text-center text-amber-700 dark:text-amber-300">SBA<br/><span className="text-[9px] font-normal">(50%)</span></th>
-                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-20 text-center" title="Exam Score (Max 100)">Exam<br/><span className="text-[9px] text-slate-400 font-normal">(100)</span></th>
-                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 bg-amber-500/10 w-16 text-center text-amber-700 dark:text-amber-300">Exam<br/><span className="text-[9px] font-normal">(50%)</span></th>
-                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white w-20 text-center">Total<br/><span className="text-[9px] font-normal">(100%)</span></th>
+                        <th className="p-1.5 border border-slate-200 dark:border-slate-800 w-[24%] sm:w-[26%]">Subject</th>
+                        <th className="p-1 border border-slate-200 dark:border-slate-800 w-[8.5%] text-center" title="Class Assessment Task 1 (Max 15)">CAT 1<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="p-1 border border-slate-200 dark:border-slate-800 w-[8.5%] text-center" title="Group Work (Max 15)">Grp<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="p-1 border border-slate-200 dark:border-slate-800 w-[8.5%] text-center" title="Class Assessment Task 2 (Max 15)">CAT 2<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="p-1 border border-slate-200 dark:border-slate-800 w-[8.5%] text-center" title="Project Work (Max 15)">Proj<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="p-1 border border-slate-200 dark:border-slate-800 bg-amber-500/10 w-[9%] text-center text-amber-700 dark:text-amber-300">SBA<br/><span className="text-[9px] font-normal">(50%)</span></th>
+                        <th className="p-1 border border-slate-200 dark:border-slate-800 w-[11%] text-center" title="Exam Score (Max 100)">Exam<br/><span className="text-[9px] text-slate-400 font-normal">(100)</span></th>
+                        <th className="p-1 border border-slate-200 dark:border-slate-800 bg-amber-500/10 w-[9%] text-center text-amber-700 dark:text-amber-300">Exam<br/><span className="text-[9px] font-normal">(50%)</span></th>
+                        <th className="p-1 border border-slate-200 dark:border-slate-800 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white w-[13%] text-center">Total<br/><span className="text-[9px] font-normal">(100%)</span></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -930,25 +930,25 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                         
                         return (
                           <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 font-semibold text-slate-900 dark:text-white text-xs">{score.subject}</td>
-                            <td className="p-1 border border-slate-200 dark:border-slate-800">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat1 ?? ''} onChange={e => handleScoreChange(idx, 'cat1', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 font-semibold text-slate-900 dark:text-white text-[11px] sm:text-xs leading-tight truncate" title={score.subject}>{score.subject}</td>
+                            <td className="p-0.5 sm:p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat1 ?? ''} onChange={e => handleScoreChange(idx, 'cat1', e.target.value)} className="w-full py-0.5 px-0.5 text-center text-xs font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none h-7 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
                             </td>
-                            <td className="p-1 border border-slate-200 dark:border-slate-800">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.groupWork ?? ''} onChange={e => handleScoreChange(idx, 'groupWork', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            <td className="p-0.5 sm:p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.groupWork ?? ''} onChange={e => handleScoreChange(idx, 'groupWork', e.target.value)} className="w-full py-0.5 px-0.5 text-center text-xs font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none h-7 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
                             </td>
-                            <td className="p-1 border border-slate-200 dark:border-slate-800">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat2 ?? ''} onChange={e => handleScoreChange(idx, 'cat2', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            <td className="p-0.5 sm:p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.cat2 ?? ''} onChange={e => handleScoreChange(idx, 'cat2', e.target.value)} className="w-full py-0.5 px-0.5 text-center text-xs font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none h-7 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
                             </td>
-                            <td className="p-1 border border-slate-200 dark:border-slate-800">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.projectWork ?? ''} onChange={e => handleScoreChange(idx, 'projectWork', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            <td className="p-0.5 sm:p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.projectWork ?? ''} onChange={e => handleScoreChange(idx, 'projectWork', e.target.value)} className="w-full py-0.5 px-0.5 text-center text-xs font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none h-7 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
                             </td>
-                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 bg-amber-50 dark:bg-amber-950/30 text-center font-bold text-amber-900 dark:text-amber-300 text-xs sm:text-sm">{sbaTotal}</td>
-                            <td className="p-1 border border-slate-200 dark:border-slate-800">
-                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.exam ?? ''} onChange={e => handleScoreChange(idx, 'exam', e.target.value)} className="w-full py-1 px-1 text-center text-xs sm:text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-2 focus:ring-amber-500 outline-none h-7 sm:h-8 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
+                            <td className="p-1 border border-slate-200 dark:border-slate-800 bg-amber-50 dark:bg-amber-950/30 text-center font-bold text-amber-900 dark:text-amber-300 text-xs">{sbaTotal}</td>
+                            <td className="p-0.5 sm:p-1 border border-slate-200 dark:border-slate-800">
+                              <input disabled={!isSubjectEditable(score.subject)} type="text" inputMode="numeric" pattern="[0-9]*" value={score.exam ?? ''} onChange={e => handleScoreChange(idx, 'exam', e.target.value)} className="w-full py-0.5 px-0.5 text-center text-xs font-semibold border border-slate-200 dark:border-slate-700 rounded focus:ring-1 focus:ring-amber-500 outline-none h-7 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500" />
                             </td>
-                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 bg-amber-50 dark:bg-amber-950/30 text-center font-bold text-amber-900 dark:text-amber-300 text-xs sm:text-sm">{examTotal}</td>
-                            <td className="p-1.5 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-center font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{finalTotal} <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400 ml-0.5">({getGrade(finalTotal)})</span></td>
+                            <td className="p-1 border border-slate-200 dark:border-slate-800 bg-amber-50 dark:bg-amber-950/30 text-center font-bold text-amber-900 dark:text-amber-300 text-xs">{examTotal}</td>
+                            <td className="p-1 border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-center font-bold text-slate-900 dark:text-white text-xs">{finalTotal} <span className="text-[10px] font-normal text-slate-500 dark:text-slate-400">({getGrade(finalTotal)})</span></td>
                           </tr>
                         );
                       })}

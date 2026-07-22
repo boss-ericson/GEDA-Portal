@@ -5,6 +5,7 @@ import { useReactToPrint } from 'react-to-print';
 import * as XLSX from 'xlsx';
 import { School, Student, Payment, BackupLog, ApiKey, Role } from '../types';
 import AcademicCenter from './AcademicCenter';
+import AICenter from './AICenter';
 import AttendanceTracker from './AttendanceTracker';
 import StudentHistoryModal from './StudentHistoryModal';
 import PromotionsManager from './PromotionsManager';
@@ -20,7 +21,7 @@ import {
   Database, Terminal, LogOut, Wifi, WifiOff, FileText, 
   Trash2, RefreshCw, Send, CheckCircle2, AlertTriangle, 
   Search, SlidersHorizontal, ArrowDownToLine, Phone, Printer, 
-  Calendar, Award, DollarSign, BookOpen, Clock, Key,
+  Calendar, Award, DollarSign, BookOpen, Clock, Key, Sparkles,
   School as SchoolIcon, GraduationCap, Settings, Edit, Menu, User
 } from 'lucide-react';
 
@@ -1479,6 +1480,21 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 <span>Academic Center</span>
               </button>
 
+              <button
+                onClick={() => handleTabChange('ai-center')}
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition cursor-pointer ${
+                  activeTab === 'ai-center'
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'text-amber-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Sparkles className="h-4 w-4 text-amber-400" />
+                  <span>NaCCA AI Center</span>
+                </div>
+                <span className="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase">AI</span>
+              </button>
+
               {role === 'Admin' && (
                 <button
                   onClick={() => handleTabChange('transcripts')}
@@ -2236,6 +2252,11 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           {/* TAB: ACADEMIC CENTER */}
           {activeTab === 'academic' && (
             <AcademicCenter school={school} students={[...offlineQueue, ...students]} isOffline={isOffline} user={user} role={role} />
+          )}
+
+          {/* TAB: NACCA AI CENTER */}
+          {activeTab === 'ai-center' && (
+            <AICenter school={school} students={[...offlineQueue, ...students]} user={user} role={role} />
           )}
 
           {/* TAB: TRANSCRIPTS */}

@@ -347,7 +347,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
             <div style="flex-1; padding: 0 10px; font-weight: bold; font-size: 14px;">
               <p style="margin: 3px 0;">${school.district ? 'ADDRESS: ' + school.district : 'POST OFFICE BOX ...'}</p>
               <p style="margin: 3px 0;">CONTACT: ${school.headTeacherPhone || '+233...'}</p>
-              <p style="margin: 3px 0;">MOTTO: RAISING GENERATIONAL THINKERS</p>
+              <p style="margin: 3px 0;">MOTTO: ${(school.motto || 'RAISING GENERATIONAL THINKERS').toUpperCase()}</p>
               <div style="background-color: #000080; color: white; padding: 8px; margin-top: 10px; font-size: 16px; font-weight: bold;">
                 LEARNER'S TERMINAL REPORT
               </div>

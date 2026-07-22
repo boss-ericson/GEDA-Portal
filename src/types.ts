@@ -12,6 +12,7 @@ export interface School {
   logo?: string;
   primaryColor?: string;
   emisCode?: string;
+  motto?: string;
   yearOfEstablishment?: string;
   headTeacherName?: string;
   headTeacherStaffId?: string;

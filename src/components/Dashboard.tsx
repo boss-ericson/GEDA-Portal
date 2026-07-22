@@ -192,6 +192,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const [settingsLogo, setSettingsLogo] = useState(school.logo || '');
   const [settingsPrimaryColor, setSettingsPrimaryColor] = useState(school.primaryColor || '#0f172a');
   const [settingsEmisCode, setSettingsEmisCode] = useState(school.emisCode || '');
+  const [settingsMotto, setSettingsMotto] = useState(school.motto || '');
   const [settingsYearOfEstablishment, setSettingsYearOfEstablishment] = useState(school.yearOfEstablishment || '');
   const [settingsHeadTeacherName, setSettingsHeadTeacherName] = useState(school.headTeacherName || '');
   const [settingsHeadTeacherStaffId, setSettingsHeadTeacherStaffId] = useState(school.headTeacherStaffId || '');
@@ -213,6 +214,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     setSettingsLogo(school.logo || '');
     setSettingsPrimaryColor(school.primaryColor || '#0f172a');
     setSettingsEmisCode(school.emisCode || '');
+    setSettingsMotto(school.motto || '');
     setSettingsYearOfEstablishment(school.yearOfEstablishment || '');
     setSettingsHeadTeacherName(school.headTeacherName || '');
     setSettingsHeadTeacherStaffId(school.headTeacherStaffId || '');
@@ -1013,6 +1015,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       logo: settingsLogo,
       primaryColor: settingsPrimaryColor,
       emisCode: settingsEmisCode,
+      motto: settingsMotto,
       yearOfEstablishment: settingsYearOfEstablishment,
       headTeacherName: settingsHeadTeacherName,
       headTeacherStaffId: settingsHeadTeacherStaffId,
@@ -3330,6 +3333,17 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                         </div>
 
                         <div>
+                          <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">School Motto</label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Raising Generational Thinkers"
+                            value={settingsMotto}
+                            onChange={(e) => setSettingsMotto(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:bg-white dark:bg-slate-900 transition"
+                          />
+                        </div>
+
+                        <div>
                           <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Year of Establishment</label>
                           <input
                             type="text"
@@ -3588,6 +3602,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                             <div className="min-w-0">
                               <span className="text-[11px] font-bold text-slate-900 dark:text-white truncate block">{settingsName || 'School Name'}</span>
                               <span className="text-[9px] text-slate-500 dark:text-slate-400 block">District: {settingsDistrict || 'District'}</span>
+                              {settingsMotto && (
+                                <span className="text-[9px] font-medium text-amber-600 dark:text-amber-400 italic block mt-0.5">"{settingsMotto}"</span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -3607,6 +3624,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                       setSettingsLogo(school.logo || '');
                       setSettingsPrimaryColor(school.primaryColor || '#0f172a');
                       setSettingsEmisCode(school.emisCode || '');
+                      setSettingsMotto(school.motto || '');
                       setSettingsYearOfEstablishment(school.yearOfEstablishment || '');
                       setSettingsHeadTeacherName(school.headTeacherName || '');
                       setSettingsHeadTeacherStaffId(school.headTeacherStaffId || '');

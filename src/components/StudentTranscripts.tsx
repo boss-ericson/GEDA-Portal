@@ -54,12 +54,20 @@ export default function StudentTranscripts({ school, students }: Props) {
       fetch(`/api/v1/academic-records?schoolId=${school.id}&studentId=${selectedStudent.id}`)
         .then(r => r.json())
         .then(data => {
-          setRecords(data);
+          const studentRecords = Array.isArray(data) 
+            ? data.filter((r: AcademicRecord) => !r.studentId || r.studentId === selectedStudent.id) 
+            : [];
+          setRecords(studentRecords);
           setLoading(false);
         })
-        .catch(console.error);
+        .catch(err => {
+          console.error(err);
+          setLoading(false);
+        });
+    } else {
+      setRecords([]);
     }
-  }, [school.id, selectedStudent]);
+  }, [school.id, selectedStudent?.id]);
 
   const handleTranscriptAction = (action: 'print' | 'pdf') => {
     if (!selectedStudent || records.length === 0) return;

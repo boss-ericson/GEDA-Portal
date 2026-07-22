@@ -25,10 +25,16 @@ export default function StudentHistoryModal({ school, student, onClose }: Props)
     fetch(`/api/v1/academic-records?schoolId=${school.id}&studentId=${student.id}`)
       .then(r => r.json())
       .then(data => {
-        setRecords(data);
+        const studentRecords = Array.isArray(data) 
+          ? data.filter((r: AcademicRecord) => !r.studentId || r.studentId === student.id)
+          : [];
+        setRecords(studentRecords);
         setLoading(false);
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
   }, [school.id, student.id]);
 
   const handleReportAction = async (record: AcademicRecord, action: 'print' | 'pdf') => {
@@ -78,7 +84,7 @@ export default function StudentHistoryModal({ school, student, onClose }: Props)
             <div style="flex-1; padding: 0 10px; font-weight: bold; font-size: 14px;">
               <p style="margin: 3px 0;">${school.district ? 'ADDRESS: ' + school.district : 'POST OFFICE BOX ...'}</p>
               <p style="margin: 3px 0;">CONTACT: ${school.headTeacherPhone || '+233...'}</p>
-              <p style="margin: 3px 0;">MOTTO: RAISING GENERATIONAL THINKERS</p>
+              <p style="margin: 3px 0;">MOTTO: ${(school.motto || 'RAISING GENERATIONAL THINKERS').toUpperCase()}</p>
               <div style="background-color: #000080; color: white; padding: 8px; margin-top: 10px; font-size: 16px; font-weight: bold;">
                 LEARNER'S TERMINAL REPORT
               </div>

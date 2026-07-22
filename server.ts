@@ -258,7 +258,10 @@ async function startServer() {
   // --- PAYMENTS ---
   app.get("/api/v1/payments", async (req, res) => {
     try {
-      const snapshot = await getDocs(query(collection(getDb(), "payments"), where("schoolId", "==", req.query.schoolId || "")));
+      const q = req.query;
+      let conditions = [where("schoolId", "==", q.schoolId || "")];
+      if (q.studentId) conditions.push(where("studentId", "==", q.studentId as string));
+      const snapshot = await getDocs(query(collection(getDb(), "payments"), ...conditions));
       res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
@@ -397,11 +400,13 @@ async function startServer() {
     try {
       const q = req.query;
       let conditions = [where("schoolId", "==", q.schoolId || "")];
-      if (q.academicYear) conditions.push(where("academicYear", "==", q.academicYear));
-      if (q.academicTerm) conditions.push(where("academicTerm", "==", q.academicTerm));
+      if (q.studentId) conditions.push(where("studentId", "==", q.studentId as string));
+      if (q.academicYear) conditions.push(where("academicYear", "==", q.academicYear as string));
+      if (q.academicTerm) conditions.push(where("academicTerm", "==", q.academicTerm as string));
+      if (q.classLevel) conditions.push(where("classLevel", "==", q.classLevel as string));
       const snapshot = await getDocs(query(collection(getDb(), "academicRecords"), ...conditions));
       res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-    } catch (e) {
+    } catch (e: any) {
       res.status(500).json({ error: e.message });
     }
   });

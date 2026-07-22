@@ -13,7 +13,7 @@ import AnalyticsCenter from './AnalyticsCenter';
 import NewsFeed from './NewsFeed';
 import PastStudents from './PastStudents';
 import BillingComponent from './BillingComponent';
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, updateDoc, setDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { 
   BarChart3, Users, PlusCircle, CreditCard, ShieldCheck, 
@@ -1045,7 +1045,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         }
       } catch (apiErr: any) {
         console.warn('Backend API failed for settings update, falling back to Firebase:', apiErr);
-        await updateDoc(doc(db, "schools", school.id), settingsPayload);
+        await setDoc(doc(db, "schools", school.id), settingsPayload, { merge: true });
         updatedSchoolData = { ...school, ...settingsPayload, id: school.id };
       }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { School } from '../types';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ShieldAlert, LogOut, CheckCircle2, Search, Power, PowerOff, Building2, Users, Bell } from 'lucide-react';
 
@@ -60,17 +60,20 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
     const newStatus = currentStatus === 'Deactivated' ? 'Active' : 'Deactivated';
 
     try {
-      const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/status`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      });
-      if (res.ok) {
-        setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, status: newStatus } : s));
-      } else {
-        const data = await res.json();
-        console.error(data.error || 'Failed to update status');
+      let success = false;
+      try {
+        const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) success = true;
+      } catch (apiErr) {}
+
+      if (!success) {
+        await setDoc(doc(db, "schools", schoolId), { status: newStatus }, { merge: true });
       }
+      setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, status: newStatus } : s));
     } catch (err) {
       console.error('Network error while updating status');
     }
@@ -80,17 +83,20 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
     const newAccess = currentAccess === 'Restricted' ? 'Full' : 'Restricted';
 
     try {
-      const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/access`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessLevel: newAccess })
-      });
-      if (res.ok) {
-        setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: newAccess } : s));
-      } else {
-        const data = await res.json();
-        console.error(data.error || 'Failed to update access level');
+      let success = false;
+      try {
+        const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/access`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessLevel: newAccess })
+        });
+        if (res.ok) success = true;
+      } catch (apiErr) {}
+
+      if (!success) {
+        await setDoc(doc(db, "schools", schoolId), { accessLevel: newAccess }, { merge: true });
       }
+      setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: newAccess } : s));
     } catch (err) {
       console.error('Network error while updating access level');
     }
@@ -98,22 +104,27 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
 
   const handleVerifyPayment = async (schoolId: string, currentStudents: number) => {
     try {
+      let success = false;
       try {
         const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/verify-payment`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paidStudentCount: currentStudents })
         });
-        if (res.ok) {
-          setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: 'Full', paidStudentCount: currentStudents, billingNotice: '' } : s));
-          return;
-        }
+        if (res.ok) success = true;
       } catch (apiErr) {}
       
-      await updateDoc(doc(db, "schools", schoolId), { accessLevel: 'Full', paidStudentCount: currentStudents, billingNotice: '' });
+      if (!success) {
+        await setDoc(doc(db, "schools", schoolId), { 
+          accessLevel: 'Full', 
+          paidStudentCount: currentStudents, 
+          billingNotice: '' 
+        }, { merge: true });
+      }
+
       setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, accessLevel: 'Full', paidStudentCount: currentStudents, billingNotice: '' } : s));
     } catch (err) {
-      console.error('Network error while verifying payment');
+      console.error('Error while verifying payment:', err);
     }
   };
 
@@ -121,19 +132,22 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
     if (unpaidStudents <= 0) return;
     const message = `Notice: You have ${unpaidStudents} new student(s) unpaid for. Please make payment to avoid access restriction.`;
     try {
-      const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/billing-notice`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ billingNotice: message })
-      });
-      if (res.ok) {
-        setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, billingNotice: message } : s));
-        alert('Notice sent successfully to the school dashboard.');
-      } else {
-        const data = await res.json();
-        console.error(data.error || 'Failed to send notice');
-        alert('Failed to send notice.');
+      let success = false;
+      try {
+        const res = await fetch(`/api/v1/superadmin/schools/${schoolId}/billing-notice`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ billingNotice: message })
+        });
+        if (res.ok) success = true;
+      } catch (apiErr) {}
+
+      if (!success) {
+        await setDoc(doc(db, "schools", schoolId), { billingNotice: message }, { merge: true });
       }
+
+      setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, billingNotice: message } : s));
+      alert('Notice sent successfully to the school dashboard.');
     } catch (err) {
       console.error('Network error while sending notice');
       alert('Network error while sending notice.');

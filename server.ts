@@ -91,7 +91,7 @@ async function startServer() {
 
   app.put("/api/v1/schools/:id", async (req, res) => {
     try {
-      await updateDoc(doc(getDb(), "schools", req.params.id), req.body);
+      await setDoc(doc(getDb(), "schools", req.params.id), req.body, { merge: true });
       const docSnap = await getDoc(doc(getDb(), "schools", req.params.id));
       if (docSnap.exists()) {
         res.json({ ...docSnap.data(), id: docSnap.id });
@@ -466,30 +466,35 @@ async function startServer() {
 
   app.put("/api/v1/superadmin/schools/:id/status", async (req, res) => {
     try {
-      await updateDoc(doc(getDb(), "schools", req.params.id), { status: req.body.status });
+      await setDoc(doc(getDb(), "schools", req.params.id), { status: req.body.status }, { merge: true });
       res.json({ message: "Status updated" });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
   app.put("/api/v1/superadmin/schools/:id/verify-payment", async (req, res) => {
     try {
-      await updateDoc(doc(getDb(), "schools", req.params.id), { accessLevel: "Full", paidStudentCount: req.body.paidStudentCount, billingNotice: "" });
-      res.json({ message: "Payment verified" });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+      const paidCount = Number(req.body.paidStudentCount !== undefined ? req.body.paidStudentCount : 0);
+      await setDoc(doc(getDb(), "schools", req.params.id), { 
+        accessLevel: "Full", 
+        paidStudentCount: paidCount, 
+        billingNotice: "" 
+      }, { merge: true });
+      res.json({ message: "Payment verified", paidStudentCount: paidCount });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
   
   app.put("/api/v1/superadmin/schools/:id/billing-notice", async (req, res) => {
     try {
-      await updateDoc(doc(getDb(), "schools", req.params.id), { billingNotice: req.body.billingNotice });
+      await setDoc(doc(getDb(), "schools", req.params.id), { billingNotice: req.body.billingNotice }, { merge: true });
       res.json({ message: "Notice sent" });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
   
   app.put("/api/v1/superadmin/schools/:id/access", async (req, res) => {
     try {
-      await updateDoc(doc(getDb(), "schools", req.params.id), { accessLevel: req.body.accessLevel });
+      await setDoc(doc(getDb(), "schools", req.params.id), { accessLevel: req.body.accessLevel }, { merge: true });
       res.json({ message: "Access updated" });
-    } catch (e) { res.status(500).json({ error: e.message }); }
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
   // Vite middleware for development

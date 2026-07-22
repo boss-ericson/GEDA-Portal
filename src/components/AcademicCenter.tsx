@@ -14,7 +14,7 @@ interface AcademicCenterProps {
 const PRIMARY_SUBJECTS = [
   "English Language", "Mathematics", "Science", "Our World Our People", 
   "Religious and Moral Education", "Computing", "Creative Arts", 
-  "Physical Education", "Ghanaian Language"
+  "History", "Ghanaian Language"
 ];
 
 

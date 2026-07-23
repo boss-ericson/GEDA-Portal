@@ -141,167 +141,271 @@ export default function AICenter({ school, students, user, role }: AICenterProps
   };
 
   const generateClientFallbackDoc = (type: string, schoolName: string, params: any) => {
+    const q = (params?.query || "").toLowerCase();
+    const school = schoolName || "Ghana Basic School";
+    const lvl = params?.level || "Basic School";
+    const subj = params?.subject || "General";
+
     if (type === 'lesson-plan') {
       const { level, subject, strand, subStrand, contentStandard, indicator, topic, duration, classSize, tlms } = params || {};
+      const t = topic || "Key Curriculum Concept";
+      const s = subject || "Integrated Science";
+      const l = level || "Basic 7 (JHS 1)";
       return `### NaCCA STANDARD-BASED LESSON PLAN
-**SCHOOL:** ${schoolName || "Ghana Basic School"}
-**CLASS/LEVEL:** ${level || "Basic 7 (JHS 1)"} | **SUBJECT:** ${subject || "Integrated Science"}
+**SCHOOL:** ${school}
+**CLASS/LEVEL:** ${l} | **SUBJECT:** ${s}
 **DURATION:** ${duration || "60 Mins"} | **CLASS SIZE:** ${classSize || "45 Learners"}
-**STRAND:** ${strand || "Diversity of Matter"}
-**SUB-STRAND:** ${subStrand || "Living and Non-Living Things"}
-**CONTENT STANDARD:** ${contentStandard || "B7.1.1.1"}
-**PERFORMANCE INDICATOR:** ${indicator || "B7.1.1.1.1 - Demonstrate understanding of cell structures"}
-**CORE COMPETENCIES:** Critical Thinking, Problem Solving, Communication and Collaboration.
-**TLMs:** ${tlms || "Microscope diagrams, plant and animal cell wall charts, onion skin slides, realia."}
+**STRAND:** ${strand || "Core Subject Strand"}
+**SUB-STRAND:** ${subStrand || "Curriculum Sub-Strand"}
+**CONTENT STANDARD:** ${contentStandard || "CS.1.1"}
+**PERFORMANCE INDICATOR:** ${indicator || "IND.1.1.1 - Demonstrate understanding of " + t}
+**CORE COMPETENCIES:** Critical Thinking & Problem Solving, Communication & Collaboration, Cultural Identity.
+**TLMs:** ${tlms || "Subject charts, realia, local community specimens, group activity sheets."}
 
 ---
 
 #### PHASE 1: STARTER / WARM-UP (10 MINS)
-1. **Prior Knowledge Check:** Ask learners to list basic living organisms in their local community.
-2. **Hook Activity:** Display an onion and ask learners what tiny units build up the entire onion.
-3. **Learning Target Statement:** By the end of this lesson, learners will identify and describe the basic parts of plant and animal cells.
+1. **Prior Knowledge Check:** Ask learners probing diagnostic questions about their real-life experiences with **${t}**.
+2. **Engaging Hook Activity:** Show a relevant local specimen, realia, or chart related to **${t}**. Ask learners to share what they observe.
+3. **Learning Target Statement:** By the end of this lesson, learners will be able to explain, demonstrate, and apply key concepts of **${t}** in ${s}.
 
 #### PHASE 2: MAIN / TEACHING & LEARNING ACTIVITIES (35 MINS)
-1. **Step 1 (Teacher Demonstration):** Explain the cell as the basic structural and functional unit of life.
-2. **Step 2 (Group Investigation):** Divide learners into small mixed-gender groups. Provide cell wall charts and ask groups to compare plant and animal cells.
-3. **Step 3 (Learner Presentation):** Group representatives present their findings on cell organelles (nucleus, cytoplasm, cell membrane).
-4. **Step 4 (Differentiation & Inclusion):** Assist learners who require visual reinforcement using enlarged cell diagrams.
+1. **Step 1 (Teacher Demonstration & Concept Unpacking):**
+   - Introduce the core terms and principles of **${t}**. Use clear illustrations on the board and connect to the local Ghanaian context.
+2. **Step 2 (Cooperative Group Investigation):**
+   - Divide learners into mixed-gender groups of 4-5.
+   - Hand out activity cards and TLMs (${tlms || "worksheets and charts"}).
+   - Task: Guide groups to investigate, discuss, and record key features of **${t}**.
+3. **Step 3 (Group Presentations & Peer Review):**
+   - Call upon group rapporteurs to present findings. Facilitate class discussion, clarifying misconceptions and encouraging positive feedback.
+4. **Step 4 (Differentiation & Inclusion):**
+   - Provide tactile/visual reinforcement for learners who need extra support. Offer challenge questions on **${t}** for fast finishers.
 
 #### PHASE 3: PLENARY / REFLECTION & ASSESSMENT (15 MINS)
-1. **Summary Review:** Review key differences between plant and animal cells with rapid-fire questions.
-2. **Class Exercise / Assessment:**
-   - Define a cell.
-   - List two functions of the cell membrane.
-3. **Home Project:** Draw and label a plant cell neatly in exercise books.`;
+1. **Summary Review:** Conduct a 3-minute rapid recap of main key takeaways regarding **${t}**.
+2. **Formative Evaluation Task:**
+   - Question 1: Explain the main purpose of **${t}** in ${s}.
+   - Question 2: Give two practical examples of how **${t}** applies in daily Ghanaian life.
+3. **Homework / Home Project:** Write a 1-page summary in exercise books or prepare a small poster illustrating **${t}**.`;
     } else if (type === 'scheme-of-learning') {
       const { level, subject, term, totalWeeks } = params || {};
-      return `### NaCCA SCHEME OF LEARNING (SOL)
-**SCHOOL:** ${schoolName || "Ghana Basic School"}
-**CLASS/LEVEL:** ${level || "Basic 8"} | **SUBJECT:** ${subject || "Mathematics"}
-**ACADEMIC TERM:** Term ${term || "1"} | **DURATION:** ${totalWeeks || 12} Weeks
+      const s = subject || "Mathematics";
+      const l = level || "Basic 8 (JHS 2)";
+      const tNum = term || "1";
+      const weeks = parseInt(totalWeeks || "12", 10) || 12;
 
-| Week | Strand & Sub-strand | Content Standard & Indicator | Topic / Focus | Key TLMs | Assessment |
+      const topicList = [
+        `Introduction to ${s} Concepts`, `Core Strand 1 Fundamentals`, `Sub-strand 1 Application`,
+        `Practical Group Investigation`, `Intermediate Skills Building`, `Mid-Term Evaluation & Review`,
+        `Core Strand 2 In-depth Study`, `Advanced Problem Solving`, `Real-world Applications in Ghana`,
+        `BECE / Terminal Exam Revision`, `Terminal Examinations`, `Report Cards & Parents Conference`
+      ];
+
+      let rows = "";
+      for (let w = 1; w <= weeks; w++) {
+        const top = topicList[(w - 1) % topicList.length];
+        const code = `B${l.replace(/[^0-9]/g, '') || '8'}.${(w % 4) + 1}.1.${(w % 3) + 1}`;
+        rows += `| **Week ${w}** | Strand ${(w % 3) + 1} | ${code} | ${top} | Charts, Realia, Worksheets | Formative Quiz ${w} |\n`;
+      }
+
+      return `### NaCCA SCHEME OF LEARNING (SOL)
+**SCHOOL:** ${school}
+**CLASS/LEVEL:** ${l} | **SUBJECT:** ${s}
+**ACADEMIC TERM:** Term ${tNum} | **DURATION:** ${weeks} Weeks
+
+| Week | Strand & Sub-strand | Content Standard Code | Topic / Focus Area | Key TLMs | Assessment Method |
 | --- | --- | --- | --- | --- | --- |
-| **Week 1** | Number & Numeration | B8.1.1.1 (B8.1.1.1.1) | Real Number Systems & Sets | Charts, Venn Diagrams | Class Test 1 |
-| **Week 2** | Number & Numeration | B8.1.1.2 (B8.1.1.2.1) | Prime Factors & Multiples | Prime Factor Trees | Group Assignment |
-| **Week 3** | Algebra & Patterns | B8.2.1.1 (B8.2.1.1.1) | Algebraic Expressions | Grid Sheets, Counters | Board Exercise |
-| **Week 4** | Algebra & Patterns | B8.2.1.2 (B8.2.1.2.1) | Linear Equations in 1 Variable | Balance Scale Models | Written Quiz |
-| **Week 5** | Geometry & Measurement | B8.3.1.1 (B8.3.1.1.1) | Angles & Lines Geometry | Protractors, Rulers | Practical Drawing |
-| **Week 6** | Mid-Term Assessment | Mid-Term Revision & Evaluation | Comprehensive Term Review | Answer Sheets | Mid-Term Exam |
-| **Week 7** | Geometry & Measurement | B8.3.2.1 (B8.3.2.1.1) | Perimeter & Area of Shapes | Metric Rules, Cut-outs | Problem Set |
-| **Week 8** | Handling Data | B8.4.1.1 (B8.4.1.1.1) | Frequency Tables & Tallies | Survey Sheets | Group Project |
-| **Week 9** | Handling Data | B8.4.1.2 (B8.4.1.2.1) | Bar Graphs & Pie Charts | Graph Books, Color Pens | Graph Plotting |
-| **Week 10** | Revision & Remediation | Revision of Difficult Concepts | BECE / WAEC Past Questions | Past Papers | Class Competition |
-| **Week 11** | End of Term Examinations | Terminal Evaluation | Comprehensive Assessment | Question Papers | Terminal Exam |
-| **Week 12** | Vacation & Marking | Report Cards & Parent Consultation | Performance Analysis | Cumulative Records | Parents Conference |`;
+${rows}`;
     } else if (type === 'exam-paper') {
       const { level, subject, topic, mcqCount, theoryCount, difficulty, includeAnswers } = params || {};
-      return `### ${schoolName || "GHANA BASIC SCHOOL"}
-**TERMINAL EXAMINATION - ACADEMIC TERM**
-**SUBJECT:** ${subject || "Social Studies"} | **CLASS:** ${level || "Basic 9 (JHS 3)"}
-**TIME ALLOWED:** 1 HOUR 30 MINUTES | **DIFFICULTY:** ${difficulty || "BECE Standard"}
-**TOPIC / SCOPE:** ${topic || "Comprehensive Term Scope"}
+      const s = subject || "Social Studies";
+      const l = level || "Basic 9 (JHS 3)";
+      const top = topic || "Comprehensive Term Work";
+      const mcqs = parseInt(mcqCount || "5", 10) || 5;
+      const diff = difficulty || "BECE Standard";
+
+      return `### ${school.toUpperCase()}
+**TERMINAL EXAMINATION - ACADEMIC EVALUATION**
+**SUBJECT:** ${s} | **CLASS:** ${l}
+**TIME ALLOWED:** 1 HOUR 30 MINUTES | **DIFFICULTY:** ${diff}
+**EXAM TOPIC / SCOPE:** ${top}
 
 ---
 
-#### SECTION A: MULTIPLE CHOICE QUESTIONS (Answer ALL questions)
+#### SECTION A: MULTIPLE CHOICE QUESTIONS (Answer ALL questions - ${mcqs} Questions)
 
-1. Which organ of government is primarily responsible for making laws in Ghana?
-   A) The Executive  B) The Judiciary  C) Parliament  D) The Council of State
+1. In the study of ${s}, which of the following best defines the key concept of **${top}**?
+   A) A temporary emergency measure  B) A fundamental structured subject topic  C) An optional extracurricular activity  D) A historical event from 1957
 
-2. The traditional leader who heads a paramount chieftaincy area in Ghana is known as:
-   A) Divisional Chief  B) Paramount Chief (Omanhene)  C) Development Chief  D) Clan Head
+2. Which of the following is considered a primary requirement when analyzing **${top}** in Ghana?
+   A) Ignoring local community needs  B) Applying systematic problem-solving and critical thinking  C) Promoting conflict among groups  D) Relying solely on memory without understanding
 
-3. Which of the following is a key requirement for promoting national unity in Ghana?
-   A) Tribalism  B) Tolerance and respect for diversity  C) Nepotism  D) Political conflict
+3. When applying concepts of ${s} to real-life situations in Ghanaian communities, learners should prioritize:
+   A) Sustainable development and civic responsibility  B) Destruction of natural resources  C) Disregarding national laws  D) Excessive expenditure
 
-4. Environmental degradation in mining areas can be controlled effectively through:
-   A) Deforestation  B) Illegal galamsey  C) Land reclamation and reforestation  D) Bush burning
+4. Which institution or body plays a vital role in supervising educational standards and assessment for ${s} in Ghana?
+   A) NaCCA & WAEC  B) GFA  C) Ghana Post  D) VRA
 
-5. The main objective of establishing the Economic Community of West African States (ECOWAS) is to:
-   A) Fight wars  B) Promote regional economic integration  C) Rule West Africa  D) Impose taxes
+5. An effective way to resolve challenges associated with **${top}** in Ghanaian schools is through:
+   A) Collaborative dialogue and positive stakeholder engagement  B) Abandoning school projects  C) Canceling all assessments  D) Ignoring feedback
 
 ---
 
 #### SECTION B: STRUCTURED & ESSAY QUESTIONS (Answer ALL questions)
 
 **QUESTION 1**
-a) Define the term **Chieftaincy** as practiced in Ghana. *(4 marks)*
-b) State and explain **three** functions of traditional authorities in national development. *(6 marks)*
+a) Define **${top}** as studied in ${s} at the ${l} level. *(4 marks)*
+b) Explain **three** reasons why understanding **${top}** is important for national development in Ghana. *(6 marks)*
 
 **QUESTION 2**
-a) Explain **two** causes of rural-urban migration in Ghana. *(4 marks)*
-b) Suggest **three** measures government can put in place to curb rural-urban migration. *(6 marks)*
+a) State **two** major challenges encountered when implementing concepts of **${top}** in local communities. *(4 marks)*
+b) Suggest **three** practical solutions that students and community leaders can adopt to address these challenges. *(6 marks)*
 
 ${includeAnswers ? `---
 
 #### TEACHER'S MARKING SCHEME & MODEL ANSWERS
 
 **SECTION A ANSWERS:**
-1. C (Parliament) | 2. B (Paramount Chief) | 3. B (Tolerance) | 4. C (Reforestation) | 5. B (Regional Integration)
+1. B (Fundamental structured topic) | 2. B (Systematic problem-solving) | 3. A (Sustainable development) | 4. A (NaCCA & WAEC) | 5. A (Collaborative dialogue)
 
 **SECTION B MODEL ANSWERS:**
-- **Q1a:** Chieftaincy is an ancient system of governance where traditional leaders (chiefs and queenmothers) rule over customary territories according to native law and customs.
-- **Q1b:** 1) Preservation of cultural heritage. 2) Maintenance of peace and conflict resolution. 3) Mobilizing community labor for local development projects.` : ''}`;
+- **Q1a:** ${top} in ${s} refers to the systematic study and application of core principles within the NaCCA curriculum framework.
+- **Q1b:** 1) Promotes critical thinking and civic literacy. 2) Encourages practical problem solving in local Ghanaian communities. 3) Prepares learners for WAEC/BECE national examinations.
+- **Q2b:** Solutions include community sensitization, resource mobilization, and active student participation in project work.` : ''}`;
     } else if (type === 'remarks') {
-      const { studentName, level, gender, score, attendance, conduct } = params || {};
+      const { studentName, level, gender, score, attendance, conduct, competencies } = params || {};
+      const sName = studentName || "Kwame Boateng";
+      const g = gender === 'Female' ? 'Female' : 'Male';
+      const pron = g === 'Female' ? 'She' : 'He';
+      const pos = g === 'Female' ? 'Her' : 'His';
+      const l = level || "Basic 7";
+
       return `### TERMINAL REPORT REMARKS & PARENT ADVICE
-**LEARNER NAME:** ${studentName || "Kwame Boateng"} | **GENDER:** ${gender || "Learner"}
-**CLASS:** ${level || "Basic 7"} | **OVERALL SCORE:** ${score || "85% (Grade A)"}
-**ATTENDANCE:** ${attendance || "58/60 Days"} | **CONDUCT:** ${conduct || "Polite and obedient"}
+**LEARNER NAME:** ${sName} | **GENDER:** ${g}
+**CLASS/LEVEL:** ${l} | **OVERALL PERFORMANCE:** ${score || "85% (Grade A - Distinction)"}
+**ATTENDANCE & PUNCTUALITY:** ${attendance || "58/60 Days"} | **CONDUCT:** ${conduct || "Polite, disciplined, cooperative"}
+**OBSERVED COMPETENCIES:** ${competencies || "Strong logical reasoning, active team player"}
 
 ---
 
 #### 1. CLASS TEACHER'S REMARK
-${studentName} is an exceptional, disciplined, and hardworking learner who consistently demonstrates academic excellence. ${gender === 'Female' ? 'She' : 'He'} engages actively during class discussions and exhibits remarkable leadership traits among peers. With sustained focus and dedication, ${gender === 'Female' ? 'she' : 'he'} will continue to achieve top honors.
+${sName} is an exceptional, disciplined, and focused learner in ${l}. ${pron} consistently displays a genuine passion for academic work and active participation during class discussions. ${pos} performance of ${score || "85%"} reflects diligent study habits and high intellectual promise. With continued guidance and encouragement, ${pron.toLowerCase()} will reach even greater academic heights.
 
 #### 2. HEADTEACHER'S ENDORSEMENT
-An outstanding terminal performance. ${studentName} is commended for exemplary behavior, punctuality, and academic distinction. Keep up the brilliant effort!
+A commendable terminal record. ${sName} is congratulated on maintaining high academic standards and exemplary character throughout the term. Keep striving for excellence!
 
 #### 3. TAILORED ADVICE TO PARENTS / GUARDIANS
-1. **Academic Support:** Encourage ${studentName} to maintain a daily 2-hour home reading schedule, particularly in analytical subjects.
-2. **Co-curricular Encouragement:** Support ${studentName}'s involvement in STEM/Science club activities to nurture observed critical thinking skills.
-3. **Administrative Note:** Please ensure all termly educational materials and school fees are prepared promptly ahead of reopening.`;
+1. **Home Learning Schedule:** Maintain a daily 2-hour structured home revision and reading routine for ${sName}.
+2. **Nurturing Talents:** Encourage ${sName} to engage in STEM/Science and debate club activities to build upon observed strengths in ${competencies || "logical reasoning and leadership"}.
+3. **Administrative Note:** Please ensure all necessary learning materials, textbooks, and school fees are prepared promptly prior to school reopening.`;
     } else if (type === 'circular') {
       const { purpose, keyDates, venue, feeOrDetails } = params || {};
-      return `### ${schoolName || "GHANA EDUCATIONAL COMPLEX"}
-**OFFICIAL CIRCULAR TO PARENTS & GUARDIANS**
-**DATE:** ${new Date().toLocaleDateString('en-GB')} | **REF:** GEC/CIRC/${new Date().getFullYear()}/04
+      const p = purpose || "End of Term Vacation & PTA General Assembly";
 
-**SUBJECT:** ${purpose || "End of Term Vacation & School Reopening Announcement"}
+      return `### ${school.toUpperCase()}
+**OFFICIAL CIRCULAR TO PARENTS & GUARDIANS**
+**DATE:** ${new Date().toLocaleDateString('en-GB')} | **REF:** GEC/CIRC/${new Date().getFullYear()}/05
+
+**SUBJECT:** ${p}
 
 Dear Parents & Guardians,
 
-Management and staff extend our warmest greetings and heartfelt gratitude for your continued partnership and trust in educating your children at ${schoolName || "Ghana Educational Complex"}.
+On behalf of the Management and Teaching Staff of ${school}, we present our warm compliments and sincere gratitude for your continued partnership in raising standard-bearing learners.
 
-As we successfully conclude the current academic term, please take note of the following vital announcements:
+As we bring the current academic term to a successful close, please take careful note of the following important arrangements:
 
-1. **VACATION & REOPENING DATES:**
-   - **Vacation Date:** ${keyDates?.split('|')[0] || "15th August"}
-   - **Reopening Date:** ${keyDates?.split('|')[1] || "10th September"}
+1. **VACATION & REOPENING TIMELINE:**
+   - ${keyDates || "Vacation Date: Friday, 12th April | Reopening Date: Tuesday, 6th May"}
 
 2. **PARENTS-TEACHERS ASSOCIATION (PTA) MEETING:**
    - **Venue:** ${venue || "School Main Assembly Hall"}
-   - All parents are encouraged to attend as important academic progress and facility upgrade plans will be discussed.
+   - All parents and guardians are cordially invited to attend as crucial decisions regarding learner welfare and academic programs will be finalized.
 
-3. **FINANCIAL & FEE PAYMENT INSTRUCTIONS:**
-   - ${feeOrDetails || "School fees for the upcoming term must be paid into the school's official account or via MoMo before reopening."}
+3. **FINANCIAL OBLIGATIONS & SCHOOL FEES:**
+   - ${feeOrDetails || "School fees for the upcoming academic term must be paid into the school's official bank account or Mobile Money merchant line before reopening."}
 
-We wish all our learners a restful and enjoyable vacation.
+We wish all our learners a safe, peaceful, and productive vacation.
 
 Yours faithfully,
 
 _______________________
-**Headteacher / Administration**
-${schoolName || "Ghana Educational Complex"}`;
+**Headteacher / Management**
+${school}`;
     } else {
-      return `### NaCCA AI TEACHER ASSISTANT
-Thank you for your inquiry regarding Ghana's Standard-Based Curriculum (SBC) and Common Core Programme (CCP).
+      // Chat fallback
+      if (q.includes("fraction") || q.includes("math") || q.includes("number") || q.includes("algebra") || q.includes("geometry") || q.includes("ratio")) {
+        return `### NaCCA MATHEMATICS PEDAGOGICAL ADVICE
+**TARGET LEVEL:** ${lvl} | **SUBJECT:** Mathematics | **SCHOOL:** ${school}
+**QUERY:** "${params?.query}"
 
-**Key Guidance:**
-1. Focus on learner-centered activities and group investigations.
-2. Utilize locally available Teaching and Learning Materials (TLMs) such as bottle caps, counters, charts, and realia.
-3. Develop core competencies: Critical Thinking, Problem Solving, Communication, Collaboration, and Cultural Identity.`;
+---
+
+#### 1. CORE NaCCA MATHEMATICS STRATEGY
+Ghana's Standard-Based Curriculum emphasizes the **Concrete-Pictorial-Abstract (CPA)** approach for teaching mathematical concepts. Rather than starting with abstract formulas, begin with hands-on physical materials.
+
+#### 2. PRACTICAL CLASSROOM STEP-BY-STEP ACTIVITY
+1. **Concrete Phase (Hands-On):** Use soda bottle caps, orange/papaya slices, grid paper, or wooden counters to demonstrate fractions or numbers physically.
+2. **Pictorial Phase (Visual Representation):** Draw fraction strips or shaded region diagrams on the blackboard and have learners replicate them.
+3. **Abstract Phase (Symbolic Notation):** Introduce standard numerical symbols ($1/2$, $2/4$, $3/6$) connected directly to the physical equal parts observed.
+
+#### 3. RECOMMENDED LOW-COST LOCAL TLMs
+- Soda bottle caps, palm kernel shells, polished river stones, cut-out cardboard fraction strips.
+
+#### 4. CORE COMPETENCIES & ASSESSMENT
+- **Critical Thinking:** Pose real-world Ghana context story problems (e.g., sharing mangos or farm harvest).`;
+      }
+
+      if (q.includes("science") || q.includes("cell") || q.includes("matter") || q.includes("plant") || q.includes("animal") || q.includes("energy") || q.includes("organ")) {
+        return `### NaCCA INTEGRATED SCIENCE GUIDANCE
+**TARGET LEVEL:** ${lvl} | **SUBJECT:** Integrated Science | **SCHOOL:** ${school}
+**QUERY:** "${params?.query}"
+
+---
+
+#### 1. INQUIRY-BASED SCIENCE METHODOLOGY
+Focus on hands-on observation and investigation using local Ghanaian environment specimens.
+
+#### 2. STEP-BY-STEP INSTRUCTIONAL DELIVERABLE
+1. **Engage:** Bring realia (leaves, onion bulbs, soil samples) to class.
+2. **Explore:** Cooperative group investigations using magnifying glasses or charts.
+3. **Explain:** Student group presentations and teacher clarification.
+4. **Elaborate:** Connect to daily life in Ghana (sanitation, agriculture, health).
+
+#### 3. RECOMMENDED LOCAL TLMs
+- Local plant leaves, seed germinations, water drop lenses, clay/sand/loam soil samples.`;
+      }
+
+      if (q.includes("ict") || q.includes("comput") || q.includes("code") || q.includes("tech")) {
+        return `### NaCCA COMPUTING / ICT PEDAGOGY
+**TARGET LEVEL:** ${lvl} | **SUBJECT:** Computing | **SCHOOL:** ${school}
+**QUERY:** "${params?.query}"
+
+---
+
+#### 1. UNPLUGGED & PRACTICAL ICT INSTRUCTION
+Use Unplugged Computer Science methods—teaching algorithmic thinking and hardware using cardboard models and logic role-play.
+
+#### 2. PRACTICAL CLASSROOM ACTIVITIES
+1. Draw keyboard/mouse layouts on cardboard for finger placement practice.
+2. Role-play algorithm steps (e.g., flowcharting daily household routines).`;
+      }
+
+      return `### NaCCA TEACHER ASSISTANT EXPERT GUIDANCE
+**TARGET LEVEL:** ${lvl} | **SUBJECT:** ${subj} | **SCHOOL:** ${school}
+**TEACHER QUESTION:** "${params?.query || "General curriculum inquiry"}"
+
+---
+
+#### 1. NaCCA CURRICULUM CONTEXT & PEDAGOGICAL STANDARD
+Ghana's Standard-Based Curriculum (SBC) and Common Core Programme (CCP) require learner-centered, activity-driven instruction.
+
+#### 2. TAILORED ACTIONABLE RECOMMENDATIONS
+1. **Structure your lesson:** Phase 1 (Starter Hook - 10m), Phase 2 (Main Investigation - 35m), Phase 3 (Plenary Reflection - 15m).
+2. **Cooperative Learning:** Group learners into mixed-ability teams of 4-5 with assigned roles (Leader, Recorder, Presenter).
+3. **Local TLMs:** Use bottle caps, charts, realia, and local specimens to make abstract concepts concrete.
+
+#### 3. ASSESSMENT & CORE COMPETENCIES
+- Evaluate understanding using rapid mini-whiteboards or exit tickets. Develop Critical Thinking, Communication, and Collaboration.`;
     }
   };
 

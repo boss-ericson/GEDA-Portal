@@ -1960,7 +1960,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               </div>
 
               {/* KPI CARDS */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 
                 {/* KPI 1 */}
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none flex items-center justify-between gap-2">
@@ -1974,7 +1974,21 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   </div>
                 </div>
 
-                {/* KPI 2 */}
+                {/* KPI 2: Registered Teachers */}
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none flex items-center justify-between gap-2">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Registered Teachers</span>
+                    <span className="text-3xl font-display font-bold text-slate-950 dark:text-white">{teachers.length}</span>
+                    <span className="block text-[10px] text-blue-600 dark:text-blue-400 font-medium">
+                      {teachers.filter((t: any) => t.isClassTeacher).length} Class Teachers
+                    </span>
+                  </div>
+                  <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 p-3 rounded-xl shrink-0">
+                    <GraduationCap className="h-6 w-6" />
+                  </div>
+                </div>
+
+                {/* KPI 3 */}
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none flex items-center justify-between gap-2">
                   <div className="space-y-1">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Fees Collected</span>
@@ -1986,7 +2000,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   </div>
                 </div>
 
-                {/* KPI 3 */}
+                {/* KPI 4 */}
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none flex items-center justify-between gap-2">
                   <div className="space-y-1">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Outstanding Arrears</span>
@@ -1998,7 +2012,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   </div>
                 </div>
 
-                {/* KPI 4 */}
+                {/* KPI 5 */}
                 <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none flex items-center justify-between gap-2">
                   <div className="space-y-1">
                     <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Offline Pending Cache</span>

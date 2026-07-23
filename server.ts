@@ -535,24 +535,25 @@ Additional Details / Fees: ${feeOrDetails || "Next Term School Fees: GHS 850 pay
 
 Write a polite, formal letter addressed to "Dear Parents & Guardians", signed by the Headteacher, structured with formal Ghanaian administrative tone, clear headings, bullet points for key dates/requirements, and warm closing phrases.`;
           } else if (type === 'chat') {
-            const { query, level, subject } = params || {};
-            prompt = `As an expert Ghanaian NaCCA Curriculum Specialist and Master Teacher Assistant, provide a detailed, highly practical, and comprehensive answer to this teacher's question:
-School: ${schoolName || "Ghana Basic School"}
-Level/Class: ${level || "Basic School"}
+            const { query, level, subject, history } = params || {};
+            let historyText = "";
+            if (Array.isArray(history) && history.length > 0) {
+              const recent = history.slice(-8);
+              historyText = "PREVIOUS CONVERSATION CONTEXT:\n" + recent.map((m: any) => `${m.sender === 'user' ? 'Teacher/User' : 'NaCCA AI Assistant'}: ${m.text}`).join("\n") + "\n\n";
+            }
+            prompt = `${historyText}School: ${schoolName || "Ghana Basic School"}
+Target Level/Class: ${level || "General Basic Education"}
 Subject: ${subject || "General"}
-Teacher Question: "${query}"
 
-Provide a rich, structured Markdown response that includes:
-1. Core NaCCA Curriculum Standard & Pedagogical Philosophy
-2. Step-by-Step Practical Classroom Teaching Strategy
-3. Recommended Low-Cost Ghanaian Teaching & Learning Materials (TLMs e.g. bottle caps, realia, charts, local specimens)
-4. Assessment Methods & Core Competencies Developed (Critical Thinking, Problem Solving, Communication, Collaboration, Cultural Identity).`;
+Teacher Question / Prompt: "${query}"
+
+As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer the teacher's request directly, dynamically, and insightfully. Address whatever they ask — whether it is a curriculum question, lesson concept, translation, test questions, administrative letter draft, classroom problem, or creative idea. Use clear, beautifully formatted Markdown with bolding, lists, and headers where appropriate.`;
           } else {
             return res.status(400).json({ error: "Invalid type requested" });
           }
 
           const response = await ai.models.generateContent({
-            model: "gemini-3.6-flash",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
               systemInstruction,
@@ -561,10 +562,11 @@ Provide a rich, structured Markdown response that includes:
           });
 
           if (response && response.text) {
+            console.log(`[AI SUCCESS] Real-time Gemini 2.5 response generated for type: ${type}`);
             return res.json({ result: response.text });
           }
         } catch (apiErr: any) {
-          console.warn("Gemini API call warning, using NaCCA template fallback:", apiErr?.message);
+          console.error("Gemini API call error:", apiErr?.message || apiErr);
         }
       }
 

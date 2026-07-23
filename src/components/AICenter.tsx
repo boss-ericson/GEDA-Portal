@@ -524,7 +524,7 @@ Ghana's Standard-Based Curriculum (SBC) and Common Core Programme (CCP) require 
         body: JSON.stringify({
           type: 'chat',
           schoolName: school?.name || "Ghana School",
-          params: { query: userText }
+          params: { query: userText, history: chatHistory }
         })
       });
       

@@ -128,6 +128,39 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const [isDeletingStudent, setIsDeletingStudent] = useState<string | null>(null);
   const [momoPendingSim, setMomoPendingSim] = useState(false);
 
+  // Dynamic Fee Calculation Helpers
+  const getStudentFeeTotal = (s: Student) => {
+    if (!s) return 1200;
+    return Number(s.feeTotal) || (s.boardingStatus === 'Boarding' ? 2500 : 1200);
+  };
+
+  const getStudentFeePaid = (s: Student) => {
+    if (!s) return 0;
+    const pSum = payments
+      .filter(p => p.studentId === s.id && (p.status === 'Success' || !p.status))
+      .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    return Math.max(Number(s.feePaid) || 0, pSum);
+  };
+
+  const getStudentRemainingFee = (s: Student) => {
+    if (!s) return 0;
+    const total = getStudentFeeTotal(s);
+    const paid = getStudentFeePaid(s);
+    return Math.max(0, total - paid);
+  };
+
+  // Sync payment inputs whenever selectedStudentId, students, or payments update
+  useEffect(() => {
+    if (selectedStudentId) {
+      const stud = students.find(s => s.id === selectedStudentId);
+      if (stud) {
+        if (stud.guardianPhone) setPaymentPhone(stud.guardianPhone);
+        const rem = getStudentRemainingFee(stud);
+        setPaymentAmount(rem > 0 ? String(rem) : '');
+      }
+    }
+  }, [selectedStudentId, students, payments]);
+
   // Admission Letter Modal
   const [letterStudent, setLetterStudent] = useState<Student | null>(null);
   const [activeLetterTab, setActiveLetterTab] = useState<'letter' | 'slip'>('letter');
@@ -875,9 +908,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       return;
     }
 
-    const feeTotal = student.feeTotal || (student.boardingStatus === 'Boarding' ? 2500 : 1200);
-    const feePaid = student.feePaid || 0;
-    const remaining = Math.max(0, feeTotal - feePaid);
+    const feeTotal = getStudentFeeTotal(student);
+    const feePaid = getStudentFeePaid(student);
+    const remaining = getStudentRemainingFee(student);
     const amountNum = parseFloat(paymentAmount);
 
     if (amountNum > remaining) {
@@ -901,7 +934,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         timestamp: new Date().toISOString()
       };
 
-      const newFeePaid = (student.feePaid || 0) + amountNum;
+      const newFeePaid = feePaid + amountNum;
       const newStatus: 'Unpaid' | 'Partial' | 'Paid' = (newFeePaid >= feeTotal && feeTotal > 0) ? 'Paid' : (newFeePaid > 0 ? 'Partial' : 'Unpaid');
 
       if (isOffline) {
@@ -1512,9 +1545,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const admittedStudents = students.filter(s => s.admissionStatus === 'Admitted').length + offlineQueue.length;
   const pendingStudents = students.filter(s => s.admissionStatus === 'Pending').length;
   
-  const totalFeesExpected = students.reduce((acc, s) => acc + s.feeTotal, 0) + offlineQueue.reduce((acc, s) => acc + s.feeTotal, 0);
-  const totalFeesPaid = payments.filter(p => p.status === 'Success').reduce((acc, p) => acc + p.amount, 0);
-  const totalFeesOutstanding = totalFeesExpected - totalFeesPaid;
+  const totalFeesExpected = students.reduce((acc, s) => acc + getStudentFeeTotal(s), 0) + offlineQueue.reduce((acc, s) => acc + getStudentFeeTotal(s), 0);
+  const totalFeesPaid = students.reduce((acc, s) => acc + getStudentFeePaid(s), 0);
+  const totalFeesOutstanding = Math.max(0, totalFeesExpected - totalFeesPaid);
 
   const mCount = students.filter(s => s.gender === 'Male').length + offlineQueue.filter(s => s.gender === 'Male').length;
   const fCount = students.filter(s => s.gender === 'Female').length + offlineQueue.filter(s => s.gender === 'Female').length;
@@ -2760,15 +2793,22 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                             </div>
                           </td>
                           <td className="py-4 px-6">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-1.5">
-                                <span className={`h-1.5 w-1.5 rounded-full ${
-                                  stud.paymentStatus === 'Paid' ? 'bg-green-600' : stud.paymentStatus === 'Partial' ? 'bg-amber-500' : 'bg-red-500'
-                                }`}></span>
-                                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{stud.paymentStatus}</span>
-                              </div>
-                              <span className="block text-[10px] text-slate-400">Paid GH₵ {(stud.feePaid || 0).toLocaleString()} / {(stud.feeTotal || 0).toLocaleString()}</span>
-                            </div>
+                            {(() => {
+                              const fPaid = getStudentFeePaid(stud);
+                              const fTotal = getStudentFeeTotal(stud);
+                              const pStatus = fPaid >= fTotal && fTotal > 0 ? 'Paid' : fPaid > 0 ? 'Partial' : 'Unpaid';
+                              return (
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className={`h-1.5 w-1.5 rounded-full ${
+                                      pStatus === 'Paid' ? 'bg-green-600' : pStatus === 'Partial' ? 'bg-amber-500' : 'bg-red-500'
+                                    }`}></span>
+                                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{pStatus}</span>
+                                  </div>
+                                  <span className="block text-[10px] text-slate-400">Paid GH₵ {fPaid.toLocaleString()} / {fTotal.toLocaleString()}</span>
+                                </div>
+                              );
+                            })()}
                           </td>
                           <td className="py-4 px-6 text-right">
                             <div className="flex items-center justify-end gap-2">
@@ -3288,37 +3328,49 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                           <select
                             value={selectedStudentId}
                             onChange={(e) => {
-                              setSelectedStudentId(e.target.value);
-                              const stud = students.find(s => s.id === e.target.value);
+                              const sId = e.target.value;
+                              setSelectedStudentId(sId);
+                              const stud = students.find(s => s.id === sId);
                               if (stud) {
                                 setPaymentPhone(stud.guardianPhone || '');
-                                const rem = Math.max(0, (stud.feeTotal || (stud.boardingStatus === 'Boarding' ? 2500 : 1200)) - (stud.feePaid || 0));
+                                const rem = getStudentRemainingFee(stud);
                                 setPaymentAmount(rem > 0 ? String(rem) : '');
+                              } else {
+                                setPaymentPhone('');
+                                setPaymentAmount('');
                               }
                             }}
                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs transition"
                             required
                           >
                             <option value="">-- Choose Admitted Student --</option>
-                            {students.map((s) => {
-                              const feeTotal = s.feeTotal || (s.boardingStatus === 'Boarding' ? 2500 : 1200);
-                              const feePaid = s.feePaid || 0;
-                              const rem = Math.max(0, feeTotal - feePaid);
-                              return (
-                                <option key={s.id} value={s.id}>
-                                  {s.fullName} ({s.classLevel} - {rem > 0 ? `Owes: GH₵ ${rem.toLocaleString()}` : 'FULLY PAID'})
-                                </option>
-                              );
-                            })}
+                            {(() => {
+                              const sortedStudents = [...students].sort((a, b) => {
+                                const remA = getStudentRemainingFee(a);
+                                const remB = getStudentRemainingFee(b);
+                                if (remA > 0 && remB === 0) return -1;
+                                if (remA === 0 && remB > 0) return 1;
+                                return a.fullName.localeCompare(b.fullName);
+                              });
+
+                              return sortedStudents.map((s) => {
+                                const rem = getStudentRemainingFee(s);
+                                return (
+                                  <option key={s.id} value={s.id}>
+                                    {s.fullName} ({s.classLevel} - {rem > 0 ? `Owes: GH₵ ${rem.toLocaleString()}` : 'FULLY PAID'})
+                                  </option>
+                                );
+                              });
+                            })()}
                           </select>
                         </div>
 
                         {selectedStudentId && (() => {
                           const stud = students.find(s => s.id === selectedStudentId);
                           if (!stud) return null;
-                          const feeTotal = stud.feeTotal || (stud.boardingStatus === 'Boarding' ? 2500 : 1200);
-                          const feePaid = stud.feePaid || 0;
-                          const rem = Math.max(0, feeTotal - feePaid);
+                          const feeTotal = getStudentFeeTotal(stud);
+                          const feePaid = getStudentFeePaid(stud);
+                          const rem = getStudentRemainingFee(stud);
                           return (
                             <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs space-y-1">
                               <div className="flex justify-between">
@@ -3331,7 +3383,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                               </div>
                               <div className="flex justify-between pt-1 border-t border-slate-200 dark:border-slate-800">
                                 <span className="font-bold text-slate-700 dark:text-slate-300">Remaining Deficit:</span>
-                                <span className="font-bold text-amber-600 dark:text-amber-400">GH₵ {rem.toLocaleString()}</span>
+                                <span className={`font-bold ${rem > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600'}`}>
+                                  GH₵ {rem.toLocaleString()} {rem === 0 ? '(FULLY CLEARED)' : ''}
+                                </span>
                               </div>
                             </div>
                           );

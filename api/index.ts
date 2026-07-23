@@ -498,7 +498,7 @@ const validateApiKey = (req: any, res: any, next: any) => {
 
   app.post("/api/v1/teachers", async (req, res) => {
     try {
-      const { schoolId, fullName, email, password, department, subject, isClassTeacher, assignedClass } = req.body;
+      const { schoolId, fullName, email, gender, password, department, subject, isClassTeacher, assignedClass } = req.body;
       if (!schoolId || !fullName || !email || !password || !department) {
         return res.status(400).json({ error: "Missing required teacher registration fields." });
       }
@@ -507,6 +507,7 @@ const validateApiKey = (req: any, res: any, next: any) => {
         schoolId,
         fullName,
         email: cleanEmail,
+        gender: gender || 'Male',
         password,
         initialPassword: password,
         department,

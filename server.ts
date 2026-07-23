@@ -1044,7 +1044,7 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
 
   app.post("/api/v1/teachers", async (req, res) => {
     try {
-      const { schoolId, fullName, email, password, department, subject, isClassTeacher, assignedClass } = req.body;
+      const { schoolId, fullName, email, gender, password, department, subject, isClassTeacher, assignedClass } = req.body;
       if (!schoolId || !fullName || !email || !password || !department) {
         return res.status(400).json({ error: "Missing required teacher registration fields." });
       }
@@ -1053,6 +1053,7 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
         schoolId,
         fullName,
         email: cleanEmail,
+        gender: gender || 'Male',
         password,
         initialPassword: password,
         department,

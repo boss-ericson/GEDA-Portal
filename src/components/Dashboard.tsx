@@ -166,6 +166,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const [newTeacherSubject, setNewTeacherSubject] = useState<string>('');
   const [newTeacherIsClassTeacher, setNewTeacherIsClassTeacher] = useState<boolean>(false);
   const [newTeacherAssignedClass, setNewTeacherAssignedClass] = useState<string>('');
+  const [newTeacherGender, setNewTeacherGender] = useState<'Male' | 'Female'>('Male');
   const [teacherError, setTeacherError] = useState<string>('');
   const [teacherSuccess, setTeacherSuccess] = useState<string>('');
   const [creatingTeacher, setCreatingTeacher] = useState<boolean>(false);
@@ -1377,6 +1378,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         schoolId: school.id,
         fullName: newTeacherName.trim(),
         email: cleanEmail,
+        gender: newTeacherGender,
         password: pwdToUse,
         initialPassword: pwdToUse,
         department: newTeacherDepartment,
@@ -1409,6 +1411,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       setTeacherSuccess(`Account for teacher ${createdTeacher.fullName} created successfully with password: ${pwdToUse}`);
       setNewTeacherName('');
       setNewTeacherEmail('');
+      setNewTeacherGender('Male');
       setNewTeacherPassword('');
       setNewTeacherDepartment('');
       setNewTeacherSubject('');
@@ -1507,6 +1510,15 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     { name: 'Female', value: fCount }
   ];
   
+  const femaleNamesList = ['ms.', 'mrs.', 'madam', 'ama', 'yaa', 'akua', 'ybaa', 'mary', 'grace', 'rose', 'florence', 'peace', 'joyce', 'evelyn', 'abena', 'adwoa', 'afia', 'eunice', 'comfort', 'esther', 'patricia', 'rita', 'gladys'];
+  const teacherMaleCount = teachers.filter(t => t.gender === 'Male' || (!t.gender && !femaleNamesList.some(f => t.fullName?.toLowerCase().includes(f)))).length;
+  const teacherFemaleCount = teachers.filter(t => t.gender === 'Female' || (!t.gender && femaleNamesList.some(f => t.fullName?.toLowerCase().includes(f)))).length;
+
+  const teacherGenderData = [
+    { name: 'Male', value: teacherMaleCount },
+    { name: 'Female', value: teacherFemaleCount }
+  ];
+
   const boardingData = [
     { name: 'Day', value: dayCount },
     { name: 'Boarding', value: boardingCount }
@@ -2064,15 +2076,15 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   </div>
                 </div>
 
-                {/* Chart 2: Student Attributes */}
+                {/* Chart 2: Student & Faculty Attributes */}
                 <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none space-y-4">
                   <div>
-                    <h3 className="font-display font-semibold text-slate-900 dark:text-white">Enrollment & Gender Dynamics</h3>
-                    <p className="text-slate-400 text-xs">Aesthetic ratio breakups of registered school students.</p>
+                    <h3 className="font-display font-semibold text-slate-900 dark:text-white">Enrollment & Faculty Demographics</h3>
+                    <p className="text-slate-400 text-xs">Visual gender ratios for registered students and teaching staff.</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 h-48">
-                    {/* Gender Chart */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 h-48">
+                    {/* Student Gender Chart */}
                     <div className="flex flex-col items-center justify-center">
                       <div className="h-32 w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -2081,9 +2093,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                               data={genderData}
                               cx="50%"
                               cy="50%"
-                              innerRadius={35}
-                              outerRadius={50}
-                              paddingAngle={5}
+                              innerRadius={24}
+                              outerRadius={38}
+                              paddingAngle={4}
                               dataKey="value"
                               stroke="none"
                             >
@@ -2091,14 +2103,45 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                               ))}
                             </Pie>
-                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', fontSize: '12px' }} />
+                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', fontSize: '11px' }} />
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
-                      <div className="text-center text-xs font-semibold text-slate-700 dark:text-slate-300">
-                        Gender Balance
-                        <div className="text-[10px] font-normal text-slate-500 mt-1">
+                      <div className="text-center text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Student Gender
+                        <div className="text-[10px] font-normal text-slate-500 mt-0.5">
                           <span className="text-blue-600 font-medium">{mCount} M</span> / <span className="text-pink-500 font-medium">{fCount} F</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Teacher Gender Chart */}
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="h-32 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={teacherGenderData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={24}
+                              outerRadius={38}
+                              paddingAngle={4}
+                              dataKey="value"
+                              stroke="none"
+                            >
+                              {teacherGenderData.map((entry, index) => (
+                                <Cell key={`tcell-${index}`} fill={index === 0 ? '#2563eb' : '#ec4899'} />
+                              ))}
+                            </Pie>
+                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', fontSize: '11px' }} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="text-center text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                        Teacher Gender
+                        <div className="text-[10px] font-normal text-slate-500 mt-0.5">
+                          <span className="text-blue-600 font-medium">{teacherMaleCount} M</span> / <span className="text-pink-500 font-medium">{teacherFemaleCount} F</span>
                         </div>
                       </div>
                     </div>
@@ -2112,23 +2155,23 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                               data={boardingData}
                               cx="50%"
                               cy="50%"
-                              innerRadius={35}
-                              outerRadius={50}
-                              paddingAngle={5}
+                              innerRadius={24}
+                              outerRadius={38}
+                              paddingAngle={4}
                               dataKey="value"
                               stroke="none"
                             >
                               {boardingData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
+                                <Cell key={`bcell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
                               ))}
                             </Pie>
-                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', fontSize: '12px' }} />
+                            <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', fontSize: '11px' }} />
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
-                      <div className="text-center text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      <div className="text-center text-[11px] font-semibold text-slate-700 dark:text-slate-300">
                         Enrollment System
-                        <div className="text-[10px] font-normal text-slate-500 mt-1">
+                        <div className="text-[10px] font-normal text-slate-500 mt-0.5">
                           <span className="text-amber-500 font-medium">{dayCount} Day</span> / <span className="text-emerald-500 font-medium">{boardingCount} Brd</span>
                         </div>
                       </div>
@@ -2136,7 +2179,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   </div>
 
                   <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
-                    💡 <b>GES Standard Ratio Guidance:</b> {school.name} recommends maintaining balanced class metrics. Ensure class sizes remain under national municipal safety ceilings of 35-40 pupils.
+                    💡 <b>Faculty Ratio Guidance:</b> {teachers.length > 0 ? `${teacherMaleCount} Male (${Math.round((teacherMaleCount / teachers.length) * 100)}%) and ${teacherFemaleCount} Female (${Math.round((teacherFemaleCount / teachers.length) * 100)}%) teachers registered.` : 'No teachers registered yet.'}
                   </div>
                 </div>
 
@@ -3333,6 +3376,34 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                       </div>
 
                       <div>
+                        <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Teacher Gender *</label>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setNewTeacherGender('Male')}
+                            className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                              newTeacherGender === 'Male'
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                            }`}
+                          >
+                            <span className="w-2 h-2 rounded-full bg-blue-300"></span> Male
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setNewTeacherGender('Female')}
+                            className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                              newTeacherGender === 'Female'
+                                ? 'bg-pink-600 text-white border-pink-600 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                            }`}
+                          >
+                            <span className="w-2 h-2 rounded-full bg-pink-300"></span> Female
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
                         <div className="flex justify-between items-center mb-1.5">
                           <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Account Password *</label>
                           <button
@@ -3471,6 +3542,46 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
                   {/* Registered Teachers List */}
                   <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none space-y-4">
+                    
+                    {/* Graphical Representation Card for Teachers */}
+                    <div className="bg-slate-900 dark:bg-slate-950 p-4 rounded-2xl border border-slate-800 text-white space-y-3 shadow-inner">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-blue-500/20 text-blue-400 rounded-lg border border-blue-500/30">
+                            <GraduationCap className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-display font-bold text-xs text-white">Teaching Faculty Gender Distribution</h4>
+                            <p className="text-[10px] text-slate-400">Graphical breakdown of {teachers.length} registered school educators</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] font-semibold">
+                          <span className="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-blue-400"></span> {teacherMaleCount} Male ({teachers.length > 0 ? Math.round((teacherMaleCount / teachers.length) * 100) : 0}%)
+                          </span>
+                          <span className="bg-pink-500/20 text-pink-300 border border-pink-500/30 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-pink-400"></span> {teacherFemaleCount} Female ({teachers.length > 0 ? Math.round((teacherFemaleCount / teachers.length) * 100) : 0}%)
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Visual Split Progress Bar */}
+                      <div className="space-y-1">
+                        <div className="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden flex border border-white/10">
+                          <div 
+                            className="h-full bg-blue-500 transition-all duration-500" 
+                            style={{ width: `${teachers.length > 0 ? (teacherMaleCount / teachers.length) * 100 : 50}%` }}
+                            title={`Male Teachers: ${teacherMaleCount}`}
+                          ></div>
+                          <div 
+                            className="h-full bg-pink-500 transition-all duration-500" 
+                            style={{ width: `${teachers.length > 0 ? (teacherFemaleCount / teachers.length) * 100 : 50}%` }}
+                            title={`Female Teachers: ${teacherFemaleCount}`}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
                       <div>
                         <h3 className="font-display font-semibold text-slate-900 dark:text-white flex items-center gap-2">
@@ -3519,8 +3630,15 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                               <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/50 transition">
                                 <td className="py-3 font-semibold text-slate-800 dark:text-slate-200">
                                   <div>
-                                    <div className="flex items-center gap-1.5">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
                                       <span>{t.fullName}</span>
+                                      <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider ${
+                                        (t.gender === 'Female' || (!t.gender && femaleNamesList.some(f => t.fullName?.toLowerCase().includes(f))))
+                                          ? 'bg-pink-100 dark:bg-pink-950/50 text-pink-700 dark:text-pink-300 border border-pink-200 dark:border-pink-800'
+                                          : 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                                      }`}>
+                                        {t.gender || ((femaleNamesList.some(f => t.fullName?.toLowerCase().includes(f))) ? 'Female' : 'Male')}
+                                      </span>
                                       {t.isClassTeacher && (
                                         <span className="bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border border-emerald-200 dark:border-emerald-800">
                                           Class Teacher

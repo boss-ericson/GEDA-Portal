@@ -3,6 +3,7 @@ export interface Teacher {
   schoolId: string;
   fullName: string;
   email: string;
+  gender?: 'Male' | 'Female';
   password?: string;
   initialPassword?: string;
   department: 'Primary' | 'JHS';

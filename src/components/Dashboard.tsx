@@ -1494,17 +1494,43 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   
   // Calculate dynamic charts data
   const chartStudents = [...students, ...offlineQueue];
-  const intakeDataMap = chartStudents.reduce((acc, s) => {
-    const d = new Date(s.createdAt);
-    const month = d.toLocaleString('default', { month: 'short' });
-    acc[month] = (acc[month] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  const intakeData = Object.entries(intakeDataMap).map(([month, count]) => ({ month, count }));
-  if (intakeData.length === 0) {
-    intakeData.push({ month: 'Jun', count: 12 }, { month: 'Jul', count: 28 }, { month: 'Aug', count: 45 }, { month: 'Sep', count: 32 });
+
+  // Initialize rolling timeline map for the last 6 months
+  const now = new Date();
+  const monthsMap: Record<string, { month: string; count: number; sortKey: number }> = {};
+
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthName = d.toLocaleString('default', { month: 'short' });
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    monthsMap[key] = {
+      month: monthName,
+      count: 0,
+      sortKey: d.getTime(),
+    };
   }
+
+  // Populate actual live student intake counts
+  chartStudents.forEach(s => {
+    if (!s.createdAt) return;
+    const d = new Date(s.createdAt);
+    if (isNaN(d.getTime())) return;
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const monthName = d.toLocaleString('default', { month: 'short' });
+
+    if (!monthsMap[key]) {
+      monthsMap[key] = {
+        month: monthName,
+        count: 0,
+        sortKey: new Date(d.getFullYear(), d.getMonth(), 1).getTime(),
+      };
+    }
+    monthsMap[key].count += 1;
+  });
+
+  const intakeData = Object.values(monthsMap)
+    .sort((a, b) => a.sortKey - b.sortKey)
+    .map(m => ({ month: m.month, count: m.count }));
 
   const genderData = [
     { name: 'Male', value: mCount },
@@ -2277,7 +2303,11 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                     <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
                       <span className="text-[10px] uppercase font-bold text-slate-400 block">Peak Intake Month</span>
                       <span className="font-bold text-slate-900 dark:text-white">
-                        {intakeData.length > 0 ? intakeData.reduce((prev, current) => (prev.count > current.count) ? prev : current).month : 'Sep'}
+                        {(() => {
+                          const maxCount = Math.max(...intakeData.map(d => d.count), 0);
+                          if (maxCount === 0) return 'None Yet';
+                          return intakeData.find(d => d.count === maxCount)?.month || 'N/A';
+                        })()}
                       </span>
                     </div>
                     <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">

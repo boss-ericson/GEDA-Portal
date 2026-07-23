@@ -26,7 +26,9 @@ import {
   FileText,
   ClipboardList,
   X,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -49,6 +51,11 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
   const [selectedSchoolId, setSelectedSchoolId] = useState<string>(schools[0]?.id || 'achimota');
   const [selectedRole, setSelectedRole] = useState<Role>('Admin');
   
+  // Password visibility states
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
+
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -637,14 +644,23 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                         </div>
                         <div className="relative">
                           <input
-                            type="password"
+                            type={showLoginPassword ? "text" : "password"}
                             autoComplete="current-password"
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                            className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl pl-4 pr-11 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
                             required
                           />
+                          <button
+                            type="button"
+                            onClick={() => setShowLoginPassword(!showLoginPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                            title={showLoginPassword ? "Hide password" : "Show password"}
+                            aria-label={showLoginPassword ? "Hide password" : "Show password"}
+                          >
+                            {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </button>
                         </div>
                       </div>
                     </motion.div>
@@ -868,30 +884,52 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Administrator Password *</label>
-                <input
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="•••••••• (min 6 chars)"
-                  value={newSchoolPassword}
-                  onChange={(e) => setNewSchoolPassword(e.target.value)}
-                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
-                  minLength={6}
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showRegisterPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="•••••••• (min 6 chars)"
+                    value={newSchoolPassword}
+                    onChange={(e) => setNewSchoolPassword(e.target.value)}
+                    className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl pl-4 pr-11 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                    minLength={6}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                    title={showRegisterPassword ? "Hide password" : "Show password"}
+                    aria-label={showRegisterPassword ? "Hide password" : "Show password"}
+                  >
+                    {showRegisterPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Repeat / Confirm Password *</label>
-                <input
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="•••••••• (repeat password)"
-                  value={newSchoolConfirmPassword}
-                  onChange={(e) => setNewSchoolConfirmPassword(e.target.value)}
-                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
-                  minLength={6}
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showRegisterConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    placeholder="•••••••• (repeat password)"
+                    value={newSchoolConfirmPassword}
+                    onChange={(e) => setNewSchoolConfirmPassword(e.target.value)}
+                    className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl pl-4 pr-11 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                    minLength={6}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                    title={showRegisterConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={showRegisterConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showRegisterConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
                 {newSchoolConfirmPassword.length > 0 && (
                   <p className={`text-[11px] font-medium mt-1.5 flex items-center gap-1 ${
                     newSchoolPassword === newSchoolConfirmPassword ? 'text-emerald-400' : 'text-red-400'

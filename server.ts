@@ -10,14 +10,9 @@ import { GoogleGenAI } from "@google/genai";
 let aiClient: any = null;
 function getAiClient() {
   if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     aiClient = new GoogleGenAI({
       apiKey: apiKey || "dummy_key",
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        }
-      }
     });
   }
   return aiClient;
@@ -238,7 +233,7 @@ Thank you for your inquiry regarding Ghana's Standard-Based Curriculum (SBC) and
   }
 }
 
-  app.post("/api/v1/ai/generate", async (req: any, res: any) => {
+  app.post(["/api/v1/ai/generate", "/api/ai/generate"], async (req: any, res: any) => {
     try {
       const { type, schoolName, params } = req.body || {};
       const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;

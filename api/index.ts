@@ -246,17 +246,52 @@ const validateApiKey = (req: any, res: any, next: any) => {
 
   app.post("/api/v1/students/bulk", async (req, res) => {
     try {
-      const { students } = req.body;
+      const { schoolId, students } = req.body;
+      if (!Array.isArray(students) || students.length === 0) {
+        return res.status(400).json({ error: "No student records provided for bulk upload." });
+      }
+
       const batch = writeBatch(getDb());
       const results = [];
       for (const s of students) {
         const docRef = doc(collection(getDb(), "students"));
-        s.createdAt = new Date().toISOString();
-        delete s.id;
-        batch.set(docRef, s);
-        results.push({ ...s, id: docRef.id });
+        const targetSchoolId = s.schoolId || schoolId;
+        const studentObj = {
+          schoolId: targetSchoolId,
+          admissionNo: s.admissionNo || s['Admission No'] || `ADM-${Math.floor(100000 + Math.random() * 900000)}`,
+          fullName: s.fullName || s['Full Name'] || 'Unknown Student',
+          dob: s.dob || s['Date of Birth'] || '2010-01-01',
+          gender: s.gender || s['Gender'] || 'Male',
+          classLevel: s.classLevel || s['Class Level'] || 'Basic 1',
+          boardingStatus: s.boardingStatus || s['Boarding Status'] || 'Day',
+          guardianName: s.guardianName || s['Guardian Name'] || 'N/A',
+          guardianPhone: s.guardianPhone || s['Guardian Phone'] || 'N/A',
+          passportPicture: s.passportPicture || '',
+          admissionStatus: s.admissionStatus || 'Admitted',
+          feePaid: Number(s.feePaid) || 0,
+          feeTotal: Number(s.feeTotal || s['Fee Total']) || (s.boardingStatus === 'Boarding' || s['Boarding Status'] === 'Boarding' ? 2500 : 1200),
+          paymentStatus: s.paymentStatus || ((Number(s.feePaid) || 0) >= (Number(s.feeTotal) || 1200) ? 'Paid' : (Number(s.feePaid) || 0) > 0 ? 'Partial' : 'Unpaid'),
+          syncStatus: 'synced',
+          remarks: s.remarks || s['Remarks'] || '',
+          createdAt: s.createdAt || new Date().toISOString()
+        };
+
+        batch.set(docRef, studentObj);
+        results.push({ ...studentObj, id: docRef.id });
       }
       await batch.commit();
+
+      // Update school student count
+      const targetSchoolId = schoolId || (results.length > 0 && results[0].schoolId);
+      if (targetSchoolId) {
+        const schoolRef = doc(getDb(), "schools", targetSchoolId);
+        const schoolSnap = await getDoc(schoolRef);
+        if (schoolSnap.exists()) {
+          const currentCount = schoolSnap.data().studentCount || 0;
+          await updateDoc(schoolRef, { studentCount: currentCount + results.length });
+        }
+      }
+
       res.status(201).json(results);
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });

@@ -427,20 +427,88 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const downloadExcelTemplate = () => {
     const ws = XLSX.utils.json_to_sheet([
       {
-        fullName: 'John Doe',
-        dob: '2010-05-14',
-        gender: 'Male',
-        classLevel: 'Basic 1',
-        boardingStatus: 'Day',
-        feeTotal: 1200,
-        guardianName: 'Jane Doe',
-        guardianPhone: '0241234567',
-        remarks: 'Transfer student'
+        'Full Name': 'Kofi Mensah',
+        'Date of Birth': '2010-05-14',
+        'Gender': 'Male',
+        'Class Level': 'Basic 1',
+        'Boarding Status': 'Day',
+        'Fee Total': 1200,
+        'Guardian Name': 'Kofi Mensah Snr',
+        'Guardian Phone': '0241234567',
+        'Remarks': 'Transfer student'
+      },
+      {
+        'Full Name': 'Ama Serwaa',
+        'Date of Birth': '2011-08-20',
+        'Gender': 'Female',
+        'Class Level': 'JHS 1',
+        'Boarding Status': 'Boarding',
+        'Fee Total': 2500,
+        'Guardian Name': 'Yaa Serwaa',
+        'Guardian Phone': '0209876543',
+        'Remarks': 'New admission'
       }
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Students Template');
     XLSX.writeFile(wb, 'GEDA_Bulk_Onboarding_Template.xlsx');
+  };
+
+  const normalizeStudentRow = (rawData: any, schoolIdStr: string): Omit<Student, 'id'> => {
+    const getVal = (...keys: string[]) => {
+      for (const k of keys) {
+        if (rawData[k] !== undefined && rawData[k] !== null && String(rawData[k]).trim() !== '') {
+          return String(rawData[k]).trim();
+        }
+      }
+      return '';
+    };
+
+    const fullName = getVal('Full Name', 'fullName', 'Fullname', 'Student Name', 'Name') || 'Unknown Student';
+    const dob = getVal('Date of Birth', 'dob', 'DOB', 'DateOfBirth') || '2010-01-01';
+    
+    const genderRaw = getVal('Gender', 'gender').toLowerCase();
+    const gender: 'Male' | 'Female' = genderRaw.startsWith('f') ? 'Female' : 'Male';
+
+    const classLevel = getVal('Class Level', 'classLevel', 'Class', 'Grade') || 'Basic 1';
+
+    const boardRaw = getVal('Boarding Status', 'boardingStatus', 'Boarding', 'Status').toLowerCase();
+    const boardingStatus: 'Day' | 'Boarding' = boardRaw.includes('board') ? 'Boarding' : 'Day';
+
+    const guardianName = getVal('Guardian Name', 'guardianName', 'Guardian', 'Parent Name') || 'N/A';
+    const guardianPhone = getVal('Guardian Phone', 'guardianPhone', 'Parent Phone', 'Phone') || 'N/A';
+    const remarks = getVal('Remarks', 'remarks', 'Note', 'Comment') || '';
+
+    const rawFeeTotal = getVal('Fee Total', 'feeTotal', 'Fees', 'Total Fee');
+    const feeTotal = rawFeeTotal ? Number(rawFeeTotal) : (boardingStatus === 'Boarding' ? 2500 : 1200);
+
+    const rawFeePaid = getVal('Fee Paid', 'feePaid', 'Paid');
+    const feePaid = rawFeePaid ? Number(rawFeePaid) : 0;
+
+    const paymentStatus: 'Unpaid' | 'Partial' | 'Paid' = feePaid >= feeTotal && feeTotal > 0 ? 'Paid' : (feePaid > 0 ? 'Partial' : 'Unpaid');
+
+    const customAdmNo = getVal('Admission No', 'admissionNo', 'Admission Number', 'Index No');
+    const admissionNo = customAdmNo || `ADM-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    return {
+      schoolId: schoolIdStr,
+      admissionNo,
+      fullName,
+      dob,
+      gender,
+      classLevel,
+      boardingStatus,
+      guardianName,
+      guardianPhone,
+      passportPicture: '',
+      admissionStatus: 'Admitted' as const,
+      feePaid,
+      feeTotal,
+      paymentStatus,
+      syncStatus: 'synced' as const,
+      remarks,
+      createdAt: new Date().toISOString()
+    };
   };
 
   const handleBulkUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -455,83 +523,76 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       let parsedData: any[] = [];
       try {
         const data = event.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
-        parsedData = XLSX.utils.sheet_to_json(sheet) as any[];
+        if (!data) {
+          setErrorMsg('Failed to read Excel file.');
+          return;
+        }
 
-        if (parsedData.length === 0) {
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        if (!sheetName) {
+          setErrorMsg('The uploaded Excel file contains no worksheets.');
+          return;
+        }
+
+        const sheet = workbook.Sheets[sheetName];
+        const rawRows = XLSX.utils.sheet_to_json(sheet) as any[];
+
+        if (!rawRows || rawRows.length === 0) {
           setErrorMsg('The uploaded Excel file is empty.');
           return;
         }
+
+        parsedData = rawRows.map(row => normalizeStudentRow(row, school.id));
 
         if (isOffline) {
           setErrorMsg('Bulk upload requires an active network connection.');
           return;
         }
 
-        const res = await fetch('/api/v1/students/bulk', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ schoolId: school.id, students: parsedData })
-        });
-
-        if (res.ok) {
-          const newStudents = await res.json();
-          setStudents((prev) => [...prev, ...newStudents]);
-          setSuccessMsg(`Successfully onboarded ${newStudents.length} students in bulk.`);
-        } else {
-          throw new Error('API failed');
-        }
-      } catch (err) {
-        console.warn("Falling back to bulk upload via Firebase");
+        let createdStudents: any[] = [];
         try {
+          const res = await fetch('/api/v1/students/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ schoolId: school.id, students: parsedData })
+          });
+
+          if (res.ok) {
+            createdStudents = await res.json();
+          } else {
+            throw new Error('API call returned failure');
+          }
+        } catch (apiErr) {
+          console.warn("API bulk upload failed, performing direct database batch:", apiErr);
           const newStudents = [];
-          for (const rawData of parsedData) {
-            const price = rawData['Fee Total'] ? Number(rawData['Fee Total']) : (rawData['Boarding Status'] === 'Boarding' ? 2500 : 1200);
-            const stu = {
-              schoolId: school.id,
-              admissionNo: 'PENDING-SYNC',
-              fullName: rawData['Full Name'] || 'Unknown',
-              dob: rawData['Date of Birth'] || '2010-01-01',
-              gender: rawData['Gender'] || 'Male',
-              classLevel: rawData['Class'] || 'JHS 1',
-              boardingStatus: rawData['Boarding Status'] || 'Day',
-              guardianName: rawData['Guardian Name'] || 'Unknown',
-              guardianPhone: rawData['Guardian Phone'] || 'Unknown',
-              passportPicture: '',
-              admissionStatus: 'Admitted',
-              feePaid: 0,
-              feeTotal: price,
-              paymentStatus: 'Unpaid',
-              syncStatus: 'synced',
-              remarks: '',
-              createdAt: new Date().toISOString()
-            };
+          for (const stu of parsedData) {
             const docRef = await addDoc(collection(db, "students"), stu);
             newStudents.push({ ...stu, id: docRef.id });
           }
-          
+
           const schoolRef = doc(db, "schools", school.id);
           const schoolSnap = await getDoc(schoolRef);
           if (schoolSnap.exists()) {
             const currentCount = schoolSnap.data().studentCount || 0;
             await updateDoc(schoolRef, { studentCount: currentCount + newStudents.length });
           }
-          
-          setStudents(prev => [...prev, ...newStudents]);
-          setSuccessMsg(`Successfully onboarded ${newStudents.length} students directly to database.`);
-        } catch (fbErr) {
-          console.error(fbErr);
-          setErrorMsg('Error processing bulk upload.');
+
+          createdStudents = newStudents;
         }
+
+        setStudents((prev) => [...prev, ...createdStudents]);
+        setSuccessMsg(`Successfully onboarded ${createdStudents.length} students in bulk.`);
+      } catch (err: any) {
+        console.error("Bulk upload processing error:", err);
+        setErrorMsg('Error processing bulk upload: ' + (err.message || 'Please check file formatting.'));
       }
-      
-      // Reset input
+
       if (e.target) {
         e.target.value = '';
       }
     };
+
     reader.readAsArrayBuffer(file);
   };
 

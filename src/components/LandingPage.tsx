@@ -74,6 +74,22 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
   const [isRegistering, setIsRegistering] = useState(false);
   const [registeredSchool, setRegisteredSchool] = useState<School | null>(null);
 
+  // Reset all landing page form fields on component mount (e.g., after logging out)
+  useEffect(() => {
+    setLoginEmail('');
+    setLoginPassword('');
+    setLoginError('');
+    setNewSchoolName('');
+    setNewSchoolDistrict('');
+    setNewSchoolEmail('');
+    setNewSchoolPassword('');
+    setNewSchoolConfirmPassword('');
+    setRegisterError('');
+    setForgotPasswordEmail('');
+    setForgotPasswordMsg('');
+    setForgotPasswordError('');
+  }, []);
+
   const ghanaRegions = [
     'Greater Accra', 'Ashanti', 'Western', 'Northern', 'Volta', 
     'Eastern', 'Central', 'Ahafo', 'Bono', 'Bono East', 
@@ -155,15 +171,18 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
         setRegisteredSchool(result.school);
         setSelectedSchoolId(result.school.id);
         
-        // Auto select and prefill login
         setLoginMode('secure');
-        setLoginEmail(newSchoolEmail);
-        setLoginPassword(newSchoolPassword);
+        // Clear all login and registration form fields so they remain empty after registration
+        setLoginEmail('');
+        setLoginPassword('');
+        setLoginError('');
         
         setNewSchoolName('');
         setNewSchoolDistrict('');
         setNewSchoolEmail('');
         setNewSchoolPassword('');
+        setNewSchoolConfirmPassword('');
+        setRegisterError('');
 
         // Note: we can also show a message to the user that a verification email was sent.
         alert('Registration successful! A verification email has been sent to your email address.');
@@ -197,6 +216,9 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
         accessLevel: 'Full',
         createdAt: new Date().toISOString()
       };
+      setLoginEmail('');
+      setLoginPassword('');
+      setLoginError('');
       onLogin(demoSchool, selectedRole, true);
     } else {
       if (!loginEmail.trim() || !loginPassword.trim()) {
@@ -290,6 +312,9 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
             }
           }
           
+          setLoginEmail('');
+          setLoginPassword('');
+          setLoginError('');
           onLogin(responseData.school, actualRole, false, responseData.teacher || null);
         } else {
           setLoginError('Invalid official school email or password.');
@@ -530,7 +555,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                   </motion.div>
                 )} 
 
-                <form onSubmit={handleLoginSubmit} className="space-y-5">
+                <form onSubmit={handleLoginSubmit} autoComplete="off" className="space-y-5">
                   {loginMode === 'secure' ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
                       <div>
@@ -538,6 +563,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                         <div className="relative">
                           <input
                             type="email"
+                            autoComplete="off"
                             value={loginEmail}
                             onChange={(e) => setLoginEmail(e.target.value)}
                             placeholder="administrator@achimota.edu.gh"
@@ -565,6 +591,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                         <div className="relative">
                           <input
                             type="password"
+                            autoComplete="current-password"
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
                             placeholder="••••••••"
@@ -738,11 +765,12 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
               </motion.div>
             )}
 
-            <form onSubmit={handleRegister} className="grid sm:grid-cols-2 gap-6">
+            <form onSubmit={handleRegister} autoComplete="off" className="grid sm:grid-cols-2 gap-6">
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">School Official Name</label>
                 <input
                   type="text"
+                  autoComplete="off"
                   placeholder="e.g. Accra Methodist Basic School"
                   value={newSchoolName}
                   onChange={(e) => setNewSchoolName(e.target.value)}
@@ -766,6 +794,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Municipal District</label>
                 <input
                   type="text"
+                  autoComplete="off"
                   placeholder="e.g. Kumasi Metro"
                   value={newSchoolDistrict}
                   onChange={(e) => setNewSchoolDistrict(e.target.value)}
@@ -782,6 +811,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">School Contact/Login Email</label>
                 <input
                   type="email"
+                  autoComplete="off"
                   placeholder="e.g. admin@school.edu.gh"
                   value={newSchoolEmail}
                   onChange={(e) => setNewSchoolEmail(e.target.value)}
@@ -793,6 +823,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Administrator Password *</label>
                 <input
                   type="password"
+                  autoComplete="new-password"
                   placeholder="•••••••• (min 6 chars)"
                   value={newSchoolPassword}
                   onChange={(e) => setNewSchoolPassword(e.target.value)}
@@ -806,6 +837,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Repeat / Confirm Password *</label>
                 <input
                   type="password"
+                  autoComplete="new-password"
                   placeholder="•••••••• (repeat password)"
                   value={newSchoolConfirmPassword}
                   onChange={(e) => setNewSchoolConfirmPassword(e.target.value)}

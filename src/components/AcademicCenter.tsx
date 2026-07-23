@@ -80,7 +80,8 @@ export default function AcademicCenter({ school, students, isOffline, user, role
       
       const attRes = await fetch(`/api/v1/attendance?schoolId=${school.id}&academicYear=${year}&academicTerm=${term}`);
       if (attRes.ok) {
-        setTermAttendance(await attRes.json());
+        const attJson = await attRes.json();
+        setTermAttendance(Array.isArray(attJson) ? attJson : []);
       }
 
       const yearRes = await fetch(`/api/v1/academic-records?schoolId=${school.id}&academicYear=${year}`);
@@ -307,9 +308,13 @@ export default function AcademicCenter({ school, students, isOffline, user, role
     
     const isJHS = record.classLevel.startsWith('JHS');
     
-    const studentAtt = termAttendance.filter(a => a.studentId === student.id);
-    const attTotal = studentAtt.length;
-    const attPresent = studentAtt.filter(a => a.status === 'Present' || a.status === 'Late').length;
+    const studentAtt = Array.isArray(termAttendance) ? termAttendance.filter(a => a.studentId === student.id) : [];
+    let attTotal = studentAtt.length;
+    let attPresent = studentAtt.filter(a => a.status === 'Present' || a.status === 'Late').length;
+    if (attTotal === 0 && (student.attendanceTotal || student.attendancePresent)) {
+      attTotal = student.attendanceTotal || 0;
+      attPresent = student.attendancePresent || 0;
+    }
 
     // Helper to get grade remarks
     const getRemark = (total: number) => {

@@ -682,6 +682,19 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
 
+  app.put("/api/v1/students/:id/academic", async (req, res) => {
+    try {
+      const studentRef = doc(getDb(), "students", req.params.id);
+      await updateDoc(studentRef, req.body);
+      const updatedSnap = await getDoc(studentRef);
+      if (updatedSnap.exists()) {
+        res.json({ ...updatedSnap.data(), id: updatedSnap.id });
+      } else {
+        res.status(404).json({ error: "Student not found" });
+      }
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
   app.delete("/api/v1/students/:id", async (req, res) => {
     try {
 
@@ -853,30 +866,61 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
   // --- OTHERS ---
   app.get("/api/v1/attendance", async (req, res) => {
     try {
-      const q = req.query;
-      let conditions = [where("schoolId", "==", q.schoolId || "")];
-      if (q.date) conditions.push(where("date", "==", q.date));
-      if (q.studentId) conditions.push(where("studentId", "==", q.studentId));
-      if (q.academicYear) conditions.push(where("academicYear", "==", q.academicYear));
-      if (q.academicTerm) conditions.push(where("academicTerm", "==", q.academicTerm));
-      const snapshot = await getDocs(query(collection(getDb(), "attendance"), ...conditions));
-      res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-    } catch (e: any) { res.status(500).json({ error: e.message }); }
+      const q: any = req.query;
+      const schoolId = (q.schoolId as string) || "";
+      if (!schoolId) {
+        return res.json([]);
+      }
+
+      const snapshot = await getDocs(query(collection(getDb(), "attendance"), where("schoolId", "==", schoolId)));
+      let records = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+
+      if (q.date) {
+        records = records.filter((r: any) => r.date === q.date);
+      }
+      if (q.studentId) {
+        records = records.filter((r: any) => r.studentId === q.studentId);
+      }
+      if (q.academicYear) {
+        records = records.filter((r: any) => r.academicYear === q.academicYear);
+      }
+      if (q.academicTerm) {
+        records = records.filter((r: any) => r.academicTerm === q.academicTerm);
+      }
+
+      res.json(records);
+    } catch (e: any) {
+      console.error("Error fetching attendance:", e);
+      res.status(500).json({ error: e.message || "Failed to fetch attendance" });
+    }
   });
 
   app.post("/api/v1/attendance/batch", async (req, res) => {
     try {
       const { schoolId, records } = req.body;
+      if (!schoolId || !Array.isArray(records) || records.length === 0) {
+        return res.json({ message: "No attendance records to save" });
+      }
+
       const batch = writeBatch(getDb());
       for (const r of records) {
-        // Enforce deterministic ID based on student and date to prevent any cross-contamination, leakage or duplicates
-        const docId = `${r.studentId}_${r.date}`;
+        // Enforce deterministic ID based on student and date to prevent duplicate document entries
+        const docId = r.id || `${r.studentId}_${r.date}`;
         const docRef = doc(getDb(), "attendance", docId);
-        batch.set(docRef, { ...r, id: docId }, { merge: true });
+        const recordData = {
+          ...r,
+          id: docId,
+          schoolId: schoolId || r.schoolId,
+          updatedAt: new Date().toISOString()
+        };
+        batch.set(docRef, recordData, { merge: true });
       }
       await batch.commit();
-      res.json({ message: "Attendance marked" });
-    } catch (e: any) { res.status(500).json({ error: e.message }); }
+      res.json({ message: "Attendance marked successfully" });
+    } catch (e: any) {
+      console.error("Error saving attendance batch:", e);
+      res.status(500).json({ error: e.message || "Failed to save attendance" });
+    }
   });
 
   app.post("/api/v1/sync", async (req, res) => {

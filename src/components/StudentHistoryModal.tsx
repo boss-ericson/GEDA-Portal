@@ -41,8 +41,13 @@ export default function StudentHistoryModal({ school, student, onClose }: Props)
     try {
       const attRes = await fetch(`/api/v1/attendance?schoolId=${school.id}&studentId=${student.id}&academicYear=${record.academicYear}&academicTerm=${record.academicTerm}`);
       const attData = await attRes.json();
-      const attTotal = attData.length;
-      const attPresent = attData.filter((a: any) => a.status === 'Present' || a.status === 'Late').length;
+      const attList = Array.isArray(attData) ? attData : [];
+      let attTotal = attList.length;
+      let attPresent = attList.filter((a: any) => a.status === 'Present' || a.status === 'Late').length;
+      if (attTotal === 0 && (student.attendanceTotal || student.attendancePresent)) {
+        attTotal = student.attendanceTotal || 0;
+        attPresent = student.attendancePresent || 0;
+      }
 
       const yearRes = await fetch(`/api/v1/academic-records?schoolId=${school.id}&academicYear=${record.academicYear}&academicTerm=${record.academicTerm}`);
       const yearData = await yearRes.json();

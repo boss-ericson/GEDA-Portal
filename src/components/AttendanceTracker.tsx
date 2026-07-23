@@ -30,22 +30,53 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
     return true; // Primary teachers have full access to attendance
   };
 
+  useEffect(() => {
+    if (school.academicTerm) setTerm(school.academicTerm);
+    if (school.academicYear) setYear(school.academicYear);
+  }, [school.academicTerm, school.academicYear]);
+
   const dateRef = React.useRef(date);
   dateRef.current = date;
 
   const fetchAttendance = async (currentDate: string) => {
-    setAttendance({}); // Clear stale data immediately on date change
-    if (isOffline) return;
     setLoading(true);
+    // First, try loading cached attendance from localStorage as immediate fallback
+    const cacheKey = `geda_attendance_${school.id}_${currentDate}`;
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (currentDate === dateRef.current) {
+          setAttendance(parsed);
+        }
+      } else {
+        setAttendance({});
+      }
+    } catch (e) {
+      setAttendance({});
+    }
+
+    if (isOffline) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch(`/api/v1/attendance?schoolId=${school.id}&date=${currentDate}`);
       if (res.ok) {
         const data: AttendanceRecord[] = await res.json();
         console.log("Fetched attendance for date", currentDate, data);
-        if (currentDate === dateRef.current) {
+        if (currentDate === dateRef.current && Array.isArray(data)) {
           const map: Record<string, AttendanceRecord> = {};
-          data.forEach(r => map[r.studentId] = r);
+          data.forEach(r => {
+            if (r.studentId && r.date === currentDate) {
+              map[r.studentId] = r;
+            }
+          });
           setAttendance(map);
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(map));
+          } catch (err) {}
         }
       } else {
         console.error("Failed to fetch attendance:", res.status, res.statusText);
@@ -90,11 +121,8 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
     setAttendance(prev => {
       const newAtt = { ...prev };
       selectedStudents.forEach(id => {
-        const existing = prev[id];
-        // Only preserve existing ID if it belongs to the current date we are marking
-        const recordId = (existing && existing.date === date) ? existing.id : '';
         newAtt[id] = {
-          id: recordId,
+          id: `${id}_${date}`,
           schoolId: school.id,
           studentId: id,
           date,
@@ -109,13 +137,10 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
 
   const handleStatusChange = (studentId: string, status: 'Present' | 'Absent' | 'Late') => {
     setAttendance(prev => {
-      const existing = prev[studentId];
-      // Only preserve existing ID if it belongs to the current date we are marking
-      const recordId = (existing && existing.date === date) ? existing.id : '';
       return {
         ...prev,
         [studentId]: {
-          id: recordId,
+          id: `${studentId}_${date}`,
           schoolId: school.id,
           studentId,
           date,
@@ -131,11 +156,8 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
     setAttendance(prev => {
       const newAtt = { ...prev };
       classStudents.forEach(s => {
-        const existing = prev[s.id];
-        // Only preserve existing ID if it belongs to the current date we are marking
-        const recordId = (existing && existing.date === date) ? existing.id : '';
         newAtt[s.id] = {
-          id: recordId,
+          id: `${s.id}_${date}`,
           schoolId: school.id,
           studentId: s.id,
           date,
@@ -149,27 +171,50 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
   };
 
   const handleSave = async () => {
-    if (isOffline) return;
     setSaving(true);
-    try {
-      // Defensively ensure we only send records for the currently selected date
-      const recordsToSave = classStudents
-        .map(s => attendance[s.id])
-        .filter(Boolean)
-        .filter(r => r.date === date);
+    const cacheKey = `geda_attendance_${school.id}_${date}`;
+    const recordsToSave = classStudents
+      .map(s => {
+        const r = attendance[s.id];
+        if (!r || r.date !== date) return null;
+        return {
+          id: r.id || `${s.id}_${date}`,
+          schoolId: school.id,
+          studentId: s.id,
+          date,
+          status: r.status,
+          academicYear: year,
+          academicTerm: term,
+        };
+      })
+      .filter(Boolean);
 
+    // Save locally
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify(attendance));
+    } catch (e) {}
+
+    if (isOffline) {
+      alert(`Attendance saved locally (${recordsToSave.length} records). Will sync when online.`);
+      setSaving(false);
+      return;
+    }
+
+    try {
       const res = await fetch('/api/v1/attendance/batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ schoolId: school.id, records: recordsToSave })
       });
       if (res.ok) {
-        alert('Attendance saved successfully');
+        alert(`Attendance saved successfully for ${activeClass} (${recordsToSave.length} records)`);
         fetchAttendance(date);
+      } else {
+        alert('Failed to save attendance on server. Stored locally.');
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to save attendance');
+      alert('Failed to connect to server. Attendance stored locally.');
     } finally {
       setSaving(false);
     }

@@ -188,7 +188,7 @@ export default function App() {
          const school = {
            name, region, district, email,
            slug: name.toLowerCase().replace(/\s+/g, '-'),
-           status: "Active", accessLevel: "Trial",
+           status: "Active", accessLevel: "Full",
            createdAt: new Date().toISOString()
          };
          // Note: We're not doing real auth creation here for simplicity on static demo, 

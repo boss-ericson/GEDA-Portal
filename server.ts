@@ -592,7 +592,7 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
       const { name, region, district, email, password } = req.body;
       const school = {
         name, region, district, email,
-        status: "Active", accessLevel: "Trial",
+        status: "Active", accessLevel: "Full",
         userId: "admin-id", // mock
         createdAt: new Date().toISOString()
       };

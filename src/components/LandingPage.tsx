@@ -124,10 +124,19 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
     setLoginError('');
     
     if (loginMode === 'demo') {
-      const school = schools.find(s => s.id === selectedSchoolId);
-      if (school) {
-        onLogin(school, selectedRole, true);
-      }
+      // Find the official GEDA Demo School Complex
+      const demoSchool = schools.find(s => s.id === 'demo-school' || s.name.toLowerCase().includes('geda')) || {
+        id: 'demo-school',
+        name: 'GEDA School Complex',
+        slug: 'geda-demo-school',
+        region: 'Greater Accra',
+        district: 'Accra Metropolitan',
+        email: 'admin@gedaschool.edu.gh',
+        status: 'Active',
+        accessLevel: 'Full',
+        createdAt: new Date().toISOString()
+      };
+      onLogin(demoSchool, selectedRole, true);
     } else {
       if (!loginEmail.trim() || !loginPassword.trim()) {
         setLoginError('Please enter your school email and password.');
@@ -492,25 +501,29 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                       </div>
                     </motion.div>
                   ) : (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
-                      <div>
-                        <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Select Registered School</label>
-                        <div className="relative">
-                          <select 
-                            value={selectedSchoolId}
-                            onChange={(e) => setSelectedSchoolId(e.target.value)}
-                            className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all appearance-none"
-                          >
-                            {schools.map((school) => (
-                              <option key={school.id} value={school.id} className="bg-[#0f172a]">
-                                {school.name} ({school.region})
-                              </option>
-                            ))}
-                          </select>
-                          <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-500 dark:text-slate-400">
-                            <SchoolIcon className="h-4 w-4" />
-                          </div>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                      <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3.5 text-xs">
+                        <div className="flex items-center gap-2 text-emerald-400 font-bold mb-1">
+                          <ShieldCheck className="h-4 w-4" />
+                          <span>Sandbox Environment</span>
                         </div>
+                        <p className="text-slate-300">
+                          Quick Demo Access provides instant sandbox evaluation strictly for <strong>GEDA School Complex</strong>.
+                        </p>
+                        <p className="text-slate-400 text-[11px] mt-1">
+                          All registered tenants are isolated and require official credentials under Secure School Login.
+                        </p>
+                      </div>
+
+                      <div className="bg-[#0a0f1c] border border-white/10 rounded-xl p-3.5 flex items-center justify-between">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-slate-500 block">Demo Tenant</span>
+                          <span className="font-bold text-white text-sm">GEDA School Complex</span>
+                          <span className="text-[11px] text-slate-400 block">Greater Accra &bull; Accra Metropolitan</span>
+                        </div>
+                        <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono px-2 py-1 rounded-md font-semibold">
+                          PUBLIC DEMO
+                        </span>
                       </div>
                     </motion.div>
                   )}

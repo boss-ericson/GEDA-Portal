@@ -234,7 +234,8 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
           </div>
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-center gap-2">
             <div className="text-xs text-slate-400">
-              Data is End-to-End Encrypted. Only high-level analytics and access controls are available to the Root Developer.
+              <strong className="text-emerald-400 block mb-1 font-semibold">🔒 Tenant Data Isolation Active</strong>
+              Student records, grades, and internal school dashboards are strictly encrypted and isolated. The Super Admin cannot access or view any registered school's private dashboard.
             </div>
           </div>
         </div>

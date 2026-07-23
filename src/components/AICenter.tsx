@@ -157,7 +157,15 @@ export default function AICenter({ school, students, user, role }: AICenterProps
         })
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type') || '';
+      let data: any = {};
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(`Server returned invalid response (${res.status}). ${text.slice(0, 100)}`);
+      }
+
       if (!res.ok) {
         throw new Error(data.error || 'AI generation failed');
       }
@@ -251,7 +259,13 @@ export default function AICenter({ school, students, user, role }: AICenterProps
           params: { query: userText }
         })
       });
-      const data = await res.json();
+      
+      const contentType = res.headers.get('content-type') || '';
+      let data: any = {};
+      if (contentType.includes('application/json')) {
+        data = await res.json();
+      }
+
       if (res.ok && data.result) {
         setChatHistory(prev => [
           ...prev,

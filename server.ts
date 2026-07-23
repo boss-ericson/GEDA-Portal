@@ -884,9 +884,31 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
   app.post("/api/v1/payments", async (req, res) => {
     try {
       const payment = req.body;
-      payment.timestamp = new Date().toISOString();
+      payment.timestamp = payment.timestamp || new Date().toISOString();
+      payment.status = payment.status || 'Success';
 
       const docRef = await addDoc(collection(getDb(), "payments"), payment);
+
+      if (payment.studentId && payment.amount) {
+        try {
+          const studentRef = doc(getDb(), "students", payment.studentId);
+          const studentSnap = await getDoc(studentRef);
+          if (studentSnap.exists()) {
+            const sData = studentSnap.data();
+            const currentFeePaid = Number(sData.feePaid) || 0;
+            const feeTotal = Number(sData.feeTotal) || (sData.boardingStatus === 'Boarding' ? 2500 : 1200);
+            const newFeePaid = currentFeePaid + Number(payment.amount);
+            const newStatus = (newFeePaid >= feeTotal && feeTotal > 0) ? 'Paid' : (newFeePaid > 0 ? 'Partial' : 'Unpaid');
+            await updateDoc(studentRef, {
+              feePaid: newFeePaid,
+              paymentStatus: newStatus
+            });
+          }
+        } catch (studentErr) {
+          console.error("Error updating student fee status:", studentErr);
+        }
+      }
+
       res.status(201).json({ ...payment, id: docRef.id });
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });

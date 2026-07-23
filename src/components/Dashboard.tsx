@@ -119,6 +119,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const [paymentPhone, setPaymentPhone] = useState('');
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  const [receiptPayment, setReceiptPayment] = useState<Payment | null>(null);
+  const [momoSearchQuery, setMomoSearchQuery] = useState('');
+  const [momoMethodFilter, setMomoMethodFilter] = useState<string>('All');
 
   // Editing / Deleting Student
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
@@ -863,7 +866,6 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
     const student = students.find(s => s.id === selectedStudentId);
     if (!student) {
-      // Check in offline queue
       const offlineStud = offlineQueue.find(s => s.id === selectedStudentId);
       if (offlineStud) {
         setPaymentError('Payments cannot be logged for pending-sync offline registrations. Please sync your offline registrations first.');
@@ -873,30 +875,56 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       return;
     }
 
-    const remaining = student.feeTotal - student.feePaid;
-    if (parseFloat(paymentAmount) > remaining) {
-      setPaymentError(`Excess amount. Student only owes GH₵ ${(remaining || 0).toLocaleString()}`);
+    const feeTotal = student.feeTotal || (student.boardingStatus === 'Boarding' ? 2500 : 1200);
+    const feePaid = student.feePaid || 0;
+    const remaining = Math.max(0, feeTotal - feePaid);
+    const amountNum = parseFloat(paymentAmount);
+
+    if (amountNum > remaining) {
+      setPaymentError(`Excess amount. Student only owes GH₵ ${remaining.toLocaleString()}`);
       return;
     }
 
     setMomoPendingSim(true);
 
-    // Simulate Mobile Money processing delays & SMS network handshakes
     setTimeout(async () => {
       const transactionId = `MOMO-${Math.floor(10000000 + Math.random() * 90000000)}`;
       
-      const payload = {
+      const payload: Payment = {
+        id: '',
         studentId: selectedStudentId,
         schoolId: school.id,
-        amount: parseFloat(paymentAmount),
+        amount: amountNum,
         method: paymentMethod,
-        transactionId
+        transactionId,
+        status: 'Success',
+        timestamp: new Date().toISOString()
       };
 
+      const newFeePaid = (student.feePaid || 0) + amountNum;
+      const newStatus: 'Unpaid' | 'Partial' | 'Paid' = (newFeePaid >= feeTotal && feeTotal > 0) ? 'Paid' : (newFeePaid > 0 ? 'Partial' : 'Unpaid');
+
       if (isOffline) {
-        // Log transaction error (Payments require authorization gateway)
-        setPaymentError('Offline Transaction Failed: Real-time payment verification requires active cellular connection for SMS handshake.');
-        setMomoPendingSim(false);
+        try {
+          const pDocRef = await addDoc(collection(db, "payments"), payload);
+          const studentRef = doc(db, "students", selectedStudentId);
+          await updateDoc(studentRef, {
+            feePaid: newFeePaid,
+            paymentStatus: newStatus
+          });
+          
+          const newPayment = { ...payload, id: pDocRef.id };
+          setPayments(prev => [newPayment, ...prev]);
+          setStudents(prev => prev.map(s => s.id === selectedStudentId ? { ...s, feePaid: newFeePaid, paymentStatus: newStatus } : s));
+          setPaymentSuccess(true);
+          setPaymentAmount('');
+          setSelectedStudentId('');
+          setPaymentPhone('');
+        } catch (err) {
+          setPaymentError('Offline Transaction Failed: Could not record payment in local store.');
+        } finally {
+          setMomoPendingSim(false);
+        }
       } else {
         try {
           const res = await fetch('/api/v1/payments', {
@@ -906,21 +934,41 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           });
           const data = await res.json();
           if (res.ok) {
+            const createdPayment = { ...payload, id: data.id || `PAY-${Date.now()}` };
+            setPayments(prev => [createdPayment, ...prev]);
+            setStudents(prev => prev.map(s => s.id === selectedStudentId ? { ...s, feePaid: newFeePaid, paymentStatus: newStatus } : s));
             setPaymentSuccess(true);
             setPaymentAmount('');
             setSelectedStudentId('');
             setPaymentPhone('');
-            fetchData(); // reload
+            fetchData();
           } else {
             setPaymentError(data.error || 'Payment logging failed.');
           }
         } catch (err) {
-          setPaymentError('Failed to verify MoMo transaction with server.');
+          // Direct Firebase fallback
+          try {
+            const docRef = await addDoc(collection(db, "payments"), payload);
+            const studentRef = doc(db, "students", selectedStudentId);
+            await updateDoc(studentRef, {
+              feePaid: newFeePaid,
+              paymentStatus: newStatus
+            });
+            const createdPayment = { ...payload, id: docRef.id };
+            setPayments(prev => [createdPayment, ...prev]);
+            setStudents(prev => prev.map(s => s.id === selectedStudentId ? { ...s, feePaid: newFeePaid, paymentStatus: newStatus } : s));
+            setPaymentSuccess(true);
+            setPaymentAmount('');
+            setSelectedStudentId('');
+            setPaymentPhone('');
+          } catch (fbErr: any) {
+            setPaymentError('Failed to verify MoMo transaction with server.');
+          }
         } finally {
           setMomoPendingSim(false);
         }
       }
-    }, 1500);
+    }, 1200);
   };
 
   // Trigger Manual Backup
@@ -3172,154 +3220,284 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   </p>
                 </div>
               ) : (
-                <div className="grid lg:grid-cols-12 gap-6">
-                  
-                  {/* Collect Momo Payments Form */}
-                  <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none space-y-5">
-                    <div className="border-b border-slate-100 dark:border-slate-800 pb-2">
-                      <h3 className="font-display font-semibold text-slate-900 dark:text-white">Log Mobile Money Payment</h3>
-                      <p className="text-slate-400 text-xs">Instantly process deposits via Ghanaian network telecom gateways.</p>
+                <div className="space-y-6">
+                  {/* Financial KPI Summary Cards */}
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Total Expected Revenue</span>
+                      <div className="text-xl font-display font-bold text-slate-900 dark:text-white">
+                        GH₵ {(totalFeesExpected || 0).toLocaleString()}
+                      </div>
+                      <p className="text-[10px] text-slate-400">{totalStudents} Total Registered Students</p>
                     </div>
 
-                    {paymentSuccess && (
-                      <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-xs flex items-center gap-1.5 font-medium animate-pulse">
-                        <CheckCircle2 className="h-5 w-5 text-green-700" />
-                        <span>Momo transaction confirmed! Student's balance and admission certificate updated successfully.</span>
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Total Fees Collected</span>
+                      <div className="text-xl font-display font-bold text-emerald-600 dark:text-emerald-400">
+                        GH₵ {(totalFeesPaid || 0).toLocaleString()}
                       </div>
-                    )}
-
-                    {paymentError && (
-                      <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl text-xs">
-                        {paymentError}
+                      <div className="flex items-center gap-1.5 text-[10px] text-emerald-700 font-medium">
+                        <CheckCircle2 className="h-3 w-3" />
+                        <span>{payments.length} Verified Transactions</span>
                       </div>
-                    )}
+                    </div>
 
-                    <form onSubmit={handlePaymentSubmit} className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Select Student *</label>
-                        <select
-                          value={selectedStudentId}
-                          onChange={(e) => {
-                            setSelectedStudentId(e.target.value);
-                            const stud = students.find(s => s.id === e.target.value);
-                            if (stud) setPaymentPhone(stud.guardianPhone);
-                          }}
-                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs transition"
-                          required
-                        >
-                          <option value="">-- Choose Admitted Student --</option>
-                          {students.filter(s => s.paymentStatus !== 'Paid').map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.fullName} ({s.classLevel} - Owed: GH₵ {((s.feeTotal || 0) - (s.feePaid || 0)).toLocaleString()})
-                            </option>
-                          ))}
-                        </select>
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Outstanding Balances</span>
+                      <div className="text-xl font-display font-bold text-amber-600 dark:text-amber-400">
+                        GH₵ {(totalFeesOutstanding || 0).toLocaleString()}
                       </div>
+                      <p className="text-[10px] text-slate-400">Term Fee Deficits Pending</p>
+                    </div>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Gateway Provider</label>
-                          <select
-                            value={paymentMethod}
-                            onChange={(e) => setPaymentMethod(e.target.value as any)}
-                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs"
-                          >
-                            <option value="MTN MoMo">MTN MoMo</option>
-                            <option value="Telecel Cash">Telecel Cash</option>
-                            <option value="AT Money">AT Money</option>
-                            <option value="Bank">Bank Deposit</option>
-                            <option value="Cash">Cash Receipt</option>
-                          </select>
-                        </div>
+                    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-1">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Collection Efficiency</span>
+                      <div className="text-xl font-display font-bold text-brand-green-700 dark:text-brand-green-400">
+                        {collectionRate}%
+                      </div>
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1">
+                        <div className="bg-brand-green-700 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, collectionRate)}%` }}></div>
+                      </div>
+                    </div>
+                  </div>
 
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Deposit Amount (GH₵) *</label>
-                          <input
-                            type="number"
-                            placeholder="e.g. 500"
-                            value={paymentAmount}
-                            onChange={(e) => setPaymentAmount(e.target.value)}
-                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs"
-                            required
-                          />
-                        </div>
+                  <div className="grid lg:grid-cols-12 gap-6">
+                    {/* Collect Momo Payments Form */}
+                    <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none space-y-5">
+                      <div className="border-b border-slate-100 dark:border-slate-800 pb-2">
+                        <h3 className="font-display font-semibold text-slate-900 dark:text-white">Log Mobile Money / Cash Deposit</h3>
+                        <p className="text-slate-400 text-xs">Instantly process deposits via Ghanaian telecom network gateways or bank transfers.</p>
                       </div>
 
-                      {['MTN MoMo', 'Telecel Cash', 'AT Money'].includes(paymentMethod) && (
-                        <div>
-                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Sender Mobile Number (MoMo)</label>
-                          <div className="relative">
-                            <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
-                              <Phone className="h-4 w-4" />
-                            </span>
-                            <input
-                              type="text"
-                              placeholder="e.g. 0244112233"
-                              value={paymentPhone}
-                              onChange={(e) => setPaymentPhone(e.target.value)}
-                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs"
-                            />
-                          </div>
+                      {paymentSuccess && (
+                        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-xs flex items-center gap-1.5 font-medium animate-pulse">
+                          <CheckCircle2 className="h-5 w-5 text-green-700 shrink-0" />
+                          <span>Payment logged successfully! Student balance and payment status updated across database.</span>
                         </div>
                       )}
 
-                      <button
-                        type="submit"
-                        disabled={momoPendingSim}
-                        className="w-full bg-brand-green-700 hover:bg-brand-green-800 text-white font-medium py-3 px-4 rounded-xl transition shadow-sm dark:shadow-none flex items-center justify-center gap-2 cursor-pointer text-xs disabled:opacity-75 disabled:cursor-not-allowed"
-                      >
-                        <Send className={`h-4 w-4 ${momoPendingSim ? 'animate-bounce' : ''}`} />
-                        <span>{momoPendingSim ? 'Executing SMS Telecom hand-shake...' : `Verify & Post GH₵ ${paymentAmount ? parseFloat(paymentAmount).toLocaleString() : '0'} Deposit`}</span>
-                      </button>
-                    </form>
-                  </div>
+                      {paymentError && (
+                        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl text-xs">
+                          {paymentError}
+                        </div>
+                      )}
 
-                  {/* Ledger summary & outstanding fees table */}
-                  <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none space-y-4">
-                    <div className="border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center justify-between">
-                      <div>
-                        <h3 className="font-display font-semibold text-slate-900 dark:text-white">Total verified transactions ledger</h3>
-                        <p className="text-slate-400 text-xs">Verify financial inputs across our secure REST nodes.</p>
+                      <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Select Student *</label>
+                          <select
+                            value={selectedStudentId}
+                            onChange={(e) => {
+                              setSelectedStudentId(e.target.value);
+                              const stud = students.find(s => s.id === e.target.value);
+                              if (stud) {
+                                setPaymentPhone(stud.guardianPhone || '');
+                                const rem = Math.max(0, (stud.feeTotal || (stud.boardingStatus === 'Boarding' ? 2500 : 1200)) - (stud.feePaid || 0));
+                                setPaymentAmount(rem > 0 ? String(rem) : '');
+                              }
+                            }}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs transition"
+                            required
+                          >
+                            <option value="">-- Choose Admitted Student --</option>
+                            {students.map((s) => {
+                              const feeTotal = s.feeTotal || (s.boardingStatus === 'Boarding' ? 2500 : 1200);
+                              const feePaid = s.feePaid || 0;
+                              const rem = Math.max(0, feeTotal - feePaid);
+                              return (
+                                <option key={s.id} value={s.id}>
+                                  {s.fullName} ({s.classLevel} - {rem > 0 ? `Owes: GH₵ ${rem.toLocaleString()}` : 'FULLY PAID'})
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+
+                        {selectedStudentId && (() => {
+                          const stud = students.find(s => s.id === selectedStudentId);
+                          if (!stud) return null;
+                          const feeTotal = stud.feeTotal || (stud.boardingStatus === 'Boarding' ? 2500 : 1200);
+                          const feePaid = stud.feePaid || 0;
+                          const rem = Math.max(0, feeTotal - feePaid);
+                          return (
+                            <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs space-y-1">
+                              <div className="flex justify-between">
+                                <span className="text-slate-400">Total Assessed Fee:</span>
+                                <span className="font-semibold text-slate-900 dark:text-slate-200">GH₵ {feeTotal.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-slate-400">Amount Paid So Far:</span>
+                                <span className="font-semibold text-emerald-600">GH₵ {feePaid.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between pt-1 border-t border-slate-200 dark:border-slate-800">
+                                <span className="font-bold text-slate-700 dark:text-slate-300">Remaining Deficit:</span>
+                                <span className="font-bold text-amber-600 dark:text-amber-400">GH₵ {rem.toLocaleString()}</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Gateway Provider</label>
+                            <select
+                              value={paymentMethod}
+                              onChange={(e) => setPaymentMethod(e.target.value as any)}
+                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs"
+                            >
+                              <option value="MTN MoMo">MTN MoMo</option>
+                              <option value="Telecel Cash">Telecel Cash</option>
+                              <option value="AT Money">AT Money</option>
+                              <option value="Bank">Bank Deposit</option>
+                              <option value="Cash">Cash Receipt</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Deposit Amount (GH₵) *</label>
+                            <input
+                              type="number"
+                              placeholder="e.g. 500"
+                              value={paymentAmount}
+                              onChange={(e) => setPaymentAmount(e.target.value)}
+                              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {['MTN MoMo', 'Telecel Cash', 'AT Money'].includes(paymentMethod) && (
+                          <div>
+                            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Sender Mobile Number (MoMo)</label>
+                            <div className="relative">
+                              <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+                                <Phone className="h-4 w-4" />
+                              </span>
+                              <input
+                                type="text"
+                                placeholder="e.g. 0244112233"
+                                value={paymentPhone}
+                                onChange={(e) => setPaymentPhone(e.target.value)}
+                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-4 py-2.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-green-700 text-xs"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={momoPendingSim}
+                          className="w-full bg-brand-green-700 hover:bg-brand-green-800 text-white font-medium py-3 px-4 rounded-xl transition shadow-sm dark:shadow-none flex items-center justify-center gap-2 cursor-pointer text-xs disabled:opacity-75 disabled:cursor-not-allowed"
+                        >
+                          <Send className={`h-4 w-4 ${momoPendingSim ? 'animate-bounce' : ''}`} />
+                          <span>{momoPendingSim ? 'Executing SMS Telecom hand-shake...' : `Verify & Post GH₵ ${paymentAmount ? parseFloat(paymentAmount).toLocaleString() : '0'} Deposit`}</span>
+                        </button>
+                      </form>
+                    </div>
+
+                    {/* Ledger summary & transactions table */}
+                    <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none space-y-4">
+                      <div className="border-b border-slate-100 dark:border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <h3 className="font-display font-semibold text-slate-900 dark:text-white">Verified Transactions Audit Trail</h3>
+                          <p className="text-slate-400 text-xs">Full history of verified fee deposits and SMS gateway transactions.</p>
+                        </div>
+                        <span className="text-xs bg-brand-green-50 text-brand-green-800 font-semibold px-2.5 py-1 rounded-full font-mono shrink-0">
+                          {payments.length} RECORDED
+                        </span>
                       </div>
-                      <span className="text-xs bg-brand-green-50 text-brand-green-800 font-semibold px-2 py-0.5 rounded-full font-mono">
-                        {payments.length} SUCCESSFUL
-                      </span>
-                    </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-50 dark:bg-slate-950 text-slate-400 uppercase font-mono text-[9px] border-b border-slate-100 dark:border-slate-800">
-                          <tr>
-                            <th className="py-2.5 px-3">Transaction ID</th>
-                            <th className="py-2.5 px-3">Student Name</th>
-                            <th className="py-2.5 px-3">Deposit</th>
-                            <th className="py-2.5 px-3">Provider</th>
-                            <th className="py-2.5 px-3">Date</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 text-slate-600 dark:text-slate-400">
-                          {payments.map((p) => {
-                            const student = students.find(s => s.id === p.studentId);
-                            return (
-                              <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/50">
-                                <td className="py-2.5 px-3 font-mono font-semibold text-slate-950 dark:text-white">{p.transactionId}</td>
-                                <td className="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">{student ? student.fullName : 'External API Student'}</td>
-                                <td className="py-2.5 px-3 font-semibold text-brand-green-700">GH₵ {(p.amount || 0).toLocaleString()}</td>
-                                <td className="py-2.5 px-3">{p.method}</td>
-                                <td className="py-2.5 px-3 text-slate-400">{new Date(p.timestamp).toLocaleDateString()}</td>
-                              </tr>
-                            );
-                          })}
-                          {payments.length === 0 && (
+                      {/* Filters & Search */}
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                          <input
+                            type="text"
+                            placeholder="Search by Student or Trans. ID..."
+                            value={momoSearchQuery}
+                            onChange={(e) => setMomoSearchQuery(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-3 py-2 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-brand-green-700"
+                          />
+                        </div>
+
+                        <select
+                          value={momoMethodFilter}
+                          onChange={(e) => setMomoMethodFilter(e.target.value)}
+                          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none"
+                        >
+                          <option value="All">All Gateways</option>
+                          <option value="MTN MoMo">MTN MoMo</option>
+                          <option value="Telecel Cash">Telecel Cash</option>
+                          <option value="AT Money">AT Money</option>
+                          <option value="Bank">Bank Deposit</option>
+                          <option value="Cash">Cash Receipt</option>
+                        </select>
+                      </div>
+
+                      {/* Table */}
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-50 dark:bg-slate-950 text-slate-400 uppercase font-mono text-[9px] border-b border-slate-100 dark:border-slate-800">
                             <tr>
-                              <td colSpan={5} className="py-8 text-center text-slate-400 font-mono">No payment logs saved.</td>
+                              <th className="py-2.5 px-3">Transaction ID</th>
+                              <th className="py-2.5 px-3">Student Name</th>
+                              <th className="py-2.5 px-3">Deposit</th>
+                              <th className="py-2.5 px-3">Provider</th>
+                              <th className="py-2.5 px-3">Date</th>
+                              <th className="py-2.5 px-3 text-right">Receipt</th>
                             </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-slate-600 dark:text-slate-400">
+                            {(() => {
+                              const filteredPayments = payments.filter((p) => {
+                                const student = students.find(s => s.id === p.studentId);
+                                const q = momoSearchQuery.toLowerCase();
+                                const matchesSearch = !q || p.transactionId.toLowerCase().includes(q) || (student && student.fullName.toLowerCase().includes(q));
+                                const matchesMethod = momoMethodFilter === 'All' || p.method === momoMethodFilter;
+                                return matchesSearch && matchesMethod;
+                              });
 
+                              if (filteredPayments.length === 0) {
+                                return (
+                                  <tr>
+                                    <td colSpan={6} className="py-8 text-center text-slate-400 font-mono">
+                                      {payments.length === 0 ? 'No payment logs recorded yet.' : 'No transactions match filter.'}
+                                    </td>
+                                  </tr>
+                                );
+                              }
+
+                              return filteredPayments.map((p) => {
+                                const student = students.find(s => s.id === p.studentId);
+                                return (
+                                  <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                                    <td className="py-2.5 px-3 font-mono font-semibold text-slate-950 dark:text-white">{p.transactionId}</td>
+                                    <td className="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">
+                                      {student ? student.fullName : 'Registered Student'}
+                                      {student?.classLevel && <span className="block text-[10px] text-slate-400">{student.classLevel}</span>}
+                                    </td>
+                                    <td className="py-2.5 px-3 font-bold text-emerald-700 dark:text-emerald-400">GH₵ {(p.amount || 0).toLocaleString()}</td>
+                                    <td className="py-2.5 px-3 font-medium">{p.method}</td>
+                                    <td className="py-2.5 px-3 text-slate-400">{p.timestamp ? new Date(p.timestamp).toLocaleDateString() : 'Recent'}</td>
+                                    <td className="py-2.5 px-3 text-right">
+                                      <button
+                                        onClick={() => setReceiptPayment(p)}
+                                        className="inline-flex items-center gap-1 bg-brand-green-50 hover:bg-brand-green-100 text-brand-green-800 dark:bg-brand-green-950/60 dark:text-brand-green-300 dark:hover:bg-brand-green-900 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer"
+                                      >
+                                        <Printer className="h-3 w-3" />
+                                        Receipt
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              });
+                            })()}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
               )}
             </div>
@@ -5379,6 +5557,176 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 </div>
               </>
             )}
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Official MoMo Payment Fee Receipt */}
+      {receiptPayment && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex overflow-y-auto p-4 print:p-0 print:bg-white print:fixed print:inset-0">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full m-auto border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden print:shadow-none print:border-none print:max-w-none print:w-full print:m-0 flex flex-col">
+            
+            {/* Modal Top Bar (Hidden during print) */}
+            <div className="bg-slate-900 text-white p-4 px-6 flex justify-between items-center print:hidden">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                <div>
+                  <h3 className="font-display font-bold text-sm">Official Fee Payment Receipt</h3>
+                  <p className="text-[11px] text-slate-400">GHANA EDUCATION SERVICE - VERIFIED TRANSACTION</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="bg-brand-green-700 hover:bg-brand-green-800 text-white font-semibold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <Printer className="h-4 w-4" />
+                  <span>Print Receipt</span>
+                </button>
+                <button
+                  onClick={() => setReceiptPayment(null)}
+                  className="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-full transition cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Printable Receipt Canvas */}
+            <div className="p-8 space-y-6 text-slate-800 dark:text-slate-200 print:text-black print:p-8">
+              
+              {/* Header with School Crest & GES Banner */}
+              <div className="border-b-2 border-slate-900 pb-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  {school.logo ? (
+                    <img src={school.logo} alt="School Logo" className="h-16 w-16 object-contain rounded-xl border border-slate-200" />
+                  ) : (
+                    <div className="h-16 w-16 bg-slate-900 text-white rounded-xl flex items-center justify-center font-bold text-xl font-display">
+                      {school.name.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="font-display font-black text-xl text-slate-950 dark:text-white uppercase tracking-tight">{school.name}</h2>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">{school.district} District • {school.region} Region, Ghana</p>
+                    <p className="text-[11px] text-slate-500 font-mono">EMIS Code: {school.emisCode || 'GES-BASIC-2026'} | Term: {school.academicTerm || 'First'} Term ({school.academicYear || '2026/2027'})</p>
+                  </div>
+                </div>
+
+                <div className="text-right font-mono">
+                  <span className="inline-block bg-emerald-100 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-1">
+                    VERIFIED PAYMENT
+                  </span>
+                  <p className="text-xs font-bold text-slate-900 dark:text-white">Receipt #: {receiptPayment.transactionId}</p>
+                  <p className="text-[10px] text-slate-500">{new Date(receiptPayment.timestamp).toLocaleString()}</p>
+                </div>
+              </div>
+
+              {/* Student Details Grid */}
+              {(() => {
+                const student = students.find(s => s.id === receiptPayment.studentId);
+                const feeTotal = student ? (student.feeTotal || (student.boardingStatus === 'Boarding' ? 2500 : 1200)) : 1200;
+                const feePaid = student ? (student.feePaid || 0) : receiptPayment.amount;
+                const remaining = Math.max(0, feeTotal - feePaid);
+
+                return (
+                  <div className="space-y-6">
+                    <div className="bg-slate-50 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 grid sm:grid-cols-2 gap-4 text-xs">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Student Information</span>
+                        <p className="font-bold text-sm text-slate-950 dark:text-white">{student ? student.fullName : 'Registered Student'}</p>
+                        <p className="text-slate-600 dark:text-slate-400">Admission No: <span className="font-mono font-semibold text-slate-900 dark:text-slate-200">{student?.admissionNo || 'N/A'}</span></p>
+                        <p className="text-slate-600 dark:text-slate-400">Class Level: <span className="font-semibold text-slate-900 dark:text-slate-200">{student?.classLevel || 'N/A'}</span> ({student?.boardingStatus || 'Day'} Student)</p>
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Payer / Guardian Details</span>
+                        <p className="font-semibold text-slate-900 dark:text-white">{student?.guardianName || 'Parent / Guardian'}</p>
+                        <p className="text-slate-600 dark:text-slate-400">Contact Number: <span className="font-mono">{student?.guardianPhone || 'N/A'}</span></p>
+                        <p className="text-slate-600 dark:text-slate-400">Payment Channel: <span className="font-bold text-brand-green-700 dark:text-brand-green-400">{receiptPayment.method}</span></p>
+                      </div>
+                    </div>
+
+                    {/* Financial Statement Table */}
+                    <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase text-[10px]">
+                          <tr>
+                            <th className="py-3 px-4">Fee Item / Description</th>
+                            <th className="py-3 px-4 text-right">Amount (GH₵)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                          <tr>
+                            <td className="py-2.5 px-4">Total Academic Term Fee Assessed</td>
+                            <td className="py-2.5 px-4 text-right font-mono font-semibold">GH₵ {feeTotal.toLocaleString()}</td>
+                          </tr>
+                          <tr className="bg-emerald-50/50 dark:bg-emerald-950/30">
+                            <td className="py-3 px-4 font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                              Deposit Posted in this Transaction ({receiptPayment.method})
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono font-bold text-base text-emerald-700 dark:text-emerald-400">
+                              GH₵ {receiptPayment.amount.toLocaleString()}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="py-2.5 px-4 font-semibold">Total Payments Accumulated To Date</td>
+                            <td className="py-2.5 px-4 text-right font-mono font-semibold text-brand-green-700 dark:text-brand-green-400">GH₵ {feePaid.toLocaleString()}</td>
+                          </tr>
+                          <tr className="bg-slate-50 dark:bg-slate-900 font-bold">
+                            <td className="py-3 px-4">Remaining Balance Owed</td>
+                            <td className={`py-3 px-4 text-right font-mono font-bold text-sm ${remaining > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600'}`}>
+                              GH₵ {remaining.toLocaleString()} {remaining === 0 ? '(FULLY CLEARED)' : ''}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Verification Footer & Signatures */}
+                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-6 text-xs">
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold uppercase text-slate-400">Audit Verification</p>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-normal">
+                          This receipt is digitally generated by the GES Ghana Basic School Admissions & Financial Portal. Transaction key <span className="font-mono font-bold text-slate-900 dark:text-slate-200">{receiptPayment.transactionId}</span> has been logged to the school's central audit trail.
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col items-end justify-between">
+                        <div className="border-b border-slate-400 dark:border-slate-600 w-48 h-8 flex items-center justify-center font-mono text-[9px] text-slate-400 italic">
+                          [Bursar / Accounts Seal]
+                        </div>
+                        <div className="text-right pt-1">
+                          <p className="font-bold text-slate-900 dark:text-slate-200">{school.headTeacherName || 'School Bursar / Registrar'}</p>
+                          <p className="text-[10px] text-slate-500">{school.name}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+
+            </div>
+
+            {/* Modal Bottom Actions (Hidden on print) */}
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 px-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3 print:hidden">
+              <button
+                type="button"
+                onClick={() => setReceiptPayment(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                Close Window
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="bg-brand-green-700 hover:bg-brand-green-800 text-white font-semibold px-5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer"
+              >
+                <Printer className="h-4 w-4" />
+                <span>Print Official Receipt</span>
+              </button>
+            </div>
 
           </div>
         </div>

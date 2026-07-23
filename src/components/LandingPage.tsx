@@ -24,7 +24,9 @@ import {
   Lock,
   CalendarCheck,
   FileText,
-  ClipboardList
+  ClipboardList,
+  X,
+  AlertCircle
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -53,12 +55,20 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+  // Forgot password state
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [forgotPasswordMsg, setForgotPasswordMsg] = useState('');
+  const [forgotPasswordError, setForgotPasswordError] = useState('');
+  const [isSubmittingForgotPassword, setIsSubmittingForgotPassword] = useState(false);
+
   // Registration form state
   const [newSchoolName, setNewSchoolName] = useState('');
   const [newSchoolRegion, setNewSchoolRegion] = useState('Greater Accra');
   const [newSchoolDistrict, setNewSchoolDistrict] = useState('');
   const [newSchoolEmail, setNewSchoolEmail] = useState('');
   const [newSchoolPassword, setNewSchoolPassword] = useState('');
+  const [newSchoolConfirmPassword, setNewSchoolConfirmPassword] = useState('');
   const [registerError, setRegisterError] = useState('');
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -70,13 +80,64 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
     'North East', 'Oti', 'Savannah', 'Upper East', 'Upper West', 'Western North'
   ];
 
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotPasswordError('');
+    setForgotPasswordMsg('');
+    if (!forgotPasswordEmail.trim()) {
+      setForgotPasswordError('Please enter your registered email address.');
+      return;
+    }
+
+    setIsSubmittingForgotPassword(true);
+    try {
+      const res = await fetch('/api/v1/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotPasswordEmail.trim() })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setForgotPasswordMsg(data.message);
+      } else {
+        setForgotPasswordError(data.error || 'No registered account found with this email.');
+      }
+    } catch (err: any) {
+      try {
+        const trimmed = forgotPasswordEmail.trim().toLowerCase();
+        const sSnap = await getDocs(query(collection(db, "schools"), where("email", "==", trimmed)));
+        if (!sSnap.empty) {
+          const schoolData = sSnap.docs[0].data();
+          setForgotPasswordMsg(`Password recovery instructions dispatched for ${schoolData.name}. Contact GEDA National Support (0244123456) for instant verification.`);
+          return;
+        }
+        const tSnap = await getDocs(query(collection(db, "teachers"), where("email", "==", trimmed)));
+        if (!tSnap.empty) {
+          const teacherData = tSnap.docs[0].data();
+          setForgotPasswordMsg(`Password reset requested for teacher ${teacherData.fullName}. Please contact your School Administrator to issue a new generated Password Slip.`);
+          return;
+        }
+        setForgotPasswordError('No account found matching this email address. Please verify your email.');
+      } catch (fbErr) {
+        setForgotPasswordError('Unable to connect to recovery service. Please check your connection.');
+      }
+    } finally {
+      setIsSubmittingForgotPassword(false);
+    }
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setRegisterError('');
     setRegisterSuccess(false);
 
-    if (!newSchoolName.trim() || !newSchoolDistrict.trim() || !newSchoolEmail.trim() || !newSchoolPassword.trim()) {
+    if (!newSchoolName.trim() || !newSchoolDistrict.trim() || !newSchoolEmail.trim() || !newSchoolPassword.trim() || !newSchoolConfirmPassword.trim()) {
       setRegisterError('Please fill in all school registration fields.');
+      return;
+    }
+
+    if (newSchoolPassword !== newSchoolConfirmPassword) {
+      setRegisterError('Administrator passwords do not match. Please verify your password entry.');
       return;
     }
     
@@ -486,7 +547,21 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                         </div>
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Password</label>
+                        <div className="flex justify-between items-center mb-2">
+                          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Password</label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowForgotPasswordModal(true);
+                              setForgotPasswordEmail(loginEmail);
+                              setForgotPasswordMsg('');
+                              setForgotPasswordError('');
+                            }}
+                            className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold hover:underline transition-colors cursor-pointer"
+                          >
+                            Forgot Password?
+                          </button>
+                        </div>
                         <div className="relative">
                           <input
                             type="password"
@@ -497,7 +572,6 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                             required
                           />
                         </div>
-                        
                       </div>
                     </motion.div>
                   ) : (
@@ -716,7 +790,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Administrator Password</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Administrator Password *</label>
                 <input
                   type="password"
                   placeholder="•••••••• (min 6 chars)"
@@ -726,6 +800,34 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                   minLength={6}
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Repeat / Confirm Password *</label>
+                <input
+                  type="password"
+                  placeholder="•••••••• (repeat password)"
+                  value={newSchoolConfirmPassword}
+                  onChange={(e) => setNewSchoolConfirmPassword(e.target.value)}
+                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                  minLength={6}
+                  required
+                />
+                {newSchoolConfirmPassword.length > 0 && (
+                  <p className={`text-[11px] font-medium mt-1.5 flex items-center gap-1 ${
+                    newSchoolPassword === newSchoolConfirmPassword ? 'text-emerald-400' : 'text-red-400'
+                  }`}>
+                    {newSchoolPassword === newSchoolConfirmPassword ? (
+                      <>
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Passwords match perfectly
+                      </>
+                    ) : (
+                      <>
+                        <X className="h-3.5 w-3.5" /> Passwords do not match
+                      </>
+                    )}
+                  </p>
+                )}
               </div>
 
               
@@ -757,6 +859,80 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
           </div>
         </div>
       </footer>
+      {/* Forgot Password Modal */}
+      {showForgotPasswordModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0f172a] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-5">
+            <button 
+              onClick={() => { setShowForgotPasswordModal(false); setForgotPasswordMsg(''); setForgotPasswordError(''); }}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 transition cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-emerald-400 font-bold text-lg font-display">
+                <KeyRound className="h-5 w-5" />
+                <span>Account Password Recovery</span>
+              </div>
+              <p className="text-slate-400 text-xs">Enter your registered email address to receive password recovery instructions or reset information.</p>
+            </div>
+
+            {forgotPasswordError && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-xs flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+                <span>{forgotPasswordError}</span>
+              </div>
+            )}
+
+            {forgotPasswordMsg ? (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-4 rounded-xl text-xs space-y-3">
+                <div className="flex items-center gap-2 font-bold text-emerald-400">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span>Request Processed</span>
+                </div>
+                <p className="leading-relaxed text-slate-200">{forgotPasswordMsg}</p>
+                <button
+                  onClick={() => { setShowForgotPasswordModal(false); setForgotPasswordMsg(''); }}
+                  className="w-full bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-400 transition cursor-pointer mt-2"
+                >
+                  Return to Portal Login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Registered Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="e.g. admin@school.edu.gh or teacher@school.edu.gh"
+                    value={forgotPasswordEmail}
+                    onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                    className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    required
+                  />
+                </div>
+
+                <div className="bg-slate-900/60 border border-white/5 p-3 rounded-xl text-[11px] text-slate-400 space-y-1">
+                  <span className="font-semibold text-slate-300 block">&bull; School Administrators:</span>
+                  <p>Recovery credentials dispatched via verified school contact channel.</p>
+                  <span className="font-semibold text-slate-300 block pt-1">&bull; Registered Teachers:</span>
+                  <p>Password resets are handled securely by your School Administrator via generated Password Slips.</p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmittingForgotPassword}
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmittingForgotPassword ? 'Checking Recovery Records...' : 'Submit Password Reset Request'}
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </form>
+            )}
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

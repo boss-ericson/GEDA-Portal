@@ -23,7 +23,8 @@ import {
   Trash2, RefreshCw, Send, CheckCircle2, AlertTriangle, 
   Search, SlidersHorizontal, ArrowDownToLine, Phone, Printer, 
   Calendar, Award, DollarSign, BookOpen, Clock, Key, Sparkles,
-  School as SchoolIcon, GraduationCap, Settings, Edit, Menu, User
+  School as SchoolIcon, GraduationCap, Settings, Edit, Menu, User,
+  Wand2, KeyRound, Download, Copy, X, Eye, EyeOff
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -168,6 +169,14 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const [teacherError, setTeacherError] = useState<string>('');
   const [teacherSuccess, setTeacherSuccess] = useState<string>('');
   const [creatingTeacher, setCreatingTeacher] = useState<boolean>(false);
+
+  // Admin Reset Teacher Password State
+  const [resetTeacherModal, setResetTeacherModal] = useState<any | null>(null);
+  const [resetTeacherPasswordInput, setResetTeacherPasswordInput] = useState<string>('');
+  const [resetTeacherSuccess, setResetTeacherSuccess] = useState<string>('');
+  const [resetTeacherError, setResetTeacherError] = useState<string>('');
+  const [isResettingTeacherPassword, setIsResettingTeacherPassword] = useState<boolean>(false);
+  const [showPasswordInTable, setShowPasswordInTable] = useState<{ [key: string]: boolean }>({});
 
   // API Key form state
   const [newKeyName, setNewKeyName] = useState('');
@@ -1115,12 +1124,169 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     reader.readAsDataURL(file);
   };
 
+  const generateTeacherPassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 4; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return `GEDA-${new Date().getFullYear()}-${code}`;
+  };
+
+  const handleExportTeachersPdf = (singleTeacher?: any) => {
+    const listToExport = singleTeacher ? [singleTeacher] : teachers;
+    if (!listToExport || listToExport.length === 0) {
+      alert('No teacher accounts found to export.');
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow popups to download or print the Teacher Credentials PDF.');
+      return;
+    }
+
+    const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${school.name} - Teacher Credentials PDF Slip</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 30px; color: #0f172a; background: #fff; }
+            .header { border-bottom: 3px solid #059669; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-start; }
+            .school-title { font-size: 22px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: -0.5px; }
+            .meta { font-size: 12px; color: #64748b; margin-top: 4px; }
+            .badge { background: #059669; color: #ffffff; padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+            th { background: #f8fafc; text-align: left; padding: 12px 10px; border-bottom: 2px solid #cbd5e1; font-weight: 700; color: #334155; text-transform: uppercase; font-size: 10px; }
+            td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+            .pwd-code { background: #f1f5f9; font-family: 'Courier New', Courier, monospace; font-weight: 800; font-size: 13px; padding: 4px 8px; border-radius: 6px; color: #0f172a; border: 1px solid #cbd5e1; display: inline-block; }
+            .notice-card { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 16px; border-radius: 12px; font-size: 11px; margin-top: 30px; line-height: 1.6; }
+            .footer { margin-top: 50px; border-top: 1px solid #e2e8f0; padding-top: 15px; text-align: center; font-size: 10px; color: #94a3b8; }
+            @media print {
+              body { margin: 15px; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="school-title">${school.name}</div>
+              <div class="meta">GES Regional Division: <strong>${school.region}</strong> &bull; District: <strong>${school.district}</strong></div>
+              <div class="meta" style="margin-top: 6px; font-weight: 600; color: #059669;">OFFICIAL TEACHER ACCESS & CREDENTIALS SLIP</div>
+            </div>
+            <div>
+              <span class="badge">CONFIDENTIAL SLIP</span>
+            </div>
+          </div>
+
+          <p style="font-size: 12px; color: #475569; margin-bottom: 10px;">
+            <strong>Issued Date:</strong> ${dateStr} &nbsp;&bull;&nbsp; 
+            <strong>Total Teacher Accounts:</strong> ${listToExport.length}
+          </p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Teacher Name</th>
+                <th>Official Email</th>
+                <th>Department</th>
+                <th>Subject / Class</th>
+                <th>Generated Password</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${listToExport.map((t, idx) => `
+                <tr>
+                  <td>${idx + 1}</td>
+                  <td><strong>${t.fullName}</strong> ${t.isClassTeacher ? '<br/><span style="color:#059669;font-size:10px;font-weight:bold;">[Class Teacher]</span>' : ''}</td>
+                  <td>${t.email}</td>
+                  <td>${t.department || 'Primary'}</td>
+                  <td>${t.department === 'JHS' ? (t.subject || 'General') : (t.assignedClass || 'General')}</td>
+                  <td><span class="pwd-code">${t.initialPassword || t.password || '••••••••'}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="notice-card">
+            <strong>🔒 Security Guidelines for School Staff & Administrators:</strong><br/>
+            1. This document contains auto-generated passwords created by the School Administrator.<br/>
+            2. Teachers should log into the portal using their registered email and auto-generated password.<br/>
+            3. Store or print this document safely in the school administration office for password recovery reference.
+          </div>
+
+          <div class="footer">
+            Generated via GEDA School Complex Portal &bull; Official Document &bull; ${school.name}
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
+  const handleResetTeacherPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetTeacherModal || !resetTeacherPasswordInput.trim()) return;
+
+    setIsResettingTeacherPassword(true);
+    setResetTeacherError('');
+    setResetTeacherSuccess('');
+
+    const newPwd = resetTeacherPasswordInput.trim();
+
+    try {
+      const res = await fetch('/api/v1/teachers/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          teacherId: resetTeacherModal.id,
+          newPassword: newPwd
+        })
+      });
+
+      if (!res.ok) {
+        await updateDoc(doc(db, "teachers", resetTeacherModal.id), {
+          password: newPwd,
+          initialPassword: newPwd,
+          updatedAt: new Date().toISOString()
+        });
+      }
+
+      setTeachers(prev => prev.map(t => t.id === resetTeacherModal.id ? {
+        ...t,
+        password: newPwd,
+        initialPassword: newPwd
+      } : t));
+
+      setResetTeacherSuccess(`Password for ${resetTeacherModal.fullName} successfully updated to ${newPwd}.`);
+    } catch (err: any) {
+      setResetTeacherError(err.message || 'Failed to update teacher password.');
+    } finally {
+      setIsResettingTeacherPassword(false);
+    }
+  };
+
   const handleCreateTeacher = async (e: React.FormEvent) => {
     e.preventDefault();
     setTeacherError('');
     setTeacherSuccess('');
     
-    if (!newTeacherName.trim() || !newTeacherEmail.trim() || !newTeacherPassword.trim() || !newTeacherDepartment) {
+    // Auto generate password if none typed
+    const pwdToUse = newTeacherPassword.trim() || generateTeacherPassword();
+
+    if (!newTeacherName.trim() || !newTeacherEmail.trim() || !newTeacherDepartment) {
       setTeacherError('Please fill all required fields including Department.');
       return;
     }
@@ -1149,7 +1315,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           schoolId: school.id,
           fullName: newTeacherName.trim(),
           email: newTeacherEmail.trim(),
-          password: newTeacherPassword,
+          password: pwdToUse,
           department: newTeacherDepartment,
           subject: newTeacherSubject.trim() || 'General',
           isClassTeacher: newTeacherIsClassTeacher,
@@ -1158,7 +1324,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       });
       const data = await res.json();
       if (res.ok) {
-        setTeacherSuccess(`Account for teacher ${data.fullName} created successfully!`);
+        setTeacherSuccess(`Account for teacher ${data.fullName} created successfully with password: ${pwdToUse}`);
         setNewTeacherName('');
         setNewTeacherEmail('');
         setNewTeacherPassword('');
@@ -3074,16 +3240,36 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Default Password *</label>
-                        <input
-                          type="password"
-                          placeholder="•••••••• (minimum 6 characters)"
-                          value={newTeacherPassword}
-                          onChange={(e) => setNewTeacherPassword(e.target.value)}
-                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:bg-white dark:bg-slate-900 transition"
-                          minLength={6}
-                          required
-                        />
+                        <div className="flex justify-between items-center mb-1.5">
+                          <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Account Password *</label>
+                          <button
+                            type="button"
+                            onClick={() => setNewTeacherPassword(generateTeacherPassword())}
+                            className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
+                          >
+                            <Wand2 className="h-3 w-3" /> Auto-Generate
+                          </button>
+                        </div>
+                        <div className="relative flex gap-2">
+                          <input
+                            type="text"
+                            placeholder="Type password or click Auto-Generate"
+                            value={newTeacherPassword}
+                            onChange={(e) => setNewTeacherPassword(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 transition"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setNewTeacherPassword(generateTeacherPassword())}
+                            className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700/50 text-amber-800 dark:text-amber-300 px-3 py-2 rounded-xl text-xs font-semibold hover:bg-amber-200 transition shrink-0 flex items-center gap-1 cursor-pointer"
+                            title="Generate secure random password"
+                          >
+                            <Wand2 className="h-3.5 w-3.5" />
+                            Generate
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-slate-400 mt-1">Passcodes can be exported as official PDF slips for teachers anytime.</p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
@@ -3192,60 +3378,126 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
                   {/* Registered Teachers List */}
                   <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none space-y-4">
-                    <div className="border-b border-slate-100 dark:border-slate-800 pb-2">
-                      <h3 className="font-display font-semibold text-slate-900 dark:text-white">Registered School Teachers</h3>
-                      <p className="text-slate-400 text-xs">Currently registered teacher roles associated with this {school.name} portal.</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+                      <div>
+                        <h3 className="font-display font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                          <span>Registered School Teachers</span>
+                          <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                            {teachers.length}
+                          </span>
+                        </h3>
+                        <p className="text-slate-400 text-xs">Manage teacher accounts, passwords, and export official PDF credential slips.</p>
+                      </div>
+
+                      {teachers.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => handleExportTeachersPdf()}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer shrink-0"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          <span>Download Staff Roster (PDF)</span>
+                        </button>
+                      )}
                     </div>
 
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
                           <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold">
-                            <th className="py-2">Name</th>
-                            <th className="py-2">Email</th>
-                            <th className="py-2">Subject / Class</th>
-                            <th className="py-2">Registered At</th>
+                            <th className="py-2.5">Teacher Name</th>
+                            <th className="py-2.5">Email / Account</th>
+                            <th className="py-2.5">Dept / Subject</th>
+                            <th className="py-2.5">Access Passcode</th>
+                            <th className="py-2.5 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
                           {loadingTeachers ? (
                             <tr>
-                              <td colSpan={4} className="py-8 text-center text-slate-400 font-mono">Loading teachers list...</td>
+                              <td colSpan={5} className="py-8 text-center text-slate-400 font-mono">Loading teachers list...</td>
                             </tr>
                           ) : teachers.length === 0 ? (
                             <tr>
-                              <td colSpan={4} className="py-8 text-center text-slate-400 font-mono">No teachers registered yet. Create one on the left.</td>
+                              <td colSpan={5} className="py-8 text-center text-slate-400 font-mono">No teachers registered yet. Create one on the left.</td>
                             </tr>
                           ) : (
                             teachers.map((t) => (
-                              <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/50">
-                                <td className="py-2.5 font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                                  {t.fullName}
-                                  {t.isClassTeacher && (
-                                    <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
-                                      Class Teacher
-                                    </span>
-                                  )}
+                              <tr key={t.id} className="border-b border-slate-50 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/50 transition">
+                                <td className="py-3 font-semibold text-slate-800 dark:text-slate-200">
+                                  <div>
+                                    <div className="flex items-center gap-1.5">
+                                      <span>{t.fullName}</span>
+                                      {t.isClassTeacher && (
+                                        <span className="bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border border-emerald-200 dark:border-emerald-800">
+                                          Class Teacher
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-[10px] text-slate-400 font-normal">Added {new Date(t.createdAt || Date.now()).toLocaleDateString()}</span>
+                                  </div>
                                 </td>
-                                <td className="py-2.5 font-mono text-slate-600 dark:text-slate-400">{t.email}</td>
-                                <td className="py-2.5 text-slate-600 dark:text-slate-400">
+                                <td className="py-3 font-mono text-slate-600 dark:text-slate-400">{t.email}</td>
+                                <td className="py-3 text-slate-600 dark:text-slate-400">
                                   <div className="flex flex-col gap-1 items-start">
                                     <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-medium border border-slate-200 dark:border-slate-700">
-                                      {t.department || 'Not Set'}
+                                      {t.department || 'Primary'}
                                     </span>
                                     {t.department === 'JHS' && t.subject && (
-                                      <span className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded text-[10px] font-medium">
+                                      <span className="bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 px-2 py-0.5 rounded text-[10px] font-medium">
                                         {t.subject}
                                       </span>
                                     )}
                                     {t.assignedClass && (
-                                      <span className="bg-indigo-100 text-indigo-900 px-2 py-0.5 rounded text-[10px] font-medium">
+                                      <span className="bg-indigo-100 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-medium">
                                         Class: {t.assignedClass}
                                       </span>
                                     )}
                                   </div>
                                 </td>
-                                <td className="py-2.5 text-slate-400">{new Date(t.createdAt).toLocaleDateString()}</td>
+                                <td className="py-3 font-mono">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-bold px-2 py-1 rounded border border-slate-200 dark:border-slate-800 text-[11px]">
+                                      {showPasswordInTable[t.id] ? (t.initialPassword || t.password || '••••••••') : '••••••••'}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => setShowPasswordInTable(prev => ({ ...prev, [t.id]: !prev[t.id] }))}
+                                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                                      title={showPasswordInTable[t.id] ? "Hide Password" : "Show Password"}
+                                    >
+                                      {showPasswordInTable[t.id] ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                                    </button>
+                                  </div>
+                                </td>
+                                <td className="py-3 text-right">
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setResetTeacherModal(t);
+                                        setResetTeacherPasswordInput(generateTeacherPassword());
+                                        setResetTeacherSuccess('');
+                                        setResetTeacherError('');
+                                      }}
+                                      className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer"
+                                      title="Reset teacher password"
+                                    >
+                                      <KeyRound className="h-3 w-3" />
+                                      <span>Reset</span>
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => handleExportTeachersPdf(t)}
+                                      className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition flex items-center gap-1 cursor-pointer"
+                                      title="Download PDF Password Slip"
+                                    >
+                                      <Download className="h-3 w-3" />
+                                      <span>PDF Slip</span>
+                                    </button>
+                                  </div>
+                                </td>
                               </tr>
                             ))
                           )}
@@ -3255,6 +3507,119 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Reset Teacher Password Modal */}
+          {resetTeacherModal && (
+            <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-md w-full shadow-2xl relative space-y-4">
+                <button
+                  type="button"
+                  onClick={() => setResetTeacherModal(null)}
+                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-base font-display">
+                    <KeyRound className="h-5 w-5" />
+                    <span>Reset Teacher Account Password</span>
+                  </div>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs">
+                    Issuing a new auto-generated password for <strong>{resetTeacherModal.fullName}</strong>.
+                  </p>
+                </div>
+
+                {resetTeacherError && (
+                  <div className="bg-red-50 text-red-800 border border-red-200 p-3 rounded-xl text-xs">
+                    {resetTeacherError}
+                  </div>
+                )}
+
+                {resetTeacherSuccess ? (
+                  <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-300 p-4 rounded-xl text-xs space-y-3">
+                    <div className="flex items-center gap-2 font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Password Updated!</span>
+                    </div>
+                    <p className="leading-relaxed">{resetTeacherSuccess}</p>
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => handleExportTeachersPdf(resetTeacherModal)}
+                        className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        <span>Download PDF Slip</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setResetTeacherModal(null)}
+                        className="bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold px-4 py-2 rounded-lg text-xs hover:bg-slate-300 transition cursor-pointer"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleResetTeacherPasswordSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+                        Teacher Email
+                      </label>
+                      <input
+                        type="text"
+                        disabled
+                        value={resetTeacherModal.email}
+                        className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-500 cursor-not-allowed"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          New Generated Password *
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setResetTeacherPasswordInput(generateTeacherPassword())}
+                          className="text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
+                        >
+                          <Wand2 className="h-3 w-3" /> Regenerate
+                        </button>
+                      </div>
+                      <div className="relative flex gap-2">
+                        <input
+                          type="text"
+                          value={resetTeacherPasswordInput}
+                          onChange={(e) => setResetTeacherPasswordInput(e.target.value)}
+                          className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setResetTeacherModal(null)}
+                        className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl text-xs hover:bg-slate-200 transition cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isResettingTeacherPassword}
+                        className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer disabled:opacity-50"
+                      >
+                        {isResettingTeacherPassword ? 'Updating...' : 'Save & Update Password'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
             </div>
           )}
 

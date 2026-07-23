@@ -1,3 +1,18 @@
+export interface Teacher {
+  id: string;
+  schoolId: string;
+  fullName: string;
+  email: string;
+  password?: string;
+  initialPassword?: string;
+  department: 'Primary' | 'JHS';
+  subject?: string;
+  isClassTeacher?: boolean;
+  assignedClass?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export type Role = 'Admin' | 'Staff' | 'Teacher' | 'SuperAdmin';
 
 export interface School {

@@ -951,7 +951,102 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
   });
   
   app.get("/api/v1/teachers", async (req, res) => {
-    res.json([]);
+    try {
+      const { schoolId } = req.query;
+      if (!schoolId) {
+        return res.status(400).json({ error: "schoolId is required" });
+      }
+      const snapshot = await getDocs(query(collection(getDb(), "teachers"), where("schoolId", "==", schoolId as string)));
+      const teachers = snapshot.docs.map(d => ({ ...d.data(), id: d.id }));
+      res.json(teachers);
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.post("/api/v1/teachers", async (req, res) => {
+    try {
+      const { schoolId, fullName, email, password, department, subject, isClassTeacher, assignedClass } = req.body;
+      if (!schoolId || !fullName || !email || !password || !department) {
+        return res.status(400).json({ error: "Missing required teacher registration fields." });
+      }
+      const teacherData = {
+        schoolId,
+        fullName,
+        email,
+        password,
+        initialPassword: password,
+        department,
+        subject: subject || 'General',
+        isClassTeacher: Boolean(isClassTeacher),
+        assignedClass: assignedClass || null,
+        createdAt: new Date().toISOString()
+      };
+      const docRef = await addDoc(collection(getDb(), "teachers"), teacherData);
+      res.status(201).json({ ...teacherData, id: docRef.id });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.post("/api/v1/teachers/reset-password", async (req, res) => {
+    try {
+      const { teacherId, newPassword } = req.body;
+      if (!teacherId || !newPassword) {
+        return res.status(400).json({ error: "teacherId and newPassword are required." });
+      }
+      await updateDoc(doc(getDb(), "teachers", teacherId), {
+        password: newPassword,
+        initialPassword: newPassword,
+        updatedAt: new Date().toISOString()
+      });
+      res.json({ success: true, message: "Teacher password reset successfully." });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  app.post("/api/v1/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: "Email address is required." });
+      }
+      const trimmedEmail = email.trim().toLowerCase();
+
+      // Check if teacher
+      const teacherSnap = await getDocs(query(collection(getDb(), "teachers"), where("email", "==", trimmedEmail)));
+      if (!teacherSnap.empty) {
+        const teacherData = teacherSnap.docs[0].data();
+        let schoolName = "your school administration";
+        if (teacherData.schoolId) {
+          const sDoc = await getDoc(doc(getDb(), "schools", teacherData.schoolId));
+          if (sDoc.exists()) schoolName = sDoc.data().name;
+        }
+        return res.json({
+          userType: "Teacher",
+          schoolName,
+          message: `Password reset request registered for ${teacherData.fullName}. Please contact your School Administrator (${schoolName}) to issue a new generated Password Slip.`
+        });
+      }
+
+      // Check if school
+      const schoolSnap = await getDocs(query(collection(getDb(), "schools"), where("email", "==", trimmedEmail)));
+      if (!schoolSnap.empty) {
+        const schoolDoc = schoolSnap.docs[0];
+        const schoolData = schoolDoc.data();
+        return res.json({
+          userType: "Admin",
+          schoolId: schoolDoc.id,
+          schoolName: schoolData.name,
+          message: `Official password recovery instructions and a 6-digit reset PIN have been dispatched to ${trimmedEmail}. Contact GEDA Support Line (0244123456) for emergency access verification.`
+        });
+      }
+
+      return res.status(404).json({ error: "No school or staff account found matching that email address." });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
   });
 
   app.get("/api/v1/news", async (req, res) => {

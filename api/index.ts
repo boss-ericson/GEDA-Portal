@@ -109,10 +109,17 @@ const validateApiKey = (req: any, res: any, next: any) => {
   app.post("/api/v1/auth/login", async (req, res) => {
     try {
       const { email, password, role } = req.body;
-      if (email === "admin@gedaschool.edu.gh") {
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required." });
+      }
+
+      const cleanEmail = email.trim().toLowerCase();
+      const rawEmail = email.trim();
+
+      if (cleanEmail === "admin@gedaschool.edu.gh") {
         return res.json({
           success: true,
-          user: { email, fullName: "Admin User", role },
+          user: { email: cleanEmail, fullName: "Admin User", role: role || "Admin" },
           school: {
             id: 'demo-school',
             name: 'GEDA Demo School Complex',
@@ -123,24 +130,70 @@ const validateApiKey = (req: any, res: any, next: any) => {
             status: 'Active',
             accessLevel: 'Full',
             createdAt: new Date().toISOString()
-          }
+          },
+          role: role || "Admin"
         });
       }
-      const snapshot = await getDocs(query(collection(getDb(), "schools"), where("email", "==", email)));
-      if (snapshot.empty) {
-        return res.status(401).json({ error: "Invalid credentials" });
+
+      // 1. Check Teachers collection first
+      let teacherSnap = await getDocs(query(collection(getDb(), "teachers"), where("email", "==", cleanEmail)));
+      if (teacherSnap.empty) {
+        teacherSnap = await getDocs(query(collection(getDb(), "teachers"), where("email", "==", rawEmail)));
       }
+
+      if (!teacherSnap.empty) {
+        const teacherDoc = teacherSnap.docs[0];
+        const teacherData = teacherDoc.data();
+        const storedPassword = teacherData.password || teacherData.initialPassword;
+
+        if (storedPassword !== password) {
+          return res.status(401).json({ error: "Invalid password for teacher account." });
+        }
+
+        const schoolDocSnap = await getDoc(doc(getDb(), "schools", teacherData.schoolId));
+        if (!schoolDocSnap.exists()) {
+          return res.status(404).json({ error: "Associated school account not found." });
+        }
+
+        const schoolData = schoolDocSnap.data();
+        if (schoolData.status === 'Deactivated') {
+          return res.status(401).json({ error: "Your school account has been deactivated. Please contact the administrator." });
+        }
+
+        return res.json({
+          success: true,
+          role: "Teacher",
+          user: { email: teacherData.email, fullName: teacherData.fullName, role: "Teacher" },
+          teacher: { ...teacherData, id: teacherDoc.id },
+          school: { ...schoolData, id: schoolDocSnap.id }
+        });
+      }
+
+      // 2. Check Schools collection
+      let snapshot = await getDocs(query(collection(getDb(), "schools"), where("email", "==", cleanEmail)));
+      if (snapshot.empty) {
+        snapshot = await getDocs(query(collection(getDb(), "schools"), where("email", "==", rawEmail)));
+      }
+
+      if (snapshot.empty) {
+        return res.status(401).json({ error: "Invalid official school email or password." });
+      }
+
       const schoolDoc = snapshot.docs[0];
       const schoolData = schoolDoc.data();
       if (schoolData.status === 'Deactivated') {
         return res.status(401).json({ error: "Your school account has been deactivated. Please contact the administrator." });
       }
-      res.json({
+
+      return res.json({
         success: true,
-        user: { email, fullName: "Admin User", role },
+        role: role || "Admin",
+        user: { email: schoolData.email || rawEmail, fullName: "Admin User", role: role || "Admin" },
         school: { ...schoolData, id: schoolDoc.id }
       });
-    } catch (e: any) { res.status(500).json({ error: e.message }); }
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
   });
 
   // --- STUDENTS ---
@@ -414,10 +467,11 @@ const validateApiKey = (req: any, res: any, next: any) => {
       if (!schoolId || !fullName || !email || !password || !department) {
         return res.status(400).json({ error: "Missing required teacher registration fields." });
       }
+      const cleanEmail = email.trim().toLowerCase();
       const teacherData = {
         schoolId,
         fullName,
-        email,
+        email: cleanEmail,
         password,
         initialPassword: password,
         department,

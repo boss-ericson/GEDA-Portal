@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { School, Role } from '../types';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth, googleAuthProvider, db } from '../lib/firebase';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 
 const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=1920',
@@ -247,10 +247,13 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
         } catch (apiErr: any) {
           console.warn('Backend login API failed, falling back to Firebase directly:', apiErr);
           try {
-            if (loginEmail.trim() === "superadmin@ges.gov.gh") {
+            const cleanEmail = loginEmail.trim().toLowerCase();
+            const rawEmail = loginEmail.trim();
+
+            if (cleanEmail === "superadmin@ges.gov.gh") {
               responseData = {
                 success: true,
-                user: { email: loginEmail.trim(), fullName: "Super Admin", role: "SuperAdmin" },
+                user: { email: cleanEmail, fullName: "Super Admin", role: "SuperAdmin" },
                 school: {
                   id: 'superadmin-ges',
                   name: 'GES Super Admin Console',
@@ -266,24 +269,68 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
               };
               isSuccess = true;
             } else {
-              const snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", loginEmail.trim())));
-              if (!snapshot.empty) {
-                const schoolDoc = snapshot.docs[0];
-                const schoolData = schoolDoc.data();
+              // 1. Check Teachers collection
+              let teacherSnap = await getDocs(query(collection(db, "teachers"), where("email", "==", cleanEmail)));
+              if (teacherSnap.empty) {
+                teacherSnap = await getDocs(query(collection(db, "teachers"), where("email", "==", rawEmail)));
+              }
+
+              if (!teacherSnap.empty) {
+                const teacherDoc = teacherSnap.docs[0];
+                const teacherData = teacherDoc.data();
+                const storedPassword = teacherData.password || teacherData.initialPassword;
+
+                if (storedPassword !== loginPassword) {
+                  setLoginError('Invalid password for teacher account.');
+                  return;
+                }
+
+                const schoolDocRef = doc(db, "schools", teacherData.schoolId);
+                const schoolSnap = await getDoc(schoolDocRef);
+                if (!schoolSnap.exists()) {
+                  setLoginError('School account not found for this teacher.');
+                  return;
+                }
+
+                const schoolData = schoolSnap.data();
                 if (schoolData.status === 'Deactivated') {
                   setLoginError('Your school account has been deactivated. Please contact the administrator.');
                   return;
                 }
+
                 responseData = {
                   success: true,
-                  school: { ...schoolData, id: schoolDoc.id },
-                  user: { email: loginEmail.trim(), fullName: "Admin User", role: selectedRole },
-                  role: selectedRole
+                  role: 'Teacher',
+                  teacher: { ...teacherData, id: teacherDoc.id },
+                  school: { ...schoolData, id: schoolSnap.id },
+                  user: { email: teacherData.email, fullName: teacherData.fullName, role: 'Teacher' }
                 };
                 isSuccess = true;
               } else {
-                 setLoginError('Invalid official school email or password.');
-                 return;
+                // 2. Check Schools collection
+                let snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", cleanEmail)));
+                if (snapshot.empty) {
+                  snapshot = await getDocs(query(collection(db, "schools"), where("email", "==", rawEmail)));
+                }
+
+                if (!snapshot.empty) {
+                  const schoolDoc = snapshot.docs[0];
+                  const schoolData = schoolDoc.data();
+                  if (schoolData.status === 'Deactivated') {
+                    setLoginError('Your school account has been deactivated. Please contact the administrator.');
+                    return;
+                  }
+                  responseData = {
+                    success: true,
+                    school: { ...schoolData, id: schoolDoc.id },
+                    user: { email: rawEmail, fullName: "Admin User", role: selectedRole },
+                    role: selectedRole
+                  };
+                  isSuccess = true;
+                } else {
+                  setLoginError('Invalid official school email or password.');
+                  return;
+                }
               }
             }
           } catch (fbErr: any) {

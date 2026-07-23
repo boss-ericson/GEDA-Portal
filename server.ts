@@ -629,10 +629,17 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
   app.post("/api/v1/auth/login", async (req, res) => {
     try {
       const { email, password, role } = req.body;
-      if (email === "superadmin@ges.gov.gh") {
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required." });
+      }
+
+      const cleanEmail = email.trim().toLowerCase();
+      const rawEmail = email.trim();
+
+      if (cleanEmail === "superadmin@ges.gov.gh") {
         return res.json({
           success: true,
-          user: { email, fullName: "Super Admin", role: "SuperAdmin" },
+          user: { email: cleanEmail, fullName: "Super Admin", role: "SuperAdmin" },
           school: {
             id: 'superadmin-ges',
             name: 'GES Super Admin Console',
@@ -648,17 +655,65 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
         });
       }
 
-      const snapshot = await getDocs(query(collection(getDb(), "schools"), where("email", "==", email)));
-      if (snapshot.empty) {
-        return res.status(401).json({ error: "Invalid credentials" });
+      // 1. Check Teachers collection first
+      let teacherSnap = await getDocs(query(collection(getDb(), "teachers"), where("email", "==", cleanEmail)));
+      if (teacherSnap.empty) {
+        teacherSnap = await getDocs(query(collection(getDb(), "teachers"), where("email", "==", rawEmail)));
       }
-      const schoolDoc = snapshot.docs[0];
-      res.json({
+
+      if (!teacherSnap.empty) {
+        const teacherDoc = teacherSnap.docs[0];
+        const teacherData = teacherDoc.data();
+        const storedPassword = teacherData.password || teacherData.initialPassword;
+
+        if (storedPassword !== password) {
+          return res.status(401).json({ error: "Invalid password for teacher account." });
+        }
+
+        const schoolDocSnap = await getDoc(doc(getDb(), "schools", teacherData.schoolId));
+        if (!schoolDocSnap.exists()) {
+          return res.status(404).json({ error: "Associated school account not found." });
+        }
+
+        const schoolData = schoolDocSnap.data();
+        if (schoolData.status === 'Deactivated') {
+          return res.status(401).json({ error: "Your school account has been deactivated. Please contact the administrator." });
+        }
+
+        return res.json({
+          success: true,
+          role: "Teacher",
+          user: { email: teacherData.email, fullName: teacherData.fullName, role: "Teacher" },
+          teacher: { ...teacherData, id: teacherDoc.id },
+          school: { ...schoolData, id: schoolDocSnap.id }
+        });
+      }
+
+      // 2. Check Schools collection for Admin accounts
+      let schoolSnap = await getDocs(query(collection(getDb(), "schools"), where("email", "==", cleanEmail)));
+      if (schoolSnap.empty) {
+        schoolSnap = await getDocs(query(collection(getDb(), "schools"), where("email", "==", rawEmail)));
+      }
+
+      if (schoolSnap.empty) {
+        return res.status(401).json({ error: "Invalid official school email or password." });
+      }
+
+      const schoolDoc = schoolSnap.docs[0];
+      const schoolData = schoolDoc.data();
+      if (schoolData.status === 'Deactivated') {
+        return res.status(401).json({ error: "Your school account has been deactivated. Please contact the administrator." });
+      }
+
+      return res.json({
         success: true,
-        user: { email, fullName: "Admin User", role },
-        school: { ...schoolDoc.data(), id: schoolDoc.id }
+        role: role || "Admin",
+        user: { email: schoolData.email || rawEmail, fullName: "Admin User", role: role || "Admin" },
+        school: { ...schoolData, id: schoolDoc.id }
       });
-    } catch (e: any) { res.status(500).json({ error: e.message }); }
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
   });
 
 
@@ -970,10 +1025,11 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
       if (!schoolId || !fullName || !email || !password || !department) {
         return res.status(400).json({ error: "Missing required teacher registration fields." });
       }
+      const cleanEmail = email.trim().toLowerCase();
       const teacherData = {
         schoolId,
         fullName,
-        email,
+        email: cleanEmail,
         password,
         initialPassword: password,
         department,

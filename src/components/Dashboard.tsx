@@ -1247,22 +1247,24 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     const newPwd = resetTeacherPasswordInput.trim();
 
     try {
-      const res = await fetch('/api/v1/teachers/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          teacherId: resetTeacherModal.id,
-          newPassword: newPwd
-        })
-      });
-
-      if (!res.ok) {
-        await updateDoc(doc(db, "teachers", resetTeacherModal.id), {
-          password: newPwd,
-          initialPassword: newPwd,
-          updatedAt: new Date().toISOString()
+      try {
+        await fetch('/api/v1/teachers/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            teacherId: resetTeacherModal.id,
+            newPassword: newPwd
+          })
         });
+      } catch (apiErr) {
+        console.warn('API password reset failed, updating Firestore directly:', apiErr);
       }
+
+      await updateDoc(doc(db, "teachers", resetTeacherModal.id), {
+        password: newPwd,
+        initialPassword: newPwd,
+        updatedAt: new Date().toISOString()
+      });
 
       setTeachers(prev => prev.map(t => t.id === resetTeacherModal.id ? {
         ...t,
@@ -1306,39 +1308,55 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       return;
     }
     
+    const cleanEmail = newTeacherEmail.trim().toLowerCase();
+    
     setCreatingTeacher(true);
     try {
-      const res = await fetch('/api/v1/teachers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          schoolId: school.id,
-          fullName: newTeacherName.trim(),
-          email: newTeacherEmail.trim(),
-          password: pwdToUse,
-          department: newTeacherDepartment,
-          subject: newTeacherSubject.trim() || 'General',
-          isClassTeacher: newTeacherIsClassTeacher,
-          assignedClass: newTeacherAssignedClass.trim() || null
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setTeacherSuccess(`Account for teacher ${data.fullName} created successfully with password: ${pwdToUse}`);
-        setNewTeacherName('');
-        setNewTeacherEmail('');
-        setNewTeacherPassword('');
-        setNewTeacherDepartment('');
-        setNewTeacherSubject('');
-        setNewTeacherAssignedClass('');
-        setNewTeacherIsClassTeacher(false);
-        // Refresh teachers list
-        setTeachers(prev => [...prev, data]);
-      } else {
-        setTeacherError(data.error || 'Failed to create teacher account.');
+      const teacherPayload = {
+        schoolId: school.id,
+        fullName: newTeacherName.trim(),
+        email: cleanEmail,
+        password: pwdToUse,
+        initialPassword: pwdToUse,
+        department: newTeacherDepartment,
+        subject: newTeacherSubject.trim() || 'General',
+        isClassTeacher: Boolean(newTeacherIsClassTeacher),
+        assignedClass: newTeacherAssignedClass.trim() || null,
+        createdAt: new Date().toISOString()
+      };
+
+      let createdTeacher: any = null;
+
+      try {
+        const res = await fetch('/api/v1/teachers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(teacherPayload)
+        });
+        const data = await res.json();
+        if (res.ok && data.id) {
+          createdTeacher = data;
+        } else {
+          throw new Error(data.error || 'Failed to create teacher via API');
+        }
+      } catch (apiErr) {
+        console.warn('API teacher creation failed, falling back to direct Firebase:', apiErr);
+        const docRef = await addDoc(collection(db, "teachers"), teacherPayload);
+        createdTeacher = { ...teacherPayload, id: docRef.id };
       }
-    } catch (err) {
-      setTeacherError('Failed to register teacher due to a connection issue.');
+
+      setTeacherSuccess(`Account for teacher ${createdTeacher.fullName} created successfully with password: ${pwdToUse}`);
+      setNewTeacherName('');
+      setNewTeacherEmail('');
+      setNewTeacherPassword('');
+      setNewTeacherDepartment('');
+      setNewTeacherSubject('');
+      setNewTeacherAssignedClass('');
+      setNewTeacherIsClassTeacher(false);
+      // Refresh teachers list
+      setTeachers(prev => [...prev.filter(t => t.id !== createdTeacher.id), createdTeacher]);
+    } catch (err: any) {
+      setTeacherError(err.message || 'Failed to register teacher.');
     } finally {
       setCreatingTeacher(false);
     }

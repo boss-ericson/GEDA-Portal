@@ -879,15 +879,22 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#04060d] text-slate-500 dark:text-slate-400 py-12 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-          <div className="flex items-center justify-center gap-2 text-white/80">
-            <GraduationCap className="h-6 w-6 text-emerald-500" />
-            <span className="font-display font-semibold tracking-tight">GEDA Portal — Ghana Ed-Admissions</span>
+      <footer className="bg-[#090d16] text-white py-12 border-t border-slate-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <div className="flex items-center justify-center gap-2.5 text-white text-xl font-extrabold">
+            <GraduationCap className="h-7 w-7 text-emerald-400" />
+            <span className="font-display tracking-tight text-white">GEDA Portal — Ghana Ed-Admissions</span>
           </div>
-          <p className="text-sm max-w-md mx-auto text-slate-400">Providing resilient, multi-tenant digital administration services for schools across the Republic of Ghana.</p>
-          <div className="text-xs pt-4 border-t border-white/5 mt-8 w-fit mx-auto">
-            &copy; {new Date().getFullYear()} GEDA Ghana. Compliant with Ghana Education Service (GES) data standards.
+          <p className="text-sm max-w-xl mx-auto text-slate-100 font-normal leading-relaxed">
+            Providing resilient, multi-tenant digital administration services for schools across the Republic of Ghana.
+          </p>
+          <div className="pt-6 border-t border-slate-700 max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white font-semibold">
+            <div className="text-slate-100">
+              &copy; {new Date().getFullYear()} GEDA Ghana. Compliant with Ghana Education Service (GES) data standards.
+            </div>
+            <div className="text-emerald-300 font-bold bg-emerald-950 border border-emerald-400 px-4 py-2 rounded-full flex items-center gap-2">
+              <span>Developed &copy; BossITSolutions</span>
+            </div>
           </div>
         </div>
       </footer>

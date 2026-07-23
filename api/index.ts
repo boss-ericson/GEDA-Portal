@@ -586,9 +586,59 @@ const validateApiKey = (req: any, res: any, next: any) => {
   app.get("/api/v1/news", async (req, res) => {
     res.json([
       {
-        id: '1', title: 'GES Announces New Curriculum Framework',
-        content: 'The Ghana Education Service has released a comprehensive update to the basic school curriculum.',
-        date: new Date().toISOString(), source: 'GES Official', url: '#'
+        id: 'ges-news-001',
+        title: 'GES Directs Strict Adherence to 2026 Academic Calendar & SBA Upload Timelines',
+        snippet: 'The Ghana Education Service (GES) Management has issued a directive to all Regional and District Directors of Education regarding Term 2 & 3 assessment schedules and School-Based Assessment (SBA) portal upload deadlines.',
+        content: `ACCRA, GHANA — The Management of the Ghana Education Service (GES) wishes to inform all Regional Directors, District Directors, Headteachers of Public and Private Basic Schools, and the general public on the standardized guidelines for the 2026 Academic Year assessment schedule.\n\nKey Directives:\n1. SBA Assessment Submission: All JHS 1 to JHS 3 teachers are required to finalize and upload all continuous assessment scores into the official portal by the designated deadline.\n2. BECE Registration Verification: Headteachers must verify candidate bio-data, subject selections, and passport photographs to eliminate spelling errors on final examination slips.\n3. Attendance Registers: Weekly attendance records must be audited by District Inspection Officers prior to terminal report generation.\n\nRegional Directors are urged to ensure total compliance across all metro, municipal, and district education directorates.`,
+        category: 'Circular & Policy',
+        source: 'GES Headquarters, Public Relations Unit',
+        date: '2026-07-20',
+        circularNo: 'GES/HQ/PR/2026/089',
+        readTime: '3 min read'
+      },
+      {
+        id: 'ges-news-002',
+        title: 'WAEC & GES Re-open BECE Candidate Bio-Data Verification Portal',
+        snippet: 'Headteachers of Junior High Schools nationwide can now access the online candidate verification portal to confirm final year student details and subject choices.',
+        content: `The West African Examinations Council (WAEC), in collaboration with the Ghana Education Service (GES), has officially opened the online bio-data verification portal for all registered 2026 Basic Education Certificate Examination (BECE) candidates.\n\nImportant Instructions for Headteachers:\n• Verify candidate full names as spelled on birth certificates or admission logs.\n• Cross-check selected Ghanaian Languages and Basic Design & Technology (BDT) options.\n• Ensure photographs conform to standard passport specifications with clear contrast and plain backgrounds.\n\nFailure to verify records before the close of portal will attract administrative surcharges for candidate index modifications.`,
+        category: 'Examinations',
+        source: 'WAEC / GES Examinations Division',
+        date: '2026-07-18',
+        circularNo: 'GES/EXAM/2026/014',
+        readTime: '2 min read'
+      },
+      {
+        id: 'ges-news-003',
+        title: 'MoE & GES Launch Nationwide Digital School Management & Offline Sync System',
+        snippet: 'Basic schools across Ghana receive modernized digital administrative tools allowing real-time attendance logging, offline data caching, and instant report card generation.',
+        content: `The Ministry of Education (MoE) in partnership with the Ghana Education Service (GES) has officially rolled out the modernized digital portal for public and private basic education institutions.\n\nFeatures Introduced:\n• Offline Data Sync: Teachers and school administrators in remote areas can record marks and attendance without active internet, syncing automatically when connected.\n• Fee Transparency & Mobile Receipts: Instant SMS notifications sent to parents upon fee payments.\n• Digital Terminal Reports: Automated grading calculation aligned with National Pre-Tertiary Curriculum Framework standard grading scales.\n\nAll basic school headteachers are instructed to utilize these digital portals for official term reporting.`,
+        category: 'Digital Transformation',
+        source: 'Ministry of Education & GES IT Division',
+        date: '2026-07-15',
+        circularNo: 'MOE/GES/IT/2026/005',
+        readTime: '4 min read'
+      },
+      {
+        id: 'ges-news-004',
+        title: 'GES Directive on Capitation Grant Disbursement and Approved Levy Caps',
+        snippet: 'GES Management issues strict guidelines on capitation grant management, financial audits, and prohibition of unapproved PTA levies in public basic schools.',
+        content: `The Director-General of the Ghana Education Service (GES) wishes to remind all Headteachers and School Management Committees (SMCs) of public basic schools regarding financial compliance rules.\n\nGuidelines:\n1. Capitation Grant: Funds allocated must be judiciously applied toward instructional materials, sanitation facilities, and continuous assessment tests.\n2. Prohibited Fees: No public basic school is permitted to charge tuition or unauthorized unapproved levies. All PTA levies must be approved by the District Director of Education.\n3. Financial Auditing: Internal auditors will conduct unannounced quarterly financial inspections across all municipal education directorates.`,
+        category: 'Finance & Grants',
+        source: "GES Financial Controller's Office",
+        date: '2026-07-10',
+        circularNo: 'GES/FIN/2026/033',
+        readTime: '3 min read'
+      },
+      {
+        id: 'ges-news-005',
+        title: 'NTC Continuous Professional Development (CPD) Points Mandate for Basic Teachers',
+        snippet: 'National Teaching Council (NTC) reminds all licensed educators in Primary and JHS departments to log mandatory CPD points for teacher license renewal.',
+        content: `The National Teaching Council (NTC) in conjunction with GES advises all professional teachers in Primary and Junior High School departments to ensure active log-in on the NTC Teacher Portal.\n\nKey Requirements:\n• CPD Points Accrual: Professional teachers must complete accredited professional learning community (PLC) sessions and digital training modules.\n• License Renewal: Teacher licenses due for renewal in 2026 must meet minimum accumulated point thresholds.\n• Headteacher Endorsement: Headteachers are required to confirm staff attendance at weekly PLC meetings on the portal.`,
+        category: 'Teacher Affairs',
+        source: 'National Teaching Council (NTC)',
+        date: '2026-07-05',
+        circularNo: 'NTC/GES/CPD/2026/009',
+        readTime: '3 min read'
       }
     ]);
   });

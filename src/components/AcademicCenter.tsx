@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { School, Student, AcademicRecord, SubjectScore, Role } from '../types';
-import { Award, PlusCircle, Printer, Search, RefreshCw, ChevronDown, ChevronRight, FileText, Download } from 'lucide-react';
+import { Award, PlusCircle, Printer, Search, RefreshCw, ChevronDown, ChevronRight, FileText, Download, Lock, ShieldCheck } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
 interface AcademicCenterProps {
@@ -53,6 +53,7 @@ const JHS_SUBJECTS = [
 ];
 
 export default function AcademicCenter({ school, students, isOffline, user, role }: AcademicCenterProps) {
+  const isSchoolAdmin = role === 'Admin' || role === 'SuperAdmin';
   const [records, setRecords] = useState<AcademicRecord[]>([]);
   const [termAttendance, setTermAttendance] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -725,33 +726,71 @@ export default function AcademicCenter({ school, students, isOffline, user, role
           <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">Manage student SBA, Exam Records, and terminal reports.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
-          <select value={year} onChange={e => setYear(e.target.value)} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 flex-1 sm:flex-initial">
+          {!isSchoolAdmin && (
+            <span 
+              className="inline-flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 px-2.5 py-1.5 rounded-xl text-xs font-semibold"
+              title="Academic parameters (Year, Term, Pass Mark, Next Term Date) can only be set by the School Admin"
+            >
+              <Lock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+              <span>Admin Lock</span>
+            </span>
+          )}
+          {isSchoolAdmin && (
+            <span 
+              className="inline-flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 px-2.5 py-1.5 rounded-xl text-xs font-semibold"
+              title="You are logged in as School Admin. You can set academic parameters."
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Admin Mode</span>
+            </span>
+          )}
+          <select 
+            disabled={!isSchoolAdmin}
+            value={year} 
+            onChange={e => setYear(e.target.value)} 
+            title={!isSchoolAdmin ? "Only School Admin can set Academic Year" : "Select Academic Year"}
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 flex-1 sm:flex-initial disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-800/80"
+          >
             <option value="2025/2026">2025/2026</option>
             <option value="2026/2027">2026/2027</option>
           </select>
-          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 flex-1 sm:flex-initial">
+          <div 
+            title={!isSchoolAdmin ? "Only School Admin can set Pass Mark" : "Pass Mark"}
+            className={`flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 flex-1 sm:flex-initial ${!isSchoolAdmin ? 'opacity-60 bg-slate-100 dark:bg-slate-800/80 cursor-not-allowed' : ''}`}
+          >
             <span className="text-slate-500 dark:text-slate-400 text-[11px] whitespace-nowrap">Pass:</span>
             <input 
+              disabled={!isSchoolAdmin}
               type="number" 
               value={passMark}
               onChange={e => setPassMark(Number(e.target.value))}
-              className="w-12 text-center font-bold text-slate-700 dark:text-slate-300 outline-none"
+              className="w-12 text-center font-bold text-slate-700 dark:text-slate-300 outline-none disabled:cursor-not-allowed disabled:bg-transparent"
               min="0"
               max="1000"
             />
           </div>
-          <select value={term} onChange={e => setTerm(e.target.value)} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 flex-1 sm:flex-initial">
+          <select 
+            disabled={!isSchoolAdmin}
+            value={term} 
+            onChange={e => setTerm(e.target.value)} 
+            title={!isSchoolAdmin ? "Only School Admin can set Term" : "Select Active Term"}
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 flex-1 sm:flex-initial disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-800/80"
+          >
             <option value="First">First Term</option>
             <option value="Second">Second Term</option>
             <option value="Third">Third Term</option>
           </select>
-          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 flex-1 sm:flex-initial">
+          <div 
+            title={!isSchoolAdmin ? "Only School Admin can set Next Term Date" : "Next Term Date"}
+            className={`flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 flex-1 sm:flex-initial ${!isSchoolAdmin ? 'opacity-60 bg-slate-100 dark:bg-slate-800/80 cursor-not-allowed' : ''}`}
+          >
             <span className="text-slate-500 dark:text-slate-400 text-[11px] whitespace-nowrap">Next Term:</span>
             <input 
+              disabled={!isSchoolAdmin}
               type="date" 
               value={nextTermBegins}
               onChange={e => setNextTermBegins(e.target.value)}
-              className="text-xs font-semibold text-slate-700 dark:text-slate-300 outline-none w-28 bg-transparent"
+              className="text-xs font-semibold text-slate-700 dark:text-slate-300 outline-none w-28 bg-transparent disabled:cursor-not-allowed"
             />
           </div>
           <button onClick={fetchRecords} disabled={loading} className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950 cursor-pointer">

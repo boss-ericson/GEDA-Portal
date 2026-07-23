@@ -115,3 +115,29 @@ export interface AttendanceRecord {
   academicYear: string;
   academicTerm: string;
 }
+
+export interface BeceSubjectScore {
+  subject: string;
+  isCore: boolean;
+  score: number; // 0 - 100
+  grade: number; // 1 - 9
+  gradeRemarks?: string;
+}
+
+export interface BeceMockRecord {
+  id: string;
+  studentId: string;
+  schoolId: string;
+  mockName: string; // e.g. "School Mock 1", "Municipal Mock 1", "National Mock"
+  academicYear: string;
+  classLevel: string;
+  scores: BeceSubjectScore[];
+  actualAggregate: number; // 4 Core + 2 Best Electives
+  best6Aggregate: number; // Top 6 overall
+  coreAggregate: number; // Sum of 4 Core
+  best2ElectiveAggregate: number; // Sum of 2 Best Electives
+  overallRemark?: string;
+  teacherRemarks?: string;
+  headteacherRemarks?: string;
+  updatedAt: string;
+}

@@ -5,6 +5,7 @@ import { useReactToPrint } from 'react-to-print';
 import * as XLSX from 'xlsx';
 import { School, Student, Payment, BackupLog, ApiKey, Role } from '../types';
 import AcademicCenter from './AcademicCenter';
+import BeceMockCenter from './BeceMockCenter';
 import AICenter from './AICenter';
 import AttendanceTracker from './AttendanceTracker';
 import StudentHistoryModal from './StudentHistoryModal';
@@ -1481,6 +1482,18 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               </button>
 
               <button
+                onClick={() => handleTabChange('bece-mock')}
+                className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs font-medium transition cursor-pointer ${
+                  activeTab === 'bece-mock'
+                    ? 'bg-amber-500 text-slate-950 dark:text-white font-bold'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <GraduationCap className="h-4 w-4 text-amber-400" />
+                <span>BECE Mock Exams</span>
+              </button>
+
+              <button
                 onClick={() => handleTabChange('ai-center')}
                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition cursor-pointer ${
                   activeTab === 'ai-center'
@@ -2252,6 +2265,11 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           {/* TAB: ACADEMIC CENTER */}
           {activeTab === 'academic' && (
             <AcademicCenter school={school} students={[...offlineQueue, ...students]} isOffline={isOffline} user={user} role={role} />
+          )}
+
+          {/* TAB: BECE MOCK EXAMS */}
+          {activeTab === 'bece-mock' && (
+            <BeceMockCenter school={school} students={[...offlineQueue, ...students]} isOffline={isOffline} user={user} role={role} />
           )}
 
           {/* TAB: NACCA AI CENTER */}

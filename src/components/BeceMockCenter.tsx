@@ -1214,55 +1214,80 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
           {/* Printable Slip Container */}
           {activeCandidateStudent && activeCandidateRecord ? (
-            <div ref={printSlipRef} className="bg-white text-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-200 max-w-4xl mx-auto font-sans">
+            <div ref={printSlipRef} className="print-slip-card bg-white text-slate-900 rounded-2xl p-5 md:p-6 shadow-2xl border border-slate-200 max-w-4xl mx-auto font-sans print:p-0 print:border-none print:shadow-none print:rounded-none">
+              <style>{`
+                @media print {
+                  @page {
+                    size: A4 portrait;
+                    margin: 6mm 8mm;
+                  }
+                  body {
+                    background: white !important;
+                    color: black !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                  }
+                  .print-slip-card {
+                    padding: 0 !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    margin: 0 !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    page-break-inside: avoid;
+                    break-inside: avoid;
+                  }
+                }
+              `}</style>
+
               {/* Header */}
-              <div className="border-b-2 border-slate-900 pb-4 mb-6 flex items-center justify-between">
+              <div className="border-b-2 border-slate-900 pb-2 mb-3 flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] uppercase tracking-widest font-bold text-slate-500">WAEC BECE MOCK PERFORMANCE SLIP</div>
-                  <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{school.name}</h2>
-                  <p className="text-xs text-slate-600">{school.district}, {school.region} Region &bull; Academic Year: {activeCandidateRecord.academicYear}</p>
+                  <div className="text-[9px] uppercase tracking-widest font-bold text-slate-500">WAEC BECE MOCK PERFORMANCE SLIP</div>
+                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{school.name}</h2>
+                  <p className="text-[11px] text-slate-600">{school.district}, {school.region} Region &bull; Academic Year: {activeCandidateRecord.academicYear}</p>
                 </div>
                 <div className="text-right">
-                  <span className="inline-block bg-slate-900 text-amber-400 text-xs font-black px-3 py-1.5 rounded uppercase tracking-wider">
+                  <span className="inline-block bg-slate-900 text-amber-400 text-xs font-black px-2.5 py-1 rounded uppercase tracking-wider">
                     {selectedMock}
                   </span>
-                  <div className="text-[10px] text-slate-500 mt-1">Ref: BECE/MOCK/{new Date().getFullYear()}</div>
+                  <div className="text-[9px] text-slate-500 mt-0.5">Ref: BECE/MOCK/{new Date().getFullYear()}</div>
                 </div>
               </div>
 
               {/* Candidate Info Card */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+              <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 mb-3 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Candidate Name</span>
-                  <span className="font-bold text-slate-900 text-sm">{activeCandidateStudent.fullName}</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Candidate Name</span>
+                  <span className="font-bold text-slate-900 text-xs">{activeCandidateStudent.fullName}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">BECE Index / Admission</span>
-                  <span className="font-mono font-bold text-slate-900">{activeCandidateStudent.admissionNo}</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">BECE Index / Admission</span>
+                  <span className="font-mono font-bold text-slate-900 text-xs">{activeCandidateStudent.admissionNo}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Class & Gender</span>
-                  <span className="font-medium text-slate-800">{activeCandidateStudent.classLevel} &bull; {activeCandidateStudent.gender}</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Class & Gender</span>
+                  <span className="font-medium text-slate-800 text-xs">{activeCandidateStudent.classLevel} &bull; {activeCandidateStudent.gender}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Guardian Contact</span>
-                  <span className="font-medium text-slate-800">{activeCandidateStudent.guardianPhone || 'N/A'}</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400 block">Guardian Contact</span>
+                  <span className="font-medium text-slate-800 text-xs">{activeCandidateStudent.guardianPhone || 'N/A'}</span>
                 </div>
               </div>
 
               {/* Subject Breakdown Table */}
-              <div className="mb-6">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 border-b pb-1">
+              <div className="mb-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-1.5 border-b pb-0.5">
                   BECE Subjects Performance Breakdown
                 </h3>
-                <table className="w-full text-left border-collapse text-xs">
+                <table className="w-full text-left border-collapse text-[11px]">
                   <thead>
-                    <tr className="bg-slate-900 text-white font-bold text-[11px]">
-                      <th className="p-2.5">Subject</th>
-                      <th className="p-2.5">Type</th>
-                      <th className="p-2.5 text-center">Raw Score (%)</th>
-                      <th className="p-2.5 text-center">WAEC Stanine Grade</th>
-                      <th className="p-2.5">Remark / Interpretation</th>
+                    <tr className="bg-slate-900 text-white font-bold text-[10px]">
+                      <th className="py-1.5 px-2">Subject</th>
+                      <th className="py-1.5 px-2">Type</th>
+                      <th className="py-1.5 px-2 text-center">Raw Score (%)</th>
+                      <th className="py-1.5 px-2 text-center">WAEC Stanine Grade</th>
+                      <th className="py-1.5 px-2">Remark / Interpretation</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 border-b">
@@ -1270,17 +1295,17 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                       const gObj = convertScoreToWaecGrade(s.score);
                       return (
                         <tr key={s.subject} className="hover:bg-slate-50">
-                          <td className="p-2.5 font-bold text-slate-900">{s.subject}</td>
-                          <td className="p-2.5 text-slate-600 font-medium">
+                          <td className="py-1 px-2 font-bold text-slate-900">{s.subject}</td>
+                          <td className="py-1 px-2 text-slate-600 font-medium text-[10px]">
                             {s.isCore ? <span className="text-indigo-700 font-bold">CORE</span> : 'ELECTIVE'}
                           </td>
-                          <td className="p-2.5 text-center font-semibold text-slate-800">{s.score}%</td>
-                          <td className="p-2.5 text-center font-black text-slate-900">
-                            <span className="inline-block bg-slate-100 text-slate-900 px-2 py-0.5 rounded border border-slate-300 font-extrabold">
+                          <td className="py-1 px-2 text-center font-semibold text-slate-800">{s.score}%</td>
+                          <td className="py-1 px-2 text-center font-black text-slate-900">
+                            <span className="inline-block bg-slate-100 text-slate-900 px-1.5 py-0.2 rounded border border-slate-300 font-extrabold text-[10px]">
                               Grade {s.grade}
                             </span>
                           </td>
-                          <td className="p-2.5 font-medium text-slate-700">{gObj.remark}</td>
+                          <td className="py-1 px-2 font-medium text-slate-700 text-[10.5px]">{gObj.remark}</td>
                         </tr>
                       );
                     })}
@@ -1289,55 +1314,55 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
               </div>
 
               {/* Aggregate Summary Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-amber-50 border-2 border-amber-400 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-black uppercase text-amber-800 tracking-wider block">ACTUAL BECE AGGREGATE</span>
-                  <span className="text-3xl font-black text-amber-900">{String(activeCandidateRecord.actualAggregate).padStart(2, '0')}</span>
-                  <span className="text-[9px] font-bold text-amber-700 block mt-0.5">(4 Core + 2 Best Electives)</span>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                <div className="bg-amber-50 border-2 border-amber-400 rounded-lg p-2 text-center">
+                  <span className="text-[9px] font-black uppercase text-amber-800 tracking-wider block">ACTUAL BECE AGGREGATE</span>
+                  <span className="text-2xl font-black text-amber-900 leading-tight">{String(activeCandidateRecord.actualAggregate).padStart(2, '0')}</span>
+                  <span className="text-[8px] font-bold text-amber-700 block">(4 Core + 2 Best Electives)</span>
                 </div>
 
-                <div className="bg-emerald-50 border-2 border-emerald-400 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider block">BEST 6 AGGREGATE</span>
-                  <span className="text-3xl font-black text-emerald-900">{String(activeCandidateRecord.best6Aggregate).padStart(2, '0')}</span>
-                  <span className="text-[9px] font-bold text-emerald-700 block mt-0.5">(Top 6 Overall Subjects)</span>
+                <div className="bg-emerald-50 border-2 border-emerald-400 rounded-lg p-2 text-center">
+                  <span className="text-[9px] font-black uppercase text-emerald-800 tracking-wider block">BEST 6 AGGREGATE</span>
+                  <span className="text-2xl font-black text-emerald-900 leading-tight">{String(activeCandidateRecord.best6Aggregate).padStart(2, '0')}</span>
+                  <span className="text-[8px] font-bold text-emerald-700 block">(Top 6 Overall Subjects)</span>
                 </div>
 
-                <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-bold uppercase text-indigo-700 block">4 CORE SUM</span>
-                  <span className="text-2xl font-black text-indigo-900">{activeCandidateRecord.coreAggregate}</span>
-                  <span className="text-[9px] text-indigo-600 block mt-0.5">Eng + Math + Sci + Soc</span>
+                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-2 text-center">
+                  <span className="text-[9px] font-bold uppercase text-indigo-700 block">4 CORE SUM</span>
+                  <span className="text-xl font-black text-indigo-900 leading-tight">{activeCandidateRecord.coreAggregate}</span>
+                  <span className="text-[8px] text-indigo-600 block">Eng + Math + Sci + Soc</span>
                 </div>
 
-                <div className="bg-cyan-50 border border-cyan-200 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-bold uppercase text-cyan-700 block">2 BEST ELECTIVES</span>
-                  <span className="text-2xl font-black text-cyan-900">{activeCandidateRecord.best2ElectiveAggregate}</span>
-                  <span className="text-[9px] text-cyan-600 block mt-0.5">Top 2 Elective Grades</span>
+                <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-2 text-center">
+                  <span className="text-[9px] font-bold uppercase text-cyan-700 block">2 BEST ELECTIVES</span>
+                  <span className="text-xl font-black text-cyan-900 leading-tight">{activeCandidateRecord.best2ElectiveAggregate}</span>
+                  <span className="text-[8px] text-cyan-600 block">Top 2 Elective Grades</span>
                 </div>
               </div>
 
               {/* Forecast Box */}
               {activeCandidatePlacement && (
-                <div className="bg-slate-900 text-white rounded-xl p-4 mb-6">
-                  <div className="text-[10px] uppercase font-bold text-amber-400 tracking-widest mb-1">SHS PLACEMENT PREDICTION & QUALIFICATION</div>
-                  <div className="text-base font-black text-white">{activeCandidatePlacement.category}</div>
-                  <div className="text-xs text-slate-300 mt-1">{activeCandidatePlacement.description}</div>
+                <div className="bg-slate-900 text-white rounded-lg p-2.5 mb-3">
+                  <div className="text-[9px] uppercase font-bold text-amber-400 tracking-widest mb-0.5">SHS PLACEMENT PREDICTION & QUALIFICATION</div>
+                  <div className="text-xs md:text-sm font-black text-white">{activeCandidatePlacement.category}</div>
+                  <div className="text-[10.5px] text-slate-300 mt-0.5">{activeCandidatePlacement.description}</div>
                 </div>
               )}
 
               {/* Signatures */}
-              <div className="border-t border-slate-300 pt-6 grid grid-cols-2 gap-8 text-xs text-slate-700">
+              <div className="border-t border-slate-300 pt-2.5 grid grid-cols-2 gap-6 text-[10.5px] text-slate-700">
                 <div>
                   <p className="font-bold text-slate-900">Form Teacher's Remarks & Signature:</p>
-                  <p className="italic text-slate-600 mt-1">"{activeCandidateRecord.actualAggregate <= 18 ? "An outstanding candidate. Keep up the high academic focus!" : "Good effort. Focus on core mathematical and scientific problem solving."}"</p>
-                  <div className="mt-8 border-b border-dashed border-slate-400 w-48" />
-                  <p className="text-[10px] text-slate-500 mt-1">Signature & Date</p>
+                  <p className="italic text-slate-600 mt-0.5 text-[10px]">"{activeCandidateRecord.actualAggregate <= 18 ? "An outstanding candidate. Keep up the high academic focus!" : "Good effort. Focus on core mathematical and scientific problem solving."}"</p>
+                  <div className="mt-4 border-b border-dashed border-slate-400 w-40" />
+                  <p className="text-[9px] text-slate-500 mt-0.5">Signature & Date</p>
                 </div>
 
                 <div className="text-right">
                   <p className="font-bold text-slate-900">Headmaster / Principal Endorsement:</p>
-                  <div className="mt-1 font-bold text-slate-900">{school.headTeacherName || 'Rev. Dr. Headmaster'}</div>
-                  <div className="mt-8 border-b border-dashed border-slate-400 w-48 ml-auto" />
-                  <p className="text-[10px] text-slate-500 mt-1">School Official Stamp & Signature</p>
+                  <div className="mt-0.5 font-bold text-slate-900">{school.headTeacherName || 'Rev. Dr. Headmaster'}</div>
+                  <div className="mt-4 border-b border-dashed border-slate-400 w-40 ml-auto" />
+                  <p className="text-[9px] text-slate-500 mt-0.5">School Official Stamp & Signature</p>
                 </div>
               </div>
             </div>

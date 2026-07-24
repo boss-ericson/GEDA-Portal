@@ -15,6 +15,7 @@ import AnalyticsCenter from './AnalyticsCenter';
 import NewsFeed from './NewsFeed';
 import PastStudents from './PastStudents';
 import BillingComponent from './BillingComponent';
+import AcademicHistoryArchive from './AcademicHistoryArchive';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, setDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { 
@@ -25,7 +26,8 @@ import {
   Calendar, Award, DollarSign, BookOpen, Clock, Key, Sparkles,
   School as SchoolIcon, GraduationCap, Settings, Edit, Menu, User,
   Wand2, KeyRound, Download, Copy, X, Eye, EyeOff,
-  TrendingUp, TrendingDown, Activity, ArrowUpRight, Zap, Building2, Layers, Percent, RefreshCcw
+  TrendingUp, TrendingDown, Activity, ArrowUpRight, Zap, Building2, Layers, Percent, RefreshCcw,
+  Archive
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -1929,6 +1931,18 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 <span>Past Students</span>
               </button>
 
+              <button
+                onClick={() => handleTabChange('academic-history')}
+                className={`${role === 'Teacher' ? 'hidden ' : ''}w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs font-medium transition cursor-pointer ${
+                  activeTab === 'academic-history'
+                    ? 'bg-amber-500 text-slate-950 dark:text-white font-bold'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <Archive className="h-4 w-4 text-amber-400" />
+                <span>Academic History</span>
+              </button>
+
               {role === 'Admin' && (
                 <button
                   onClick={() => handleTabChange('teachers')}
@@ -2076,8 +2090,8 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           {activeTab === 'overview' && role !== 'Teacher' && (
             <div className="space-y-6 fade-in">
               {/* EXECUTIVE COMMAND BANNER */}
-              <div className="bg-slate-900 dark:bg-slate-950 text-white rounded-2xl p-6 border border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div className="space-y-2 max-w-2xl">
+              <div className="bg-slate-900 dark:bg-slate-950 text-white rounded-2xl p-6 border border-slate-800 shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                <div className="space-y-3 max-w-3xl">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-emerald-400 border border-slate-700 text-xs font-semibold">
                       <span className="relative flex h-2 w-2">
@@ -2100,10 +2114,59 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   <p className="text-slate-400 text-sm leading-relaxed">
                     Overview of student enrollment, fee collection efficiency, teaching staff coverage, and system sync.
                   </p>
+
+                  {/* CALENDAR METADATA ROW */}
+                  <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+                    <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl px-3 py-1.5 flex items-center gap-2 text-amber-300 font-semibold">
+                      <Calendar className="h-3.5 w-3.5 text-amber-400" />
+                      <span>Academic Year: <b>{school.academicYear || '2026/2027'}</b></span>
+                    </div>
+
+                    <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl px-3 py-1.5 flex items-center gap-2 text-slate-300">
+                      <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>Active Term: <b>{school.academicTerm || 'First'}</b></span>
+                    </div>
+
+                    <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl px-3 py-1.5 flex items-center gap-2 text-slate-300">
+                      <span className="text-amber-400 font-bold">Reopening:</span>
+                      <span className="font-mono text-white">
+                        {school.reopeningDate 
+                          ? new Date(school.reopeningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                          : '08 Sep 2026'}
+                      </span>
+                    </div>
+
+                    <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl px-3 py-1.5 flex items-center gap-2 text-slate-300">
+                      <span className="text-rose-400 font-bold">Vacation:</span>
+                      <span className="font-mono text-white">
+                        {school.vacationDate 
+                          ? new Date(school.vacationDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                          : '21 Jul 2026'}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => handleTabChange('settings')}
+                      className="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-xl transition flex items-center gap-1 cursor-pointer"
+                      title="Edit active year, term or calendar dates in Settings"
+                    >
+                      <Settings className="h-3 w-3 text-amber-400" />
+                      <span>Edit Dates</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleTabChange('academic-history')}
+                      className="bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[11px] font-bold px-2.5 py-1 rounded-xl transition flex items-center gap-1 cursor-pointer"
+                      title="View historical archives"
+                    >
+                      <Archive className="h-3 w-3" />
+                      <span>History & Archives</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Connectivity & Actions */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full md:w-auto">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full lg:w-auto">
                   <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-3 flex items-center gap-3 text-xs">
                     <div className={`p-2 rounded-lg ${isOffline ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
                       {isOffline ? <WifiOff className="h-4 w-4 animate-pulse" /> : <Wifi className="h-4 w-4" />}
@@ -2945,6 +3008,17 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           {/* TAB: PAST STUDENTS */}
           {activeTab === 'past-students' && (
             <PastStudents school={school} students={[...offlineQueue, ...students]} />
+          )}
+
+          {/* TAB: ACADEMIC HISTORY & ARCHIVE */}
+          {activeTab === 'academic-history' && (
+            <AcademicHistoryArchive 
+              school={school} 
+              students={[...offlineQueue, ...students]} 
+              payments={payments}
+              isOffline={isOffline}
+              onNavigateToTab={handleTabChange}
+            />
           )}
 
           {/* TAB 3: ADMISSIONS PORTAL (REGISTER FORM) */}

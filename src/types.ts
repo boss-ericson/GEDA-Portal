@@ -158,3 +158,29 @@ export interface BeceMockRecord {
   headteacherRemarks?: string;
   updatedAt: string;
 }
+
+export interface CharacterBadge {
+  id: string;
+  studentId: string;
+  schoolId: string;
+  badgeType: 'Punctuality' | 'Academic Excellence' | 'Leadership' | 'Sportsmanship' | 'Peer Mentor' | 'Creative Innovator' | 'Model Citizen';
+  awardedBy: string;
+  date: string;
+  reason?: string;
+  academicYear: string;
+  academicTerm: string;
+}
+
+export interface ParentBroadcastNotice {
+  id: string;
+  schoolId: string;
+  title: string;
+  message: string;
+  targetAudience: 'All Parents' | 'Class-Specific' | 'Debtors Only' | 'JHS Candidates';
+  targetClass?: string;
+  channel: 'SMS Broadcast' | 'WhatsApp Notice' | 'Portal Notice Board';
+  sentBy: string;
+  timestamp: string;
+  recipientsCount: number;
+  status: 'Delivered' | 'Pending' | 'Queued';
+}

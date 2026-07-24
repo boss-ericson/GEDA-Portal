@@ -16,6 +16,8 @@ import NewsFeed from './NewsFeed';
 import PastStudents from './PastStudents';
 import BillingComponent from './BillingComponent';
 import AcademicHistoryArchive from './AcademicHistoryArchive';
+import { ParentNoticeHub } from './ParentNoticeHub';
+import { StudentIDCardGenerator } from './StudentIDCardGenerator';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, setDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { 
@@ -27,7 +29,7 @@ import {
   School as SchoolIcon, GraduationCap, Settings, Edit, Menu, User,
   Wand2, KeyRound, Download, Copy, X, Eye, EyeOff,
   TrendingUp, TrendingDown, Activity, ArrowUpRight, Zap, Building2, Layers, Percent, RefreshCcw,
-  Archive
+  Archive, MessageSquare
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -1883,6 +1885,36 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   <span>NaCCA AI Center</span>
                 </div>
                 <span className="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase">AI</span>
+              </button>
+
+              <button
+                onClick={() => handleTabChange('parent-hub')}
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition cursor-pointer ${
+                  activeTab === 'parent-hub'
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'text-indigo-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <MessageSquare className="h-4 w-4 text-indigo-400" />
+                  <span>Parent Notices & Badges</span>
+                </div>
+                <span className="bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase">SMS</span>
+              </button>
+
+              <button
+                onClick={() => handleTabChange('id-cards')}
+                className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition cursor-pointer ${
+                  activeTab === 'id-cards'
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <CreditCard className="h-4 w-4 text-emerald-400" />
+                  <span>Student ID Cards</span>
+                </div>
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[9px] px-1.5 py-0.2 rounded font-bold uppercase">PRINT</span>
               </button>
 
               {role === 'Admin' && (
@@ -4387,6 +4419,35 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 )}
               </div>
             </div>
+          )}
+
+          {activeTab === 'parent-hub' && (
+            <ParentNoticeHub
+              school={school}
+              students={students}
+              userRole={role}
+              userName={user?.email || 'School Admin'}
+              isOffline={isOffline}
+            />
+          )}
+
+          {activeTab === 'id-cards' && (
+            <StudentIDCardGenerator
+              school={school}
+              students={students}
+              userRole={role}
+              isOffline={isOffline}
+              onUpdateStudentPhoto={async (studentId, photoUrl) => {
+                setStudents(prev => prev.map(s => s.id === studentId ? { ...s, passportPicture: photoUrl } : s));
+                if (!isOffline) {
+                  try {
+                    await updateDoc(doc(db, 'students', studentId), { passportPicture: photoUrl });
+                  } catch (err) {
+                    console.error('Error saving student photo to database:', err);
+                  }
+                }
+              }}
+            />
           )}
 
           {activeTab === 'billing' && (

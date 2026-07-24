@@ -4573,14 +4573,27 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Active Academic Year</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. 2026/2027"
-                            required
+                          <select
                             value={settingsAcademicYear}
                             onChange={(e) => setSettingsAcademicYear(e.target.value)}
-                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:bg-white dark:bg-slate-900 transition"
-                          />
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:bg-white dark:bg-slate-900 transition cursor-pointer font-medium"
+                          >
+                            {(() => {
+                              const sysYr = new Date().getFullYear();
+                              const years: string[] = [];
+                              for (let y = sysYr - 3; y <= sysYr + 5; y++) {
+                                years.push(`${y}/${y + 1}`);
+                              }
+                              if (settingsAcademicYear && !years.includes(settingsAcademicYear)) {
+                                years.unshift(settingsAcademicYear);
+                              }
+                              return years.map(yr => (
+                                <option key={yr} value={yr}>
+                                  {yr} {yr === `${sysYr}/${sysYr + 1}` ? '(Current System Standard)' : ''}
+                                </option>
+                              ));
+                            })()}
+                          </select>
                         </div>
 
                         <div>

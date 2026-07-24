@@ -113,7 +113,7 @@ export default function StudentHistoryModal({ school, student, onClose }: Props)
             <div>TERM: <span style="text-decoration: underline; text-transform: uppercase;">${record.academicTerm}</span></div>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <div>NEXT TERM BEGINS: <span style="text-decoration: underline;">${school.reopeningDate || '...'}</span></div>
+            <div>NEXT TERM BEGINS: <span style="text-decoration: underline;">${school.nextTermBegins || school.reopeningDate || '...'}</span></div>
             <div>VACATION DATE: <span style="text-decoration: underline;">${school.vacationDate || '...'}</span></div>
           </div>
         </div>

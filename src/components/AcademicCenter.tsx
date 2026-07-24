@@ -61,8 +61,27 @@ export default function AcademicCenter({ school, students, isOffline, user, role
   const [activeClass, setActiveClass] = useState<string>('JHS 1');
   const [term, setTerm] = useState<string>(school.academicTerm || 'First');
   const [year, setYear] = useState<string>(school.academicYear || '2026/2027');
-  const [nextTermBegins, setNextTermBegins] = useState<string>(school.reopeningDate || '');
+  const [nextTermBegins, setNextTermBegins] = useState<string>(school.nextTermBegins || '');
   const [passMark, setPassMark] = useState<number>(400);
+
+  useEffect(() => {
+    setNextTermBegins(school.nextTermBegins || '');
+  }, [school.nextTermBegins]);
+
+  const handleNextTermChange = async (val: string) => {
+    setNextTermBegins(val);
+    if (isSchoolAdmin && school.id && !isOffline) {
+      try {
+        await fetch(`/api/v1/schools/${school.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nextTermBegins: val })
+        });
+      } catch (err) {
+        console.error('Failed to sync nextTermBegins:', err);
+      }
+    }
+  };
   
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [editRecord, setEditRecord] = useState<AcademicRecord | null>(null);
@@ -377,7 +396,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
             <div>TERM: <span style="text-decoration: underline; text-transform: uppercase;">${record.academicTerm}</span></div>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <div>NEXT TERM BEGINS: <span style="text-decoration: underline;">${nextTermBegins || school.reopeningDate || '...'}</span></div>
+            <div>NEXT TERM BEGINS: <span style="text-decoration: underline;">${nextTermBegins || school.nextTermBegins || '...'}</span></div>
             <div>VACATION DATE: <span style="text-decoration: underline;">${school.vacationDate || '...'}</span></div>
           </div>
         </div>
@@ -789,7 +808,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
               disabled={!isSchoolAdmin}
               type="date" 
               value={nextTermBegins}
-              onChange={e => setNextTermBegins(e.target.value)}
+              onChange={e => handleNextTermChange(e.target.value)}
               className="text-xs font-semibold text-slate-700 dark:text-slate-300 outline-none w-28 bg-transparent disabled:cursor-not-allowed"
             />
           </div>

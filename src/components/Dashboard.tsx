@@ -251,6 +251,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const [settingsAcademicYear, setSettingsAcademicYear] = useState(school.academicYear || '2026/2027');
   const [settingsAcademicTerm, setSettingsAcademicTerm] = useState(school.academicTerm || 'First');
   const [settingsReopeningDate, setSettingsReopeningDate] = useState(school.reopeningDate || '');
+  const [settingsNextTermBegins, setSettingsNextTermBegins] = useState(school.nextTermBegins || '');
   const [settingsVacationDate, setSettingsVacationDate] = useState(school.vacationDate || '');
   const [savingSettings, setSavingSettings] = useState(false);
   const [settingsSuccess, setSettingsSuccess] = useState('');
@@ -273,6 +274,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     setSettingsAcademicYear(school.academicYear || '2026/2027');
     setSettingsAcademicTerm(school.academicTerm || 'First');
     setSettingsReopeningDate(school.reopeningDate || '');
+    setSettingsNextTermBegins(school.nextTermBegins || '');
     setSettingsVacationDate(school.vacationDate || '');
     setSettingsSuccess('');
     setSettingsError('');
@@ -1180,6 +1182,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
       academicYear: settingsAcademicYear,
       academicTerm: settingsAcademicTerm,
       reopeningDate: settingsReopeningDate,
+      nextTermBegins: settingsNextTermBegins,
       vacationDate: settingsVacationDate,
     };
 
@@ -2142,6 +2145,15 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                         {school.vacationDate 
                           ? new Date(school.vacationDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                           : '21 Jul 2026'}
+                      </span>
+                    </div>
+
+                    <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl px-3 py-1.5 flex items-center gap-2 text-slate-300">
+                      <span className="text-cyan-400 font-bold">Next Term:</span>
+                      <span className="font-mono text-white">
+                        {school.nextTermBegins 
+                          ? new Date(school.nextTermBegins).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                          : 'Pending'}
                       </span>
                     </div>
 
@@ -4625,6 +4637,16 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                             type="date"
                             value={settingsVacationDate}
                             onChange={(e) => setSettingsVacationDate(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:bg-white dark:bg-slate-900 transition"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Next Term Begins Date</label>
+                          <input
+                            type="date"
+                            value={settingsNextTermBegins}
+                            onChange={(e) => setSettingsNextTermBegins(e.target.value)}
                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:bg-white dark:bg-slate-900 transition"
                           />
                         </div>

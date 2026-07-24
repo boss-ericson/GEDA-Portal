@@ -36,6 +36,7 @@ export interface School {
   academicYear?: string;
   academicTerm?: string;
   reopeningDate?: string;
+  nextTermBegins?: string;
   vacationDate?: string;
   status?: 'Active' | 'Deactivated';
   accessLevel?: 'Restricted' | 'Full';

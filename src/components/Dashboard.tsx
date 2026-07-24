@@ -1872,7 +1872,10 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               </button>
 
               <button
-                onClick={() => handleTabChange('ai-center')}
+                onClick={() => {
+                  alert("AI Center will be available to you soon");
+                  handleTabChange('ai-center');
+                }}
                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition cursor-pointer ${
                   activeTab === 'ai-center'
                     ? 'bg-amber-500 text-slate-950 font-bold'

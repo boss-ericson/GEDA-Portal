@@ -2076,70 +2076,119 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           {activeTab === 'overview' && role !== 'Teacher' && (
             <div className="space-y-6 fade-in">
               {/* EXECUTIVE COMMAND BANNER */}
-              <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-emerald-950 text-white rounded-3xl p-6 shadow-xl border border-slate-800 relative overflow-hidden">
-                <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div className="absolute bottom-0 left-1/3 -mb-8 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                  <div className="space-y-2 max-w-2xl">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold backdrop-blur-md">
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        Academic Term 3 • Live Telemetry
+              <div className="bg-slate-900 dark:bg-slate-950 text-white rounded-2xl p-6 border border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="space-y-2 max-w-2xl">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-emerald-400 border border-slate-700 text-xs font-semibold">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-300 text-xs font-mono border border-slate-700/80">
-                        <Building2 className="h-3.5 w-3.5 text-amber-400" />
-                        {school.name || 'GES Model School'}
-                      </span>
-                    </div>
-
-                    <h2 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight">
-                      Institutional Intelligence & Metrics Center
-                    </h2>
-                    <p className="text-slate-300 text-sm leading-relaxed">
-                      Real-time operational indicators across Student Enrollment, Revenue Collections, Teaching Faculty, and Encryption Node Sync.
-                    </p>
+                      Academic Term 3 • Live Operations
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-mono border border-slate-700">
+                      <Building2 className="h-3.5 w-3.5 text-amber-400" />
+                      {school.name || 'GES Model School'}
+                    </span>
                   </div>
 
-                  {/* Header Actions & Telemetry Badges */}
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full md:w-auto">
-                    <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-3 flex items-center gap-3 text-xs">
-                      <div className={`p-2 rounded-xl ${isOffline ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
-                        {isOffline ? <WifiOff className="h-4 w-4 animate-pulse" /> : <Wifi className="h-4 w-4" />}
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Node Connectivity</div>
-                        <div className="font-bold text-white flex items-center gap-1">
-                          {isOffline ? 'OFFLINE CACHING ACTIVE' : 'GES NODE SYNCHRONIZED'}
-                        </div>
+                  <h2 className="text-2xl sm:text-3xl font-display font-bold text-white tracking-tight">
+                    Metrics & Operational Center
+                  </h2>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    Overview of student enrollment, fee collection efficiency, teaching staff coverage, and system sync.
+                  </p>
+                </div>
+
+                {/* Connectivity & Actions */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full md:w-auto">
+                  <div className="bg-slate-800/80 border border-slate-700 rounded-xl p-3 flex items-center gap-3 text-xs">
+                    <div className={`p-2 rounded-lg ${isOffline ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
+                      {isOffline ? <WifiOff className="h-4 w-4 animate-pulse" /> : <Wifi className="h-4 w-4" />}
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">System Node</div>
+                      <div className="font-bold text-white flex items-center gap-1">
+                        {isOffline ? 'OFFLINE CACHING' : 'GES NODE ONLINE'}
                       </div>
                     </div>
-
-                    {offlineQueue.length > 0 && (
-                      <button
-                        onClick={handleOfflineSync}
-                        className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-3 rounded-2xl shadow-lg transition flex items-center justify-center gap-2 cursor-pointer border border-amber-300/40"
-                      >
-                        <RefreshCcw className="h-4 w-4 animate-spin" />
-                        <span>Sync {offlineQueue.length} Pending Records</span>
-                      </button>
-                    )}
                   </div>
+
+                  {offlineQueue.length > 0 && (
+                    <button
+                      onClick={handleOfflineSync}
+                      className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer border border-amber-300/40"
+                    >
+                      <RefreshCcw className="h-4 w-4 animate-spin" />
+                      <span>Sync {offlineQueue.length} Records</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* KPI CARDS GRID (5 EXECUTIVE METRICS) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* METRICS CARDS GRID (FEATURED ASYMMETRIC LAYOUT) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4">
                 
-                {/* KPI 1: Student Enrollment */}
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200 space-y-3 relative overflow-hidden group">
+                {/* FEATURED CARD 1: Revenue & Fee Collections (Spotlight - 6 Cols) */}
+                <div className="lg:col-span-6 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Enrollment</span>
-                    <div className="h-10 w-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900/50 group-hover:scale-105 transition-transform">
-                      <Users className="h-5 w-5" />
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Financial Revenue & Collections</span>
+                      <h3 className="font-display font-bold text-lg text-slate-950 dark:text-white">Fee Settlement Summary</h3>
+                    </div>
+                    <div className="h-10 w-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-800">
+                      <DollarSign className="h-5 w-5" />
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4 items-baseline">
+                    <div>
+                      <span className="text-xs text-slate-400 block font-medium">Total Fees Collected</span>
+                      <div className="text-3xl font-display font-bold text-emerald-600 dark:text-emerald-400 tracking-tight mt-0.5">
+                        GH₵ {(totalFeesPaid || 0).toLocaleString()}
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                          <TrendingUp className="h-3.5 w-3.5" />
+                          {collectionRate}% Efficiency
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 bg-slate-50 dark:bg-slate-950 p-3 rounded-xl border border-slate-100 dark:border-slate-800 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Expected Total:</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">GH₵ {(totalFeesExpected || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500">Arrears Owed:</span>
+                        <span className="font-semibold text-rose-600 dark:text-rose-400">GH₵ {(totalFeesOutstanding || 0).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex justify-between text-xs font-semibold">
+                      <span className="text-slate-600 dark:text-slate-300">Target Progress</span>
+                      <button onClick={() => handleTabChange('payments')} className="text-brand-green-700 hover:underline cursor-pointer flex items-center gap-1">
+                        <span>Open MoMo Ledger</span>
+                        <ArrowUpRight className="h-3 w-3" />
+                      </button>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden flex">
+                      <div className="bg-emerald-600 h-full transition-all duration-500" style={{ width: `${collectionRate}%` }}></div>
+                      <div className="bg-rose-400 h-full transition-all duration-500" style={{ width: `${100 - collectionRate}%` }}></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CARD 2: Student Enrollment (3 Cols) */}
+                <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Student Body</span>
+                    <div className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-800">
+                      <Users className="h-4 w-4" />
                     </div>
                   </div>
 
@@ -2147,36 +2196,30 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                     <div className="text-3xl font-display font-bold text-slate-950 dark:text-white tracking-tight">
                       {totalStudents}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
-                        {admittedStudents} Admitted ({admissionRate}%)
+                    <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                      <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                        {admittedStudents} Admitted
                       </span>
                       {pendingStudents > 0 && (
-                        <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">
-                          {pendingStudents} pending
+                        <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/80 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800">
+                          {pendingStudents} Pending
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Mini Progress Bar */}
-                  <div className="space-y-1 pt-1">
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-emerald-600 h-full rounded-full transition-all duration-500" style={{ width: `${admissionRate}%` }}></div>
-                    </div>
-                    <div className="flex justify-between text-[10px] text-slate-400">
-                      <span>Verified Admissions</span>
-                      <span>{admissionRate}% Rate</span>
-                    </div>
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs text-slate-500">
+                    <span>JHS: <strong className="text-slate-900 dark:text-slate-200">{jhsStudentsCount}</strong></span>
+                    <span>Primary: <strong className="text-slate-900 dark:text-slate-200">{primaryStudentsCount}</strong></span>
                   </div>
                 </div>
 
-                {/* KPI 2: Teaching Staff & Faculty */}
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200 space-y-3 relative overflow-hidden group">
+                {/* CARD 3: Faculty & Teaching Staff (3 Cols) */}
+                <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Teaching Faculty</span>
-                    <div className="h-10 w-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900/50 group-hover:scale-105 transition-transform">
-                      <GraduationCap className="h-5 w-5" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Teaching Staff</span>
+                    <div className="h-9 w-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-200 dark:border-purple-800">
+                      <GraduationCap className="h-4 w-4" />
                     </div>
                   </div>
 
@@ -2184,196 +2227,69 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                     <div className="text-3xl font-display font-bold text-slate-950 dark:text-white tracking-tight">
                       {teachers.length}
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/80 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800">
-                        {classTeacherCount} Class Teachers ({classTeacherCoverage}%)
-                      </span>
-                    </div>
+                    <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/80 px-2 py-0.5 rounded-md border border-purple-200 dark:border-purple-800 inline-block mt-2">
+                      {classTeacherCount} Class Teachers ({classTeacherCoverage}%)
+                    </p>
                   </div>
 
-                  {/* Staff Breakdown */}
-                  <div className="space-y-1 pt-1">
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden flex">
-                      <div className="bg-blue-600 h-full" style={{ width: `${teachers.length > 0 ? Math.round((teacherMaleCount / teachers.length) * 100) : 50}%` }}></div>
-                      <div className="bg-pink-500 h-full" style={{ width: `${teachers.length > 0 ? Math.round((teacherFemaleCount / teachers.length) * 100) : 50}%` }}></div>
-                    </div>
-                    <div className="flex justify-between text-[10px] text-slate-400">
-                      <span>{teacherMaleCount} Male</span>
-                      <span>{teacherFemaleCount} Female</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* KPI 3: Revenue Collected */}
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200 space-y-3 relative overflow-hidden group">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Fees Collected</span>
-                    <div className="h-10 w-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900/50 group-hover:scale-105 transition-transform">
-                      <DollarSign className="h-5 w-5" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-2xl font-display font-bold text-emerald-700 dark:text-emerald-400 tracking-tight">
-                      GH₵ {(totalFeesPaid || 0).toLocaleString()}
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-xs font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-100/80 dark:bg-emerald-900/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3" />
-                        {collectionRate}% Collection Efficiency
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Revenue Progress */}
-                  <div className="space-y-1 pt-1">
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-emerald-600 h-full rounded-full transition-all duration-500" style={{ width: `${collectionRate}%` }}></div>
-                    </div>
-                    <div className="flex justify-between text-[10px] text-slate-400">
-                      <span>Verified Revenue</span>
-                      <span>Target: GH₵ {(totalFeesExpected || 0).toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* KPI 4: Outstanding Arrears */}
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200 space-y-3 relative overflow-hidden group">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Outstanding Arrears</span>
-                    <div className="h-10 w-10 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-100 dark:border-rose-900/50 group-hover:scale-105 transition-transform">
-                      <CreditCard className="h-5 w-5" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-2xl font-display font-bold text-rose-600 dark:text-rose-400 tracking-tight">
-                      GH₵ {(totalFeesOutstanding || 0).toLocaleString()}
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className="text-xs font-medium text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/80 px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-800">
-                        {100 - collectionRate}% Pending Settlement
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Arrears Indicator */}
-                  <div className="space-y-1 pt-1">
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-rose-500 h-full rounded-full transition-all duration-500" style={{ width: `${100 - collectionRate}%` }}></div>
-                    </div>
-                    <div className="flex justify-between text-[10px] text-slate-400">
-                      <span>Tuition & Boarding Dues</span>
-                      <button onClick={() => handleTabChange('payments')} className="text-brand-green-700 hover:underline font-semibold cursor-pointer">
-                        View Log →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* KPI 5: Offline Cache */}
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200 space-y-3 relative overflow-hidden group">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Offline Cache</span>
-                    <div className={`h-10 w-10 rounded-2xl flex items-center justify-center shrink-0 border transition-transform group-hover:scale-105 ${
-                      offlineQueue.length > 0 
-                        ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border-amber-300 animate-pulse' 
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
-                    }`}>
-                      <WifiOff className="h-5 w-5" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-3xl font-display font-bold text-slate-950 dark:text-white tracking-tight">
-                      {offlineQueue.length}
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-md border ${
-                        offlineQueue.length > 0
-                          ? 'text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 border-amber-200'
-                          : 'text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
-                      }`}>
-                        {offlineQueue.length > 0 ? 'Awaiting Auto Sync' : 'Cache Clear & Ready'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Cache Status */}
-                  <div className="space-y-1 pt-1">
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full ${offlineQueue.length > 0 ? 'bg-amber-500 w-full' : 'bg-emerald-500 w-full'}`}></div>
-                    </div>
-                    <div className="flex justify-between text-[10px] text-slate-400">
-                      <span>Encrypted Storage</span>
-                      <span>Local Node</span>
-                    </div>
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between text-xs text-slate-500">
+                    <span>Male: <strong className="text-blue-600">{teacherMaleCount}</strong></span>
+                    <span>Female: <strong className="text-pink-600">{teacherFemaleCount}</strong></span>
                   </div>
                 </div>
 
               </div>
 
-              {/* DYNAMIC ANALYTICS & DEMOGRAPHICS COMMAND GRID */}
+              {/* DYNAMIC ANALYTICS & DEMOGRAPHICS GRID */}
               <div className="grid lg:grid-cols-12 gap-6">
                 
-                {/* CHART 1: Enrollment Timeline & Intake Velocity (7 Cols) */}
-                <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                {/* CHART 1: Enrollment Intake Velocity (7 Cols) */}
+                <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                     <div>
                       <div className="flex items-center gap-2">
-                        <BarChart3 className="h-5 w-5 text-brand-green-700 dark:text-brand-green-400" />
+                        <BarChart3 className="h-5 w-5 text-emerald-600" />
                         <h3 className="font-display font-bold text-slate-950 dark:text-white text-base">
-                          Monthly Student Intake Velocity
+                          Monthly Student Admissions Trend
                         </h3>
                       </div>
                       <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
-                        Linear index of student admissions recorded across academic terms.
+                        Historical timeline of registered student admissions across terms.
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-medium">
-                      <span className="bg-white dark:bg-slate-700 text-slate-900 dark:text-white px-3 py-1 rounded-lg shadow-xs font-semibold">
-                        Admission Index
-                      </span>
-                      <span className="text-slate-400 px-2">
-                        {intakeData.reduce((acc: number, curr: any) => acc + Number(curr.count || 0), 0)} Total Logged
-                      </span>
+                    <div className="bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      {intakeData.reduce((acc: number, curr: any) => acc + Number(curr.count || 0), 0)} Registrations Logged
                     </div>
                   </div>
 
                   {/* Recharts Area Chart */}
-                  <div className="h-72 w-full relative pt-2">
+                  <div className="h-64 w-full relative pt-2">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={intakeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <defs>
-                          <linearGradient id="colorCountExecutive" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#15803d" stopOpacity={0.4}/>
-                            <stop offset="95%" stopColor="#15803d" stopOpacity={0.0}/>
-                          </linearGradient>
-                        </defs>
-                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.15} />
+                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" opacity={0.3} />
                         <RechartsTooltip 
                           contentStyle={{ 
                             backgroundColor: '#0f172a', 
                             color: '#ffffff',
-                            borderRadius: '16px', 
-                            border: '1px solid #1e293b', 
+                            borderRadius: '12px', 
+                            border: 'none', 
                             boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)', 
                             fontSize: '12px',
-                            padding: '12px 16px'
+                            padding: '10px 14px'
                           }}
-                          formatter={(value: any) => [`${value} Students Registered`, 'Monthly Intake']}
+                          formatter={(value: any) => [`${value} Students`, 'Admissions']}
                         />
                         <Area 
                           type="monotone" 
                           dataKey="count" 
-                          stroke="#15803d" 
-                          strokeWidth={3.5} 
-                          fillOpacity={1} 
-                          fill="url(#colorCountExecutive)" 
-                          activeDot={{ r: 7, strokeWidth: 2, stroke: '#ffffff' }} 
+                          stroke="#16a34a" 
+                          strokeWidth={2.5} 
+                          fill="#dcfce7" 
+                          fillOpacity={0.6}
+                          activeDot={{ r: 6, strokeWidth: 2, stroke: '#ffffff' }} 
                         />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -2381,8 +2297,8 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
                   {/* Chart Summary Footer */}
                   <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800 text-center text-xs">
-                    <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Peak Intake Month</span>
+                    <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Peak Month</span>
                       <span className="font-bold text-slate-900 dark:text-white">
                         {(() => {
                           const maxCount = Math.max(...intakeData.map(d => d.count), 0);
@@ -2391,39 +2307,39 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                         })()}
                       </span>
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Average Registration</span>
-                      <span className="font-bold text-brand-green-700 dark:text-brand-green-400">
+                    <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Monthly Average</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">
                         {Math.round(intakeData.reduce((acc: number, curr: any) => acc + Number(curr.count || 0), 0) / (intakeData.length || 1))} / Month
                       </span>
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 block">System Verification</span>
+                    <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Record Status</span>
                       <span className="font-bold text-emerald-600 flex items-center justify-center gap-1">
-                        <CheckCircle2 className="h-3.5 w-3.5" /> 100% Verified
+                        <CheckCircle2 className="h-3.5 w-3.5" /> Synchronized
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* CHART 2: DEMOGRAPHICS & STAFFING RATIOS (5 Cols) */}
-                <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
-                  <div className="pb-2 border-b border-slate-100 dark:border-slate-800">
+                <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-4">
+                  <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <Layers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       <h3 className="font-display font-bold text-slate-950 dark:text-white text-base">
-                        Demographic & Faculty Distribution
+                        Demographic Ratios
                       </h3>
                     </div>
                     <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
-                      Ratios across Registered Students, Faculty Staff, and Boarding System.
+                      Breakdown across student gender, faculty distribution, and residency.
                     </p>
                   </div>
 
-                  {/* 3 Interactive Rings Grid */}
+                  {/* 3 Donut Rings Grid */}
                   <div className="grid grid-cols-3 gap-2 h-44 items-center">
                     
-                    {/* Student Gender Ring */}
+                    {/* Student Gender Donut */}
                     <div className="flex flex-col items-center justify-center space-y-1">
                       <div className="h-28 w-full relative">
                         <ResponsiveContainer width="100%" height="100%">
@@ -2446,20 +2362,20 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                           </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                             {totalStudents}
                           </span>
                         </div>
                       </div>
-                      <div className="text-center text-[11px] font-bold text-slate-800 dark:text-slate-200">
-                        Student Gender
-                        <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="text-center text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Students
+                        <div className="text-[10px] font-medium text-slate-500 mt-0.5">
                           <span className="text-blue-600 font-bold">{mCount} M</span> / <span className="text-pink-500 font-bold">{fCount} F</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Teacher Gender Ring */}
+                    {/* Teacher Gender Donut */}
                     <div className="flex flex-col items-center justify-center space-y-1">
                       <div className="h-28 w-full relative">
                         <ResponsiveContainer width="100%" height="100%">
@@ -2482,20 +2398,20 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                           </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                             {teachers.length}
                           </span>
                         </div>
                       </div>
-                      <div className="text-center text-[11px] font-bold text-slate-800 dark:text-slate-200">
-                        Faculty Staff
-                        <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="text-center text-xs font-bold text-slate-800 dark:text-slate-200">
+                        Faculty
+                        <div className="text-[10px] font-medium text-slate-500 mt-0.5">
                           <span className="text-blue-600 font-bold">{teacherMaleCount} M</span> / <span className="text-pink-500 font-bold">{teacherFemaleCount} F</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Boarding System Ring */}
+                    {/* Boarding System Donut */}
                     <div className="flex flex-col items-center justify-center space-y-1">
                       <div className="h-28 w-full relative">
                         <ResponsiveContainer width="100%" height="100%">
@@ -2518,14 +2434,14 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                           </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                             {dayCount + boardingCount}
                           </span>
                         </div>
                       </div>
-                      <div className="text-center text-[11px] font-bold text-slate-800 dark:text-slate-200">
+                      <div className="text-center text-xs font-bold text-slate-800 dark:text-slate-200">
                         Residency
-                        <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                        <div className="text-[10px] font-medium text-slate-500 mt-0.5">
                           <span className="text-amber-600 font-bold">{dayCount} Day</span> / <span className="text-emerald-600 font-bold">{boardingCount} Brd</span>
                         </div>
                       </div>
@@ -2533,16 +2449,16 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
                   </div>
 
-                  {/* Executive Intelligence Insight Box */}
-                  <div className="bg-slate-900 text-white p-4 rounded-2xl border border-slate-800 text-xs space-y-2 relative overflow-hidden">
-                    <div className="flex items-center gap-2 text-amber-400 font-bold text-[11px] uppercase tracking-wider">
-                      <Sparkles className="h-4 w-4 shrink-0" />
-                      <span>Executive Faculty Guidance</span>
+                  {/* Executive Guidance Note */}
+                  <div className="bg-slate-50 dark:bg-slate-950 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
+                      <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                      <span>Operational Note</span>
                     </div>
-                    <p className="text-slate-300 text-xs leading-relaxed">
+                    <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">
                       {teachers.length > 0 
-                        ? `${teachers.length} teachers cover active primary & JHS classes. Gender ratio stands at ${Math.round((teacherMaleCount / teachers.length) * 100)}% Male to ${Math.round((teacherFemaleCount / teachers.length) * 100)}% Female.`
-                        : 'No faculty members registered. Add teachers in the Staff Registry to monitor class allocations.'}
+                        ? `${teachers.length} registered teachers assigned across Primary and JHS departments. Collection rate is currently at ${collectionRate}%.`
+                        : 'No faculty registered. Add staff members in Staff Registry to manage class coverage.'}
                     </p>
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 import { useReactToPrint } from 'react-to-print';
@@ -1656,149 +1657,164 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   } as React.CSSProperties : {};
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-800 flex flex-col font-sans text-slate-800 dark:text-slate-200" style={dynamicStyles}>
+    <div className="h-screen max-h-screen overflow-hidden bg-slate-100 dark:bg-slate-800 flex flex-col font-sans text-slate-800 dark:text-slate-200" style={dynamicStyles}>
 
-      
-      {/* Upper color indicator stripe representing the Ghanaian flag */}
-      <div className="h-1.5 w-full flex no-print">
-        <div className="h-full bg-red-600 flex-1"></div>
-        <div className="h-full bg-amber-400 flex-1"></div>
-        <div className="h-full bg-green-700 flex-1"></div>
-      </div>
-
-      {/* Connectivity Status Banner */}
-      <div className={`py-2 px-4 flex flex-wrap items-center justify-between border-b no-print text-xs font-medium transition ${
-        isOffline 
-          ? 'bg-red-50 border-red-100 text-red-900' 
-          : 'bg-brand-green-50 border-brand-green-100 text-brand-green-900'
-      }`}>
-        <div className="flex items-center gap-2">
-          {isOffline ? (
-            <div className="flex items-center gap-1.5">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-              </span>
-              <span className="font-semibold uppercase font-display tracking-wide">Offline Local Sandbox Mode Enabled</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-brand-green-600"></span>
-              <span className="font-semibold uppercase font-display tracking-wide">Connected to GEDA Cloud servers</span>
-            </div>
-          )}
-          {offlineQueue.length > 0 && (
-            <span className="bg-amber-400 text-slate-950 dark:text-white font-semibold px-2 py-0.5 rounded-full text-[10px]">
-              {offlineQueue.length} record{offlineQueue.length > 1 ? 's' : ''} waiting to Sync
-            </span>
-          )}
+      {/* Fixed Top Header Container */}
+      <div className="shrink-0 z-30 bg-white dark:bg-slate-900 border-b border-[#274C77]/15 no-print shadow-2xs">
+        {/* Upper color indicator stripe representing the Ghanaian flag */}
+        <div className="h-1.5 w-full flex">
+          <div className="h-full bg-red-600 flex-1"></div>
+          <div className="h-full bg-amber-400 flex-1"></div>
+          <div className="h-full bg-green-700 flex-1"></div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {offlineQueue.length > 0 && !isOffline && (
-            <button
-              onClick={handleOfflineSync}
-              disabled={isSyncing}
-              className="bg-brand-green-700 hover:bg-brand-green-800 text-white font-semibold py-1 px-3 rounded-lg flex items-center gap-1.5 transition cursor-pointer"
-            >
-              <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
-              Sync Offline Cache Now
-            </button>
-          )}
-
-          <div className="flex items-center gap-2 border-l border-slate-300 dark:border-slate-600 pl-3">
-            <span className="text-slate-500 dark:text-slate-400">Test Network Break:</span>
-            <button
-              onClick={handleOfflineToggle}
-              className={`px-2.5 py-1 rounded-lg text-[10px] uppercase font-bold tracking-wider cursor-pointer border transition ${
-                isOffline
-                  ? 'bg-brand-green-700 text-white border-brand-green-800'
-                  : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-red-600 hover:bg-red-50'
-              }`}
-            >
-              {isOffline ? 'Simulate Reconnect' : 'Trigger Offline Mode'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Dashboard Header */}
-      <header className="bg-white border-b border-[#274C77]/15 h-15 px-5 flex items-center justify-between gap-3 no-print shadow-2xs">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 hover:bg-[#EEF6FC] rounded-lg text-[#274C77] transition-colors cursor-pointer"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="text-white p-1.5 rounded-xl flex items-center justify-center overflow-hidden h-9 w-9 shadow-inner bg-[#0B1E2D]">
-            {school.logo ? (
-              <img src={school.logo} alt="Emblem" className="h-full w-full object-contain" referrerPolicy="no-referrer" />
+        {/* Connectivity Status Banner */}
+        <div className={`py-2 px-4 flex flex-wrap items-center justify-between border-b text-xs font-medium transition ${
+          isOffline 
+            ? 'bg-red-50 border-red-100 text-red-900' 
+            : 'bg-brand-green-50 border-brand-green-100 text-brand-green-900'
+        }`}>
+          <div className="flex items-center gap-2">
+            {isOffline ? (
+              <div className="flex items-center gap-1.5">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                </span>
+                <span className="font-semibold uppercase font-display tracking-wide">Offline Local Sandbox Mode Enabled</span>
+              </div>
             ) : (
-              <SchoolIcon className="h-5 w-5 text-[#DCEAF6]" />
+              <div className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-brand-green-600"></span>
+                <span className="font-semibold uppercase font-display tracking-wide">Connected to GEDA Cloud servers</span>
+              </div>
+            )}
+            {offlineQueue.length > 0 && (
+              <span className="bg-amber-400 text-slate-950 dark:text-white font-semibold px-2 py-0.5 rounded-full text-[10px]">
+                {offlineQueue.length} record{offlineQueue.length > 1 ? 's' : ''} waiting to Sync
+              </span>
             )}
           </div>
-          <div>
-            <h1 className="font-display font-bold text-sm text-[#0B1E2D] flex items-center gap-2">
-              {role === 'Teacher' ? `${getGreeting()}, ${user?.fullName || 'Teacher'}` : school.name}
-              {role !== 'Teacher' && <span className="text-[10px] bg-[#EEF6FC] text-[#274C77] px-2 py-0.5 rounded-full font-mono font-medium border border-[#274C77]/15">{school.region}</span>}
-            </h1>
-            <p className="text-[10px] text-[#274C77]/80 font-medium">
-              {role === 'Teacher' ? school.name : `District: ${school.district} | Multi-tenant space`}
-            </p>
+
+          <div className="flex items-center gap-3">
+            {offlineQueue.length > 0 && !isOffline && (
+              <button
+                onClick={handleOfflineSync}
+                disabled={isSyncing}
+                className="bg-brand-green-700 hover:bg-brand-green-800 text-white font-semibold py-1 px-3 rounded-lg flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                Sync Offline Cache Now
+              </button>
+            )}
+
+            <div className="flex items-center gap-2 border-l border-slate-300 dark:border-slate-600 pl-3">
+              <span className="text-slate-500 dark:text-slate-400">Test Network Break:</span>
+              <button
+                onClick={handleOfflineToggle}
+                className={`px-2.5 py-1 rounded-lg text-[10px] uppercase font-bold tracking-wider cursor-pointer border transition ${
+                  isOffline
+                    ? 'bg-brand-green-700 text-white border-brand-green-800'
+                    : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600 text-red-600 hover:bg-red-50'
+                }`}
+              >
+                {isOffline ? 'Simulate Reconnect' : 'Trigger Offline Mode'}
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Simulation Role-Based Switcher */}
-          {isDemo && (
-            <div className="bg-[#EEF6FC] p-1 rounded-xl border border-[#274C77]/15 hidden sm:flex items-center gap-1">
-              <span className="text-[9px] font-bold text-[#274C77] uppercase tracking-wider px-1.5">Role:</span>
-              {(['Admin', 'Staff', 'Teacher'] as Role[]).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => onRoleChange(r)}
-                  className={`text-[10px] px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${
-                    role === r
-                      ? 'bg-[#0B1E2D] text-white shadow-xs'
-                      : 'text-[#274C77] hover:bg-[#DCEAF6]'
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <button
-            onClick={onLogout}
-            className="flex items-center gap-1.5 border border-[#274C77]/20 hover:bg-[#EEF6FC] text-[#0B1E2D] py-1.5 px-3 rounded-xl transition text-xs font-semibold cursor-pointer shadow-2xs"
-          >
-            <LogOut className="h-3.5 w-3.5 text-[#274C77]" />
-            <span className="hidden md:inline">Log Out Portal</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Content Body Grid */}
-      <div className="flex-1 grid md:grid-cols-12 relative">
-        
-        {/* Navigation Sidebar Drawer */}
-        {isSidebarOpen && (
-          <>
-            {/* Mobile backdrop overlay */}
-            <div 
-              className="fixed inset-0 bg-[#0B1E2D]/60 backdrop-blur-xs z-40 md:hidden no-print"
-              onClick={() => setIsSidebarOpen(false)}
-            />
-            <aside 
-              className="fixed md:relative inset-y-0 left-0 z-50 w-64 md:w-auto text-white flex flex-col border-r border-[#13293D] p-3 space-y-1.5 no-print md:col-span-3 lg:col-span-2 shadow-2xl md:shadow-none bg-[#0B1E2D]" 
+        {/* Main Dashboard Header */}
+        <header className="bg-white dark:bg-slate-900 h-15 px-5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-1.5 hover:bg-[#EEF6FC] dark:hover:bg-slate-800 rounded-lg text-[#274C77] dark:text-slate-200 transition-colors cursor-pointer"
+              title={isSidebarOpen ? "Hide Sidebar" : "Show Sidebar"}
             >
-          <div className="pb-2.5 border-b border-[#274C77]/20 mb-2 px-2">
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="text-white p-1.5 rounded-xl flex items-center justify-center overflow-hidden h-9 w-9 shadow-inner bg-[#0B1E2D]">
+              {school.logo ? (
+                <img src={school.logo} alt="Emblem" className="h-full w-full object-contain" referrerPolicy="no-referrer" />
+              ) : (
+                <SchoolIcon className="h-5 w-5 text-[#DCEAF6]" />
+              )}
+            </div>
+            <div>
+              <h1 className="font-display font-bold text-sm text-[#0B1E2D] dark:text-white flex items-center gap-2">
+                {role === 'Teacher' ? `${getGreeting()}, ${user?.fullName || 'Teacher'}` : school.name}
+                {role !== 'Teacher' && <span className="text-[10px] bg-[#EEF6FC] dark:bg-slate-800 text-[#274C77] dark:text-slate-200 px-2 py-0.5 rounded-full font-mono font-medium border border-[#274C77]/15">{school.region}</span>}
+              </h1>
+              <p className="text-[10px] text-[#274C77]/80 dark:text-slate-400 font-medium">
+                {role === 'Teacher' ? school.name : `District: ${school.district} | Multi-tenant space`}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Simulation Role-Based Switcher */}
+            {isDemo && (
+              <div className="bg-[#EEF6FC] dark:bg-slate-800 p-1 rounded-xl border border-[#274C77]/15 hidden sm:flex items-center gap-1">
+                <span className="text-[9px] font-bold text-[#274C77] dark:text-slate-300 uppercase tracking-wider px-1.5">Role:</span>
+                {(['Admin', 'Staff', 'Teacher'] as Role[]).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => onRoleChange(r)}
+                    className={`text-[10px] px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer ${
+                      role === r
+                        ? 'bg-[#0B1E2D] text-white shadow-xs'
+                        : 'text-[#274C77] dark:text-slate-300 hover:bg-[#DCEAF6] dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1.5 border border-[#274C77]/20 hover:bg-[#EEF6FC] dark:hover:bg-slate-800 text-[#0B1E2D] dark:text-slate-200 py-1.5 px-3 rounded-xl transition text-xs font-semibold cursor-pointer shadow-2xs"
+            >
+              <LogOut className="h-3.5 w-3.5 text-[#274C77] dark:text-slate-300" />
+              <span className="hidden md:inline">Log Out Portal</span>
+            </button>
+          </div>
+        </header>
+      </div>
+
+      {/* Content Body Grid / Viewport */}
+      <div className="flex-1 flex overflow-hidden relative w-full h-full">
+        
+        {/* Navigation Sidebar Drawer with Smooth Collapse Animation */}
+        <AnimatePresence initial={false}>
+          {isSidebarOpen && (
+            <>
+              {/* Mobile backdrop overlay */}
+              <motion.div 
+                key="sidebar-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-[#0B1E2D]/60 backdrop-blur-xs z-40 md:hidden no-print"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+              <motion.aside 
+                key="sidebar-drawer"
+                initial={{ width: 0, opacity: 0, x: -20 }}
+                animate={{ width: 256, opacity: 1, x: 0 }}
+                exit={{ width: 0, opacity: 0, x: -20 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="fixed md:relative inset-y-0 left-0 z-50 md:z-20 w-64 shrink-0 text-white flex flex-col border-r border-[#13293D] p-3 space-y-1.5 no-print shadow-2xl md:shadow-none bg-[#0B1E2D] h-full overflow-y-auto overflow-x-hidden" 
+              >
+          <div className="pb-2.5 border-b border-[#274C77]/20 mb-2 px-2 shrink-0">
             <span className="text-[10px] font-bold text-[#4A6FA5] uppercase tracking-widest block">Management</span>
             <span className="text-[11px] font-medium text-[#DCEAF6]/80 block mt-0.5">Logged as <b className="text-white font-semibold">{role}</b></span>
           </div>
 
+          <div className="flex-1 overflow-y-auto space-y-1.5 pr-0.5">
           {school.accessLevel !== 'Restricted' && (
             <>
               <button
@@ -1810,7 +1826,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <BarChart3 className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Metrics Center</span>
+                <span className="whitespace-nowrap">Metrics Center</span>
               </button>
               <button
                 onClick={() => handleTabChange('analytics')}
@@ -1821,7 +1837,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <BarChart3 className="h-4 w-4 text-[#DCEAF6]" />
-                <span>School Analytics</span>
+                <span className="whitespace-nowrap">School Analytics</span>
               </button>
 
               <button
@@ -1833,7 +1849,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <Users className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Student Registry</span>
+                <span className="whitespace-nowrap">Student Registry</span>
               </button>
               <button
                 onClick={() => handleTabChange('classes')}
@@ -1844,7 +1860,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <BookOpen className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Classes</span>
+                <span className="whitespace-nowrap">Classes</span>
               </button>
               <button
                 onClick={() => handleTabChange('academic')}
@@ -1855,7 +1871,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <Award className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Academic Center</span>
+                <span className="whitespace-nowrap">Academic Center</span>
               </button>
 
               <button
@@ -1867,7 +1883,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <GraduationCap className="h-4 w-4 text-[#DCEAF6]" />
-                <span>BECE Mock Exams</span>
+                <span className="whitespace-nowrap">BECE Mock Exams</span>
               </button>
 
               <button
@@ -1883,7 +1899,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               >
                 <div className="flex items-center gap-2.5">
                   <Sparkles className="h-4 w-4 text-[#4A6FA5]" />
-                  <span>NaCCA AI Center</span>
+                  <span className="whitespace-nowrap">NaCCA AI Center</span>
                 </div>
                 <span className="bg-[#274C77]/60 text-[#DCEAF6] border border-[#4A6FA5]/30 text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase">AI</span>
               </button>
@@ -1898,7 +1914,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               >
                 <div className="flex items-center gap-2.5">
                   <MessageSquare className="h-4 w-4 text-[#4A6FA5]" />
-                  <span>Parent Notices & Badges</span>
+                  <span className="whitespace-nowrap">Parent Notices & Badges</span>
                 </div>
                 <span className="bg-[#274C77]/60 text-[#DCEAF6] border border-[#4A6FA5]/30 text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase">SMS</span>
               </button>
@@ -1913,7 +1929,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   }`}
                 >
                   <FileText className="h-4 w-4 text-[#DCEAF6]" />
-                  <span>Transcripts</span>
+                  <span className="whitespace-nowrap">Transcripts</span>
                 </button>
               )}
               <button
@@ -1925,7 +1941,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <ShieldCheck className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Mark Attendance</span>
+                <span className="whitespace-nowrap">Mark Attendance</span>
               </button>
 
               <button
@@ -1937,7 +1953,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <BookOpen className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Promotions</span>
+                <span className="whitespace-nowrap">Promotions</span>
               </button>
 
               <button
@@ -1949,7 +1965,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <GraduationCap className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Past Students</span>
+                <span className="whitespace-nowrap">Past Students</span>
               </button>
 
               <button
@@ -1961,7 +1977,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <Archive className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Academic History</span>
+                <span className="whitespace-nowrap">Academic History</span>
               </button>
 
               {role === 'Admin' && (
@@ -1974,7 +1990,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                   }`}
                 >
                   <GraduationCap className="h-4 w-4 text-[#DCEAF6]" />
-                  <span>Teacher Accounts</span>
+                  <span className="whitespace-nowrap">Teacher Accounts</span>
                 </button>
               )}
             </>
@@ -1990,7 +2006,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               }`}
             >
               <PlusCircle className="h-4 w-4 text-[#DCEAF6]" />
-              <span>Admissions Portal</span>
+              <span className="whitespace-nowrap">Admissions Portal</span>
             </button>
           )}
 
@@ -2004,7 +2020,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               }`}
             >
               <Settings className="h-4 w-4 text-[#DCEAF6]" />
-              <span>School Settings</span>
+              <span className="whitespace-nowrap">School Settings</span>
             </button>
           )}
 
@@ -2018,7 +2034,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               }`}
             >
               <CreditCard className="h-4 w-4 text-[#DCEAF6]" />
-              <span>Billing (Blaze)</span>
+              <span className="whitespace-nowrap">Billing (Blaze)</span>
             </button>
           )}
 
@@ -2035,7 +2051,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <CreditCard className="h-4 w-4 text-[#DCEAF6]" />
-                <span>MoMo Ledger</span>
+                <span className="whitespace-nowrap">MoMo Ledger</span>
               </button>
 
               {role !== 'Teacher' && <div className="pt-2 pb-1 px-2"><span className="text-[10px] uppercase font-bold text-[#4A6FA5] tracking-wider">System</span></div>}
@@ -2049,7 +2065,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <Database className="h-4 w-4 text-[#DCEAF6]" />
-                <span>Security Backups</span>
+                <span className="whitespace-nowrap">Security Backups</span>
               </button>
 
               <button
@@ -2061,7 +2077,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 }`}
               >
                 <Terminal className="h-4 w-4 text-[#DCEAF6]" />
-                <span>SIS API Sandbox</span>
+                <span className="whitespace-nowrap">SIS API Sandbox</span>
               </button>
             </>
           )}
@@ -2072,11 +2088,13 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               This portal encrypts multi-tenant student identities and enforces local offline caches.
             </div>
           </div>
-        </aside>
+          </div>
+        </motion.aside>
           </>
         )}
+        </AnimatePresence>
         {/* Dashboard Panels */}
-        <main className={`col-span-12 ${isSidebarOpen ? 'md:col-span-9 lg:col-span-10' : 'md:col-span-12'} p-4 space-y-4 overflow-y-auto w-full`}>
+        <main className="flex-1 h-full overflow-y-auto p-4 space-y-4 w-full min-w-0">
           
           {/* Notifications Alert Container */}
           {billingNotice && (

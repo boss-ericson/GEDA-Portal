@@ -57,15 +57,15 @@ export const DEFAULT_MOCK_NAMES = [
 
 export const convertScoreToWaecGrade = (score: number) => {
   const s = Math.max(0, Math.min(100, Math.round(score || 0)));
-  if (s >= 80) return { grade: 1, remark: 'Highest / Distinction', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' };
-  if (s >= 75) return { grade: 2, remark: 'Higher / Distinction', color: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/20' };
-  if (s >= 70) return { grade: 3, remark: 'High / Credit', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' };
-  if (s >= 65) return { grade: 4, remark: 'High Average / Credit', color: 'bg-blue-500/15 text-blue-300 border-blue-500/20' };
-  if (s >= 60) return { grade: 5, remark: 'Average / Credit', color: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' };
-  if (s >= 55) return { grade: 6, remark: 'Low Average / Credit', color: 'bg-amber-500/20 text-amber-300 border-amber-500/30' };
-  if (s >= 50) return { grade: 7, remark: 'Low / Pass', color: 'bg-orange-500/20 text-orange-300 border-orange-500/30' };
-  if (s >= 40) return { grade: 8, remark: 'Lower / Pass', color: 'bg-rose-500/20 text-rose-300 border-rose-500/30' };
-  return { grade: 9, remark: 'Lowest / Fail', color: 'bg-red-600/30 text-red-400 border-red-500/40' };
+  if (s >= 80) return { grade: 1, remark: 'Highest / Distinction', color: 'bg-emerald-100 text-emerald-800 border-emerald-300' };
+  if (s >= 75) return { grade: 2, remark: 'Higher / Distinction', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
+  if (s >= 70) return { grade: 3, remark: 'High / Credit', color: 'bg-blue-100 text-blue-800 border-blue-300' };
+  if (s >= 65) return { grade: 4, remark: 'High Average / Credit', color: 'bg-blue-50 text-blue-700 border-blue-200' };
+  if (s >= 60) return { grade: 5, remark: 'Average / Credit', color: 'bg-cyan-100 text-cyan-800 border-cyan-300' };
+  if (s >= 55) return { grade: 6, remark: 'Low Average / Credit', color: 'bg-amber-100 text-amber-800 border-amber-300' };
+  if (s >= 50) return { grade: 7, remark: 'Low / Pass', color: 'bg-orange-100 text-orange-800 border-orange-300' };
+  if (s >= 40) return { grade: 8, remark: 'Lower / Pass', color: 'bg-rose-100 text-rose-800 border-rose-300' };
+  return { grade: 9, remark: 'Lowest / Fail', color: 'bg-red-100 text-red-800 border-red-300' };
 };
 
 export const calculateBeceAggregates = (scores: BeceSubjectScore[]) => {
@@ -99,11 +99,11 @@ export const calculateBeceAggregates = (scores: BeceSubjectScore[]) => {
 };
 
 export const getShsPlacementCategory = (actualAgg: number) => {
-  if (actualAgg <= 12) return { category: "Category A SHS (Top Tier)", description: "Eligible for PRESEC, Achimota, Wesley Girls, Prempeh, Mfantsipim", badge: "bg-emerald-500/20 text-emerald-400 border-emerald-500/40" };
-  if (actualAgg <= 18) return { category: "Category B SHS (High Tier)", description: "Eligible for Ghana National, Opoku Ware, Aburi Girls, Mawuli", badge: "bg-blue-500/20 text-blue-400 border-blue-500/40" };
-  if (actualAgg <= 24) return { category: "Category C SHS (Standard Tier)", description: "Eligible for Regional and District Model Senior High Schools", badge: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40" };
-  if (actualAgg <= 36) return { category: "Category D SHS / Technical", description: "Eligible for Community Senior High & TVET Technical Institutes", badge: "bg-amber-500/20 text-amber-300 border-amber-500/40" };
-  return { category: "Remedial Support Required", description: "Aggregate exceeds pass threshold; needs focused revision", badge: "bg-rose-500/20 text-rose-400 border-rose-500/40" };
+  if (actualAgg <= 12) return { category: "Category A SHS (Top Tier)", description: "Eligible for PRESEC, Achimota, Wesley Girls, Prempeh, Mfantsipim", badge: "bg-emerald-100 text-emerald-800 border-emerald-300" };
+  if (actualAgg <= 18) return { category: "Category B SHS (High Tier)", description: "Eligible for Ghana National, Opoku Ware, Aburi Girls, Mawuli", badge: "bg-blue-100 text-blue-800 border-blue-300" };
+  if (actualAgg <= 24) return { category: "Category C SHS (Standard Tier)", description: "Eligible for Regional and District Model Senior High Schools", badge: "bg-cyan-100 text-cyan-800 border-cyan-300" };
+  if (actualAgg <= 36) return { category: "Category D SHS / Technical", description: "Eligible for Community Senior High & TVET Technical Institutes", badge: "bg-amber-100 text-amber-800 border-amber-300" };
+  return { category: "Remedial Support Required", description: "Aggregate exceeds pass threshold; needs focused revision", badge: "bg-rose-100 text-rose-800 border-rose-300" };
 };
 
 export default function BeceMockCenter({ school, students, isOffline, user, role }: BeceMockCenterProps) {
@@ -605,23 +605,22 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
   return (
     <div className="space-y-6 pb-12">
       {/* Top Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-6 text-white shadow-xl border border-indigo-500/20">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="rounded-3xl bg-[#0B1E2D] p-6 text-white shadow-xs border border-[#274C77]/30">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide flex items-center gap-1">
-                <Trophy className="h-3.5 w-3.5" /> WAEC BECE Standard
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="bg-[#13293D] text-[#DCEAF6] border border-[#274C77]/40 text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide flex items-center gap-1">
+                <Trophy className="h-3.5 w-3.5 text-amber-400" /> WAEC BECE Standard
               </span>
-              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs px-2.5 py-0.5 rounded-full font-medium">
+              <span className="bg-[#EEF6FC]/15 text-[#DCEAF6] border border-[#274C77]/30 text-xs px-2.5 py-0.5 rounded-full font-medium">
                 Stanine Grading System (1 - 9)
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <GraduationCap className="h-8 w-8 text-amber-400" />
+            <h1 className="text-2xl md:text-3xl font-display font-extrabold tracking-tight text-white flex items-center gap-3">
+              <GraduationCap className="h-8 w-8 text-[#DCEAF6]" />
               BECE Mock Exams Portal
             </h1>
-            <p className="mt-1 text-sm text-slate-300 max-w-2xl">
+            <p className="mt-1 text-sm text-[#DCEAF6]/80 max-w-2xl">
               Comprehensive score collection, WAEC aggregate calculation (4 Core + 2 Best Electives vs Best 6), ranking analysis, and mock progress tracking for JHS candidates.
             </p>
           </div>
@@ -629,7 +628,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={handleSeedDemoData}
-              className="bg-indigo-600/60 hover:bg-indigo-600 text-indigo-100 border border-indigo-400/30 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer"
+              className="bg-[#274C77] hover:bg-[#4A6FA5] text-white border border-[#4A6FA5]/40 text-xs font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs"
               title="Generate sample mock scores for instant testing"
             >
               <Sparkles className="h-4 w-4 text-amber-300" />
@@ -638,14 +637,14 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
             <button
               onClick={handleExportExcel}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="bg-[#13293D] hover:bg-[#274C77] text-white border border-[#274C77]/40 text-xs font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Download className="h-4 w-4" />
               Export Excel Sheet
             </button>
 
-            <label className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1.5 cursor-pointer">
-              <FileSpreadsheet className="h-4 w-4 text-emerald-400" />
+            <label className="bg-[#EEF6FC]/15 hover:bg-[#EEF6FC]/25 text-[#DCEAF6] border border-[#274C77]/30 text-xs font-semibold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+              <FileSpreadsheet className="h-4 w-4 text-[#DCEAF6]" />
               Import Excel
               <input type="file" accept=".xlsx, .xls" onChange={handleImportExcel} className="hidden" />
             </label>
@@ -655,28 +654,28 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
       {/* Notifications */}
       {notification && (
-        <div className={`p-4 rounded-xl border text-sm font-medium flex items-center justify-between transition-all ${
-          notification.type === 'success' ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200' :
-          notification.type === 'error' ? 'bg-rose-950/40 border-rose-500/40 text-rose-200' :
-          'bg-indigo-950/40 border-indigo-500/40 text-indigo-200'
+        <div className={`p-4 rounded-2xl border text-sm font-medium flex items-center justify-between transition-all ${
+          notification.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-900' :
+          notification.type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-900' :
+          'bg-[#EEF6FC] border-[#274C77]/30 text-[#0B1E2D]'
         }`}>
           <div className="flex items-center gap-2">
-            {notification.type === 'success' ? <CheckCircle2 className="h-5 w-5 text-emerald-400" /> : <AlertTriangle className="h-5 w-5 text-rose-400" />}
+            {notification.type === 'success' ? <CheckCircle2 className="h-5 w-5 text-emerald-600" /> : <AlertTriangle className="h-5 w-5 text-rose-600" />}
             <span>{notification.text}</span>
           </div>
         </div>
       )}
 
       {/* Mock Exam Selector & Filters Control Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="bg-white border border-[#274C77]/20 rounded-3xl p-4 shadow-xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3">
           {/* Selected Mock Exam Selector */}
-          <div className="flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-xl p-1.5 pl-3">
-            <span className="text-xs text-slate-400 font-medium">Mock Exam:</span>
+          <div className="flex items-center gap-2 bg-[#EEF6FC]/60 border border-[#274C77]/20 rounded-2xl p-1.5 pl-3">
+            <span className="text-xs text-[#274C77] font-semibold">Mock Exam:</span>
             <select
               value={selectedMock}
               onChange={(e) => setSelectedMock(e.target.value)}
-              className="bg-slate-900 text-amber-300 font-bold text-xs rounded-lg px-2.5 py-1.5 border border-slate-700 focus:outline-none focus:border-amber-400"
+              className="bg-white text-[#0B1E2D] font-bold text-xs rounded-xl px-2.5 py-1.5 border border-[#274C77]/30 focus:outline-none focus:border-[#274C77]"
             >
               {mockList.map(m => (
                 <option key={m} value={m}>{m}</option>
@@ -684,7 +683,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
             </select>
             <button
               onClick={() => setShowAddMockModal(true)}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-2.5 py-1.5 rounded-lg transition font-medium flex items-center gap-1 cursor-pointer"
+              className="bg-[#274C77] hover:bg-[#13293D] text-white text-xs px-3 py-1.5 rounded-xl transition font-medium flex items-center gap-1 cursor-pointer"
               title="Add custom mock session"
             >
               <PlusCircle className="h-3.5 w-3.5" />
@@ -693,12 +692,12 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
           </div>
 
           {/* Target Class Filter */}
-          <div className="flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-xl p-1.5 pl-3">
-            <span className="text-xs text-slate-400 font-medium">Class:</span>
+          <div className="flex items-center gap-2 bg-[#EEF6FC]/60 border border-[#274C77]/20 rounded-2xl p-1.5 pl-3">
+            <span className="text-xs text-[#274C77] font-semibold">Class:</span>
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="bg-slate-900 text-slate-200 font-semibold text-xs rounded-lg px-2.5 py-1.5 border border-slate-700 focus:outline-none focus:border-indigo-400"
+              className="bg-white text-[#0B1E2D] font-semibold text-xs rounded-xl px-2.5 py-1.5 border border-[#274C77]/30 focus:outline-none focus:border-[#274C77]"
             >
               <option value="JHS 3">JHS 3 (Basic 9 Candidate)</option>
               <option value="JHS 2">JHS 2 (Basic 8)</option>
@@ -711,22 +710,22 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
         {/* Quick Search and Save Button */}
         <div className="flex items-center gap-3">
           <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#274C77]" />
             <input
               type="text"
               placeholder="Search candidate name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-800 text-xs text-slate-200 placeholder-slate-400 pl-9 pr-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-[#EEF6FC]/50 text-xs text-[#0B1E2D] placeholder-[#274C77]/60 pl-9 pr-3 py-2 rounded-2xl border border-[#274C77]/20 focus:outline-none focus:border-[#274C77]"
             />
           </div>
 
           <button
             onClick={handleSaveAllRecords}
             disabled={isSaving}
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-md shadow-amber-500/10 cursor-pointer disabled:opacity-50"
+            className="bg-[#0B1E2D] hover:bg-[#274C77] text-white font-bold text-xs px-4 py-2 rounded-2xl transition flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
           >
-            {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {isSaving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 text-[#DCEAF6]" />}
             <span>{isSaving ? 'Saving...' : 'Save Mock Records'}</span>
           </button>
         </div>
@@ -734,55 +733,55 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
       {/* Overview Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-          <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">BECE Candidates</p>
+        <div className="bg-white border border-[#274C77]/20 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-bold text-[#274C77]/80 uppercase tracking-wider">BECE Candidates</p>
           <div className="mt-1 flex items-baseline justify-between">
-            <p className="text-xl font-bold text-white">{candidateStudents.length}</p>
-            <Users className="h-4 w-4 text-indigo-400" />
+            <p className="text-2xl font-display font-bold text-[#0B1E2D]">{candidateStudents.length}</p>
+            <Users className="h-5 w-5 text-[#274C77]" />
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-          <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Actual Agg Avg (4C+2B)</p>
+        <div className="bg-white border border-[#274C77]/20 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-bold text-[#274C77]/80 uppercase tracking-wider">Actual Agg Avg (4C+2B)</p>
           <div className="mt-1 flex items-baseline justify-between">
-            <p className="text-xl font-bold text-amber-400">{avgActualAgg}</p>
-            <Trophy className="h-4 w-4 text-amber-400" />
+            <p className="text-2xl font-display font-bold text-[#0B1E2D]">{avgActualAgg}</p>
+            <Trophy className="h-5 w-5 text-amber-500" />
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-          <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Best 6 Agg Avg</p>
+        <div className="bg-white border border-[#274C77]/20 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-bold text-[#274C77]/80 uppercase tracking-wider">Best 6 Agg Avg</p>
           <div className="mt-1 flex items-baseline justify-between">
-            <p className="text-xl font-bold text-emerald-400">{avgBest6Agg}</p>
-            <Award className="h-4 w-4 text-emerald-400" />
+            <p className="text-2xl font-display font-bold text-[#0B1E2D]">{avgBest6Agg}</p>
+            <Award className="h-5 w-5 text-emerald-600" />
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-          <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Top Candidate</p>
+        <div className="bg-white border border-[#274C77]/20 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-bold text-[#274C77]/80 uppercase tracking-wider">Top Candidate</p>
           <div className="mt-1">
-            <p className="text-xs font-bold text-white truncate">{topCandidate ? topCandidate.student.fullName : '--'}</p>
-            <p className="text-[10px] font-bold text-emerald-400">{topCandidate ? `Agg ${String(topCandidate.actualAgg).padStart(2, '0')}` : '--'}</p>
+            <p className="text-xs font-bold text-[#0B1E2D] truncate">{topCandidate ? topCandidate.student.fullName : '--'}</p>
+            <p className="text-[10px] font-bold text-[#274C77]">{topCandidate ? `Agg ${String(topCandidate.actualAgg).padStart(2, '0')}` : '--'}</p>
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 shadow-sm">
-          <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Pass Rate (Agg &le; 36)</p>
+        <div className="bg-white border border-[#274C77]/20 rounded-2xl p-4 shadow-xs">
+          <p className="text-[11px] font-bold text-[#274C77]/80 uppercase tracking-wider">Pass Rate (Agg &le; 36)</p>
           <div className="mt-1 flex items-baseline justify-between">
-            <p className="text-xl font-bold text-cyan-400">{passRate}%</p>
-            <Target className="h-4 w-4 text-cyan-400" />
+            <p className="text-2xl font-display font-bold text-[#0B1E2D]">{passRate}%</p>
+            <Target className="h-5 w-5 text-teal-600" />
           </div>
         </div>
       </div>
 
       {/* Main Tab Bar */}
-      <div className="border-b border-slate-800 flex items-center gap-1 overflow-x-auto">
+      <div className="border-b border-[#274C77]/20 flex items-center gap-1 overflow-x-auto">
         <button
           onClick={() => setActiveTab('scores')}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-2xl transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'scores'
-              ? 'border-amber-400 text-amber-400 bg-slate-900'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+              ? 'border-[#274C77] text-[#0B1E2D] bg-[#EEF6FC]'
+              : 'border-transparent text-[#274C77]/70 hover:text-[#0B1E2D] hover:bg-[#EEF6FC]/50'
           }`}
         >
           <Edit3 className="h-4 w-4" />
@@ -791,10 +790,10 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
         <button
           onClick={() => setActiveTab('rankings')}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-2xl transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'rankings'
-              ? 'border-amber-400 text-amber-400 bg-slate-900'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+              ? 'border-[#274C77] text-[#0B1E2D] bg-[#EEF6FC]'
+              : 'border-transparent text-[#274C77]/70 hover:text-[#0B1E2D] hover:bg-[#EEF6FC]/50'
           }`}
         >
           <Trophy className="h-4 w-4" />
@@ -803,10 +802,10 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
         <button
           onClick={() => setActiveTab('analytics')}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-2xl transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'analytics'
-              ? 'border-amber-400 text-amber-400 bg-slate-900'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+              ? 'border-[#274C77] text-[#0B1E2D] bg-[#EEF6FC]'
+              : 'border-transparent text-[#274C77]/70 hover:text-[#0B1E2D] hover:bg-[#EEF6FC]/50'
           }`}
         >
           <BarChart3 className="h-4 w-4" />
@@ -815,10 +814,10 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
         <button
           onClick={() => setActiveTab('slip')}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-2xl transition flex items-center gap-2 border-b-2 cursor-pointer whitespace-nowrap ${
             activeTab === 'slip'
-              ? 'border-amber-400 text-amber-400 bg-slate-900'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+              ? 'border-[#274C77] text-[#0B1E2D] bg-[#EEF6FC]'
+              : 'border-transparent text-[#274C77]/70 hover:text-[#0B1E2D] hover:bg-[#EEF6FC]/50'
           }`}
         >
           <Printer className="h-4 w-4" />
@@ -828,73 +827,73 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
       {/* TAB 1: SCORE ENTRY GRID */}
       {activeTab === 'scores' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
+        <div className="bg-white border border-[#274C77]/20 rounded-3xl p-5 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#274C77]/15 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <h3 className="text-sm font-bold text-[#0B1E2D] flex items-center gap-2">
                 <span>Subject Score Entry Grid — {selectedMock}</span>
-                <span className="text-xs font-normal text-slate-400">({filteredCandidates.length} candidates)</span>
+                <span className="text-xs font-semibold text-[#274C77]">({filteredCandidates.length} candidates)</span>
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#274C77]/80">
                 Enter percentage scores (0-100). WAEC Grade (1-9) and aggregates are calculated dynamically.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-300">
-              <span className="inline-block w-3 h-3 bg-indigo-500/30 border border-indigo-400/50 rounded-sm"></span>
+            <div className="flex items-center gap-2 text-xs text-[#274C77] font-medium">
+              <span className="inline-block w-3 h-3 bg-[#EEF6FC] border border-[#274C77]/40 rounded-xs"></span>
               <span>Mandatory Core Subjects (Eng, Math, Sci, Soc)</span>
             </div>
           </div>
 
           {filteredCandidates.length === 0 ? (
-            <div className="p-8 text-center bg-slate-950/50 rounded-xl border border-slate-800">
-              <User className="h-8 w-8 text-slate-600 mx-auto mb-2" />
-              <p className="text-sm text-slate-300 font-medium">No candidates found in {selectedClass}</p>
-              <p className="text-xs text-slate-500 mt-1">Register students in JHS 3 or switch the class filter above.</p>
+            <div className="p-8 text-center bg-[#EEF6FC]/40 rounded-2xl border border-[#274C77]/20">
+              <User className="h-8 w-8 text-[#274C77] mx-auto mb-2" />
+              <p className="text-sm text-[#0B1E2D] font-medium">No candidates found in {selectedClass}</p>
+              <p className="text-xs text-[#274C77]/80 mt-1">Register students in JHS 3 or switch the class filter above.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[1100px]">
                 <thead>
-                  <tr className="bg-slate-950/80 text-slate-400 text-[11px] font-bold uppercase border-b border-slate-800">
-                    <th className="p-2.5 sticky left-0 bg-slate-950 z-20 min-w-[180px]">Candidate Name</th>
+                  <tr className="bg-[#EEF6FC] text-[#0B1E2D] text-[11px] font-bold uppercase border-b border-[#274C77]/20">
+                    <th className="p-3 sticky left-0 bg-[#EEF6FC] z-20 min-w-[180px]">Candidate Name</th>
                     
                     {/* Core Subjects Headers */}
                     {BECE_CORE_SUBJECTS.map(cs => (
-                      <th key={cs} className="p-2 text-center bg-indigo-950/40 text-indigo-300 border-x border-slate-800 min-w-[90px]">
+                      <th key={cs} className="p-2 text-center bg-[#274C77]/10 text-[#0B1E2D] border-x border-[#274C77]/20 min-w-[90px]">
                         <div>{cs}</div>
-                        <div className="text-[9px] text-indigo-400/80 font-normal">CORE</div>
+                        <div className="text-[9px] text-[#274C77] font-semibold">CORE</div>
                       </th>
                     ))}
 
                     {/* Elective Subjects Headers */}
                     {BECE_ELECTIVE_SUBJECTS.map(es => (
-                      <th key={es} className="p-2 text-center text-slate-300 border-r border-slate-800 min-w-[90px]">
+                      <th key={es} className="p-2 text-center text-[#0B1E2D] border-r border-[#274C77]/20 min-w-[90px]">
                         <div>{es}</div>
-                        <div className="text-[9px] text-slate-500 font-normal">ELECTIVE</div>
+                        <div className="text-[9px] text-[#274C77]/70 font-normal">ELECTIVE</div>
                       </th>
                     ))}
 
-                    <th className="p-2 text-center bg-amber-950/30 text-amber-300 min-w-[95px] border-l border-slate-800">
+                    <th className="p-2 text-center bg-[#EEF6FC] text-[#0B1E2D] min-w-[95px] border-l border-[#274C77]/20">
                       <div>ACTUAL AGG</div>
-                      <div className="text-[9px] text-amber-400 font-normal">4 Core + 2 Best</div>
+                      <div className="text-[9px] text-[#274C77] font-semibold">4 Core + 2 Best</div>
                     </th>
 
-                    <th className="p-2 text-center bg-emerald-950/30 text-emerald-300 min-w-[95px]">
+                    <th className="p-2 text-center bg-[#EEF6FC] text-[#0B1E2D] min-w-[95px]">
                       <div>BEST 6 AGG</div>
-                      <div className="text-[9px] text-emerald-400 font-normal">Top 6 Overall</div>
+                      <div className="text-[9px] text-[#274C77] font-semibold">Top 6 Overall</div>
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 text-xs">
+                <tbody className="divide-y divide-[#274C77]/15 text-xs">
                   {filteredCandidates.map((student) => {
                     const record = getRecordForStudent(student.id);
 
                     return (
-                      <tr key={student.id} className="hover:bg-slate-800/40 transition">
+                      <tr key={student.id} className="hover:bg-[#EEF6FC]/30 transition">
                         {/* Student Name */}
-                        <td className="p-2.5 sticky left-0 bg-slate-900 z-10 font-semibold text-slate-200 border-r border-slate-800">
+                        <td className="p-3 sticky left-0 bg-white z-10 font-semibold text-[#0B1E2D] border-r border-[#274C77]/20">
                           <div className="truncate max-w-[170px]">{student.fullName}</div>
-                          <div className="text-[10px] font-mono text-slate-400">{student.admissionNo}</div>
+                          <div className="text-[10px] font-mono text-[#274C77]">{student.admissionNo}</div>
                         </td>
 
                         {/* Core Subject Score Inputs */}
@@ -904,7 +903,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                           const gObj = convertScoreToWaecGrade(scoreVal);
 
                           return (
-                            <td key={cs} className="p-1.5 text-center bg-indigo-950/10 border-x border-slate-800">
+                            <td key={cs} className="p-1.5 text-center bg-[#EEF6FC]/20 border-x border-[#274C77]/20">
                               <div className="flex flex-col items-center gap-1">
                                 <input
                                   type="number"
@@ -913,7 +912,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                                   value={scoreVal || ''}
                                   onChange={(e) => handleScoreChange(student.id, cs, e.target.value)}
                                   placeholder="0"
-                                  className="w-16 bg-slate-950 text-center font-bold text-white border border-indigo-500/30 rounded py-1 text-xs focus:outline-none focus:border-indigo-400"
+                                  className="w-16 bg-white text-center font-bold text-[#0B1E2D] border border-[#274C77]/30 rounded-xl py-1 text-xs focus:outline-none focus:border-[#274C77]"
                                 />
                                 <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${gObj.color}`}>
                                   Grade {gObj.grade}
@@ -930,7 +929,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                           const gObj = convertScoreToWaecGrade(scoreVal);
 
                           return (
-                            <td key={es} className="p-1.5 text-center border-r border-slate-800">
+                            <td key={es} className="p-1.5 text-center border-r border-[#274C77]/20">
                               <div className="flex flex-col items-center gap-1">
                                 <input
                                   type="number"
@@ -939,7 +938,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                                   value={scoreVal || ''}
                                   onChange={(e) => handleScoreChange(student.id, es, e.target.value)}
                                   placeholder="0"
-                                  className="w-16 bg-slate-950 text-center text-slate-200 border border-slate-700 rounded py-1 text-xs focus:outline-none focus:border-slate-500"
+                                  className="w-16 bg-white text-center text-[#0B1E2D] border border-[#274C77]/20 rounded-xl py-1 text-xs focus:outline-none focus:border-[#274C77]"
                                 />
                                 <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${gObj.color}`}>
                                   Grade {gObj.grade}
@@ -950,20 +949,20 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                         })}
 
                         {/* Actual Aggregate (4 Core + 2 Best) */}
-                        <td className="p-2 text-center bg-amber-950/20 font-extrabold text-amber-400 border-l border-slate-800">
+                        <td className="p-2 text-center bg-[#EEF6FC]/40 font-black text-[#0B1E2D] border-l border-[#274C77]/20">
                           <div className="text-base">{String(record.actualAggregate).padStart(2, '0')}</div>
-                          <div className="text-[9px] text-slate-400 font-normal">Core: {record.coreAggregate} | Elect: {record.best2ElectiveAggregate}</div>
+                          <div className="text-[9px] text-[#274C77] font-semibold">Core: {record.coreAggregate} | Elect: {record.best2ElectiveAggregate}</div>
                         </td>
 
                         {/* Best 6 Aggregate */}
-                        <td className="p-2 text-center bg-emerald-950/20 font-extrabold text-emerald-400">
+                        <td className="p-2 text-center bg-[#EEF6FC]/60 font-black text-[#274C77]">
                           <div className="text-base">{String(record.best6Aggregate).padStart(2, '0')}</div>
                           <button
                             onClick={() => {
                               setSelectedCandidateId(student.id);
                               setActiveTab('slip');
                             }}
-                            className="text-[10px] text-indigo-400 hover:underline mt-0.5 block mx-auto cursor-pointer"
+                            className="text-[10px] text-[#274C77] hover:underline font-bold mt-0.5 block mx-auto cursor-pointer"
                           >
                             View Slip &rarr;
                           </button>
@@ -980,14 +979,14 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
       {/* TAB 2: RANKINGS & LEAGUE TABLE */}
       {activeTab === 'rankings' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="bg-white border border-[#274C77]/20 rounded-3xl p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-[#274C77]/15 pb-3">
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Trophy className="h-4 w-4 text-amber-400" />
+              <h3 className="text-sm font-bold text-[#0B1E2D] flex items-center gap-2">
+                <Trophy className="h-4 w-4 text-amber-500" />
                 BECE Candidate Performance League Table — {selectedMock}
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#274C77]/80">
                 Sorted by Actual WAEC Aggregate (4 Core + 2 Best Electives). Lower aggregate indicates superior academic distinction.
               </p>
             </div>
@@ -996,19 +995,19 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-950/80 text-slate-400 text-[11px] font-bold uppercase border-b border-slate-800">
+                <tr className="bg-[#EEF6FC] text-[#0B1E2D] text-[11px] font-bold uppercase border-b border-[#274C77]/20">
                   <th className="p-3 w-12 text-center">Rank</th>
                   <th className="p-3">Index / Admission</th>
                   <th className="p-3">Candidate Full Name</th>
                   <th className="p-3 text-center">4 Core Grades</th>
                   <th className="p-3 text-center">Top 2 Electives</th>
-                  <th className="p-3 text-center bg-amber-950/30 text-amber-300">Actual Agg (4C+2B)</th>
-                  <th className="p-3 text-center bg-emerald-950/30 text-emerald-300">Best 6 Agg</th>
+                  <th className="p-3 text-center bg-[#EEF6FC] text-[#0B1E2D]">Actual Agg (4C+2B)</th>
+                  <th className="p-3 text-center bg-[#EEF6FC] text-[#0B1E2D]">Best 6 Agg</th>
                   <th className="p-3">SHS Qualification Forecast</th>
                   <th className="p-3 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-xs">
+              <tbody className="divide-y divide-[#274C77]/15 text-xs">
                 {rankedCandidates.map((item, idx) => {
                   const place = getShsPlacementCategory(item.actualAgg);
                   const isTop3 = idx < 3;
@@ -1025,37 +1024,37 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                   const top2Str = `${sortedElects[0] || 9} - ${sortedElects[1] || 9}`;
 
                   return (
-                    <tr key={item.student.id} className="hover:bg-slate-800/40 transition">
+                    <tr key={item.student.id} className="hover:bg-[#EEF6FC]/30 transition">
                       {/* Rank Position */}
                       <td className="p-3 text-center font-bold">
                         {isTop3 ? (
-                          <span className={`inline-flex items-center justify-center h-6 w-6 rounded-full font-extrabold text-xs ${
-                            idx === 0 ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/20' :
-                            idx === 1 ? 'bg-slate-300 text-slate-950' :
-                            'bg-amber-700/80 text-white'
+                          <span className={`inline-flex items-center justify-center h-6 w-6 rounded-full font-black text-xs ${
+                            idx === 0 ? 'bg-[#0B1E2D] text-white' :
+                            idx === 1 ? 'bg-[#274C77] text-white' :
+                            'bg-[#4A6FA5] text-white'
                           }`}>
                             {idx + 1}
                           </span>
                         ) : (
-                          <span className="text-slate-400">{idx + 1}th</span>
+                          <span className="text-[#274C77] font-semibold">{idx + 1}th</span>
                         )}
                       </td>
 
-                      <td className="p-3 font-mono text-slate-400">{item.student.admissionNo}</td>
+                      <td className="p-3 font-mono text-[#274C77]">{item.student.admissionNo}</td>
                       
-                      <td className="p-3 font-semibold text-white">
+                      <td className="p-3 font-semibold text-[#0B1E2D]">
                         <div>{item.student.fullName}</div>
-                        <div className="text-[10px] text-slate-400">{item.student.gender} &bull; {item.student.classLevel}</div>
+                        <div className="text-[10px] text-[#274C77]/70">{item.student.gender} &bull; {item.student.classLevel}</div>
                       </td>
 
-                      <td className="p-3 text-center font-mono text-slate-300">{coreGradesStr}</td>
-                      <td className="p-3 text-center font-mono text-slate-300">{top2Str}</td>
+                      <td className="p-3 text-center font-mono text-[#0B1E2D]">{coreGradesStr}</td>
+                      <td className="p-3 text-center font-mono text-[#0B1E2D]">{top2Str}</td>
 
-                      <td className="p-3 text-center bg-amber-950/20 font-black text-amber-400 text-sm">
+                      <td className="p-3 text-center bg-[#EEF6FC]/40 font-black text-[#0B1E2D] text-sm">
                         {String(item.actualAgg).padStart(2, '0')}
                       </td>
 
-                      <td className="p-3 text-center bg-emerald-950/20 font-black text-emerald-400 text-sm">
+                      <td className="p-3 text-center bg-[#EEF6FC]/60 font-black text-[#274C77] text-sm">
                         {String(item.best6Agg).padStart(2, '0')}
                       </td>
 
@@ -1071,7 +1070,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                             setSelectedCandidateId(item.student.id);
                             setActiveTab('slip');
                           }}
-                          className="bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition border border-indigo-500/30 cursor-pointer"
+                          className="bg-[#274C77] hover:bg-[#0B1E2D] text-white px-3 py-1.5 rounded-xl text-[11px] font-semibold transition cursor-pointer"
                         >
                           Result Slip
                         </button>
@@ -1088,24 +1087,24 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
       {/* TAB 3: MOCK PROGRESS & GRAPHICAL ANALYTICS */}
       {activeTab === 'analytics' && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
+          <div className="bg-white border border-[#274C77]/20 rounded-3xl p-6 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[#274C77]/15 pb-4 mb-4">
               <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-emerald-400" />
+                <h3 className="text-sm font-bold text-[#0B1E2D] flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-[#274C77]" />
                   Candidate Progress Across Subsequent Mock Exams
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-[#274C77]/80">
                   Track aggregate trend over time (Mock 1 &rarr; Mock 2 &rarr; Municipal Mock &rarr; National Mock). Lower aggregate trend indicates performance growth.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">Filter Candidate:</span>
+                <span className="text-xs text-[#274C77] font-semibold">Filter Candidate:</span>
                 <select
                   value={selectedCandidateId}
                   onChange={(e) => setSelectedCandidateId(e.target.value)}
-                  className="bg-slate-800 text-slate-200 text-xs rounded-xl px-3 py-1.5 border border-slate-700 focus:outline-none focus:border-indigo-400"
+                  className="bg-[#EEF6FC] text-[#0B1E2D] text-xs font-semibold rounded-xl px-3 py-1.5 border border-[#274C77]/30 focus:outline-none focus:border-[#274C77]"
                 >
                   <option value="">All Candidates (Class Average)</option>
                   {candidateStudents.map(s => (
@@ -1118,13 +1117,13 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={getMockProgressChartData()}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="name" stroke="#94a3b8" tick={{ fontSize: 11 }} />
-                  <YAxis domain={[6, 54]} reversed stroke="#94a3b8" tick={{ fontSize: 11 }} label={{ value: 'WAEC Aggregate (Lower is Better)', angle: -90, position: 'insideLeft', fill: '#94a3b8', fontSize: 10 }} />
-                  <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', color: '#f8fafc', fontSize: '12px' }} />
-                  <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  <Line type="monotone" dataKey="actualAgg" name="Actual Aggregate (4 Core + 2 Best)" stroke="#f59e0b" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
-                  <Line type="monotone" dataKey="best6Agg" name="Best 6 Aggregate" stroke="#10b981" strokeWidth={2} strokeDasharray="4 4" dot={{ r: 4 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EEF6FC" />
+                  <XAxis dataKey="name" stroke="#274C77" tick={{ fontSize: 11 }} />
+                  <YAxis domain={[6, 54]} reversed stroke="#274C77" tick={{ fontSize: 11 }} label={{ value: 'WAEC Aggregate (Lower is Better)', angle: -90, position: 'insideLeft', fill: '#0B1E2D', fontSize: 10 }} />
+                  <RechartsTooltip contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#274C77', borderRadius: '12px', color: '#0B1E2D', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                  <Legend wrapperStyle={{ fontSize: '12px', color: '#0B1E2D' }} />
+                  <Line type="monotone" dataKey="actualAgg" name="Actual Aggregate (4 Core + 2 Best)" stroke="#0B1E2D" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
+                  <Line type="monotone" dataKey="best6Agg" name="Best 6 Aggregate" stroke="#274C77" strokeWidth={2} strokeDasharray="4 4" dot={{ r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -1132,33 +1131,33 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Core Subject Average Scores */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-              <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-indigo-400" />
+            <div className="bg-white border border-[#274C77]/20 rounded-3xl p-6 shadow-xs">
+              <h3 className="text-sm font-bold text-[#0B1E2D] mb-1 flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-[#274C77]" />
                 Core Subjects Performance Breakdown — {selectedMock}
               </h3>
-              <p className="text-xs text-slate-400 mb-4">Average score percentage across 4 compulsory BECE core subjects.</p>
+              <p className="text-xs text-[#274C77]/80 mb-4">Average score percentage across 4 compulsory BECE core subjects.</p>
               
               <div className="h-60 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={getCoreSubjectChartData()}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="subject" stroke="#94a3b8" tick={{ fontSize: 11 }} />
-                    <YAxis domain={[0, 100]} stroke="#94a3b8" tick={{ fontSize: 11 }} />
-                    <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', color: '#f8fafc', fontSize: '12px' }} />
-                    <Bar dataKey="avgScore" name="Average Score (%)" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#EEF6FC" />
+                    <XAxis dataKey="subject" stroke="#274C77" tick={{ fontSize: 11 }} />
+                    <YAxis domain={[0, 100]} stroke="#274C77" tick={{ fontSize: 11 }} />
+                    <RechartsTooltip contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#274C77', borderRadius: '12px', color: '#0B1E2D', fontSize: '12px' }} />
+                    <Bar dataKey="avgScore" name="Average Score (%)" fill="#274C77" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
             {/* SHS Placement Category Pie Chart */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-              <h3 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-                <Award className="h-4 w-4 text-amber-400" />
+            <div className="bg-white border border-[#274C77]/20 rounded-3xl p-6 shadow-xs">
+              <h3 className="text-sm font-bold text-[#0B1E2D] mb-1 flex items-center gap-2">
+                <Award className="h-4 w-4 text-amber-500" />
                 Predicted Senior High School Placement Categories
               </h3>
-              <p className="text-xs text-slate-400 mb-4">Distribution of candidate aggregate rankings into WAEC SHS tiers.</p>
+              <p className="text-xs text-[#274C77]/80 mb-4">Distribution of candidate aggregate rankings into WAEC SHS tiers.</p>
               
               <div className="h-60 w-full flex items-center justify-center">
                 <ResponsiveContainer width="100%" height="100%">
@@ -1176,8 +1175,8 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', color: '#f8fafc', fontSize: '12px' }} />
-                    <Legend wrapperStyle={{ fontSize: '11px' }} />
+                    <RechartsTooltip contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#274C77', borderRadius: '12px', color: '#0B1E2D', fontSize: '12px' }} />
+                    <Legend wrapperStyle={{ fontSize: '11px', color: '#0B1E2D' }} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -1189,13 +1188,13 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
       {/* TAB 4: CANDIDATE MOCK RESULT SLIP */}
       {activeTab === 'slip' && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="bg-white border border-[#274C77]/20 rounded-3xl p-4 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 font-medium">Select Candidate:</span>
+              <span className="text-xs text-[#274C77] font-semibold">Select Candidate:</span>
               <select
                 value={selectedCandidateId}
                 onChange={(e) => setSelectedCandidateId(e.target.value)}
-                className="bg-slate-800 text-white text-xs font-bold rounded-xl px-3 py-2 border border-slate-700 focus:outline-none focus:border-amber-400"
+                className="bg-[#EEF6FC] text-[#0B1E2D] text-xs font-bold rounded-xl px-3 py-2 border border-[#274C77]/30 focus:outline-none focus:border-[#274C77]"
               >
                 {candidateStudents.map(s => (
                   <option key={s.id} value={s.id}>{s.fullName} ({s.admissionNo})</option>
@@ -1205,7 +1204,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
             <button
               onClick={() => reactToPrintFn && reactToPrintFn()}
-              className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-2 cursor-pointer shadow-md"
+              className="bg-[#0B1E2D] hover:bg-[#274C77] text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-2 cursor-pointer shadow-xs"
             >
               <Printer className="h-4 w-4" />
               <span>Print Candidate Result Slip</span>
@@ -1367,7 +1366,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
               </div>
             </div>
           ) : (
-            <div className="p-8 bg-slate-900 border border-slate-800 rounded-xl text-center text-slate-400 text-xs">
+            <div className="p-8 bg-white border border-[#274C77]/20 rounded-2xl text-center text-[#274C77] text-xs font-medium">
               Select a candidate from the dropdown above to render their BECE Mock Result Slip.
             </div>
           )}
@@ -1376,13 +1375,13 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
 
       {/* Add Custom Mock Modal */}
       {showAddMockModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <PlusCircle className="h-5 w-5 text-amber-400" />
+        <div className="fixed inset-0 bg-[#0B1E2D]/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-[#274C77]/20 rounded-3xl p-6 max-w-md w-full shadow-xl space-y-4">
+            <h3 className="text-base font-bold text-[#0B1E2D] flex items-center gap-2">
+              <PlusCircle className="h-5 w-5 text-[#274C77]" />
               Create Custom Mock Exam Session
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#274C77]/80">
               Enter a custom name for your school, municipal, district, or external mock exam (e.g. "2026 District Super Mock").
             </p>
 
@@ -1391,20 +1390,20 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
               placeholder="e.g. Municipal Mock 3 or Super Mock 2026"
               value={newMockInput}
               onChange={(e) => setNewMockInput(e.target.value)}
-              className="w-full bg-slate-800 text-white text-xs p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-amber-400"
+              className="w-full bg-[#EEF6FC]/50 text-[#0B1E2D] text-xs p-3 rounded-2xl border border-[#274C77]/30 focus:outline-none focus:border-[#274C77]"
             />
 
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setShowAddMockModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold text-[#274C77] hover:text-[#0B1E2D] transition cursor-pointer"
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleCreateMock}
-                className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl transition cursor-pointer"
+                className="bg-[#0B1E2D] hover:bg-[#274C77] text-white font-bold text-xs px-4 py-2 rounded-xl transition cursor-pointer shadow-xs"
               >
                 Create Mock Session
               </button>

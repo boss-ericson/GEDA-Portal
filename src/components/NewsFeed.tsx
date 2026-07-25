@@ -153,31 +153,31 @@ export default function NewsFeed() {
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700/80 shadow-sm dark:shadow-none space-y-4 fade-in h-full flex flex-col">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-          <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
-            <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 rounded-xl">
+      <div className="bg-white p-6 rounded-3xl border border-[#274C77]/20 shadow-xs space-y-4 fade-in h-full flex flex-col">
+        <div className="flex items-center justify-between border-b border-[#274C77]/15 pb-3">
+          <div className="flex items-center gap-2 text-[#0B1E2D]">
+            <div className="p-2 bg-[#EEF6FC] text-[#274C77] rounded-xl border border-[#274C77]/20">
               <Newspaper className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-display font-bold text-base text-slate-900 dark:text-white leading-none">GES News Updates</h3>
-              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Official Directives & Curriculum Bulletins</p>
+              <h3 className="font-display font-bold text-base text-[#0B1E2D] leading-none">GES News Updates</h3>
+              <p className="text-[10px] text-[#274C77]/80 font-medium mt-0.5">Official Directives & Curriculum Bulletins</p>
             </div>
           </div>
           <button 
             onClick={fetchNews} 
             disabled={loading}
-            className="p-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="p-2 bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl text-[#274C77] hover:bg-[#DCEAF6] transition cursor-pointer"
             title="Refresh GES News Feed"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-emerald-600' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-[#274C77]' : ''}`} />
           </button>
         </div>
         
         <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar">
           {loading && news.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-2 py-8">
-              <RefreshCw className="h-6 w-6 animate-spin text-emerald-600" />
+            <div className="flex flex-col items-center justify-center h-full text-[#274C77]/70 space-y-2 py-8">
+              <RefreshCw className="h-6 w-6 animate-spin text-[#274C77]" />
               <span className="text-xs font-medium">Fetching latest updates from GES Portal...</span>
             </div>
           ) : news.length > 0 ? (
@@ -186,32 +186,32 @@ export default function NewsFeed() {
                 <div 
                   key={item.id || index} 
                   onClick={() => setSelectedArticle(item)}
-                  className="group p-4 rounded-2xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-950/40 hover:bg-white dark:hover:bg-slate-900 hover:border-emerald-500/50 hover:shadow-md transition-all cursor-pointer relative"
+                  className="group p-4 rounded-2xl border border-[#274C77]/15 bg-[#EEF6FC]/40 hover:bg-white hover:border-[#274C77]/40 hover:shadow-xs transition-all cursor-pointer relative"
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      <ShieldCheck className="h-3 w-3" />
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#13293D] text-[#DCEAF6] border border-[#274C77]/40">
+                      <ShieldCheck className="h-3 w-3 text-[#4A6FA5]" />
                       {item.category || 'Official Directive'}
                     </span>
-                    <div className="flex items-center gap-1 text-[10px] font-mono text-slate-400 shrink-0">
-                      <Calendar className="h-3 w-3" />
+                    <div className="flex items-center gap-1 text-[10px] font-mono text-[#274C77]/80 font-medium shrink-0">
+                      <Calendar className="h-3 w-3 text-[#4A6FA5]" />
                       <span>{item.date}</span>
                     </div>
                   </div>
 
-                  <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-xs sm:text-sm leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors mb-1.5 line-clamp-2">
+                  <h4 className="font-semibold text-[#0B1E2D] text-xs sm:text-sm leading-snug group-hover:text-[#274C77] transition-colors mb-1.5 line-clamp-2">
                     {item.title}
                   </h4>
 
-                  <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 mb-2.5">
+                  <p className="text-[11px] text-[#274C77]/80 leading-relaxed line-clamp-2 mb-2.5">
                     {item.snippet || item.content}
                   </p>
 
-                  <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100 dark:border-slate-800/60">
-                    <span className="text-slate-400 text-[10px] font-mono truncate max-w-[180px]">
+                  <div className="flex items-center justify-between text-[11px] pt-1 border-t border-[#274C77]/15">
+                    <span className="text-[#274C77]/70 text-[10px] font-mono truncate max-w-[180px]">
                       {item.source || 'GES Official'}
                     </span>
-                    <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform text-[11px]">
+                    <span className="inline-flex items-center gap-1 font-bold text-[#274C77] group-hover:translate-x-0.5 transition-transform text-[11px]">
                       Read Article <ArrowRight className="h-3.5 w-3.5" />
                     </span>
                   </div>
@@ -219,7 +219,7 @@ export default function NewsFeed() {
               ))}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-slate-400 text-xs italic py-8">
+            <div className="flex items-center justify-center h-full text-[#274C77]/60 text-xs italic py-8">
               No news updates available.
             </div>
           )}
@@ -229,16 +229,16 @@ export default function NewsFeed() {
       {/* GES ARTICLE READER MODAL */}
       <AnimatePresence>
         {selectedArticle && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0B1E2D]/80 backdrop-blur-xs">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.2 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800"
+              className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl border border-[#274C77]/30"
             >
               {/* Modal Banner Header */}
-              <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-emerald-950 text-white p-6 relative shrink-0 border-b border-emerald-800/50">
+              <div className="bg-[#0B1E2D] text-white p-6 relative shrink-0 border-b border-[#274C77]/40">
                 <button
                   onClick={() => setSelectedArticle(null)}
                   className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors cursor-pointer"
@@ -248,12 +248,12 @@ export default function NewsFeed() {
                 </button>
 
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  <span className="bg-[#13293D] text-[#DCEAF6] border border-[#274C77]/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5 text-[#4A6FA5]" />
                     {selectedArticle.category || 'Official GES Communique'}
                   </span>
                   {selectedArticle.circularNo && (
-                    <span className="text-[11px] font-mono text-emerald-200/80 bg-black/30 px-2.5 py-1 rounded-full border border-white/10">
+                    <span className="text-[11px] font-mono text-[#DCEAF6]/80 bg-black/30 px-2.5 py-1 rounded-full border border-white/10">
                       Ref: {selectedArticle.circularNo}
                     </span>
                   )}
@@ -263,18 +263,18 @@ export default function NewsFeed() {
                   {selectedArticle.title}
                 </h2>
 
-                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 mt-3 pt-3 border-t border-white/10">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-[#DCEAF6] mt-3 pt-3 border-t border-white/10">
                   <div className="flex items-center gap-1.5">
-                    <FileText className="h-3.5 w-3.5 text-emerald-400" />
+                    <FileText className="h-3.5 w-3.5 text-[#4A6FA5]" />
                     <span>{selectedArticle.source || 'Ghana Education Service'}</span>
                   </div>
-                  <div className="flex items-center gap-1.5 font-mono text-slate-300">
-                    <Calendar className="h-3.5 w-3.5 text-emerald-400" />
+                  <div className="flex items-center gap-1.5 font-mono text-[#DCEAF6]">
+                    <Calendar className="h-3.5 w-3.5 text-[#4A6FA5]" />
                     <span>{selectedArticle.date}</span>
                   </div>
                   {selectedArticle.readTime && (
-                    <div className="flex items-center gap-1.5 text-slate-300">
-                      <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                    <div className="flex items-center gap-1.5 text-[#DCEAF6]">
+                      <Clock className="h-3.5 w-3.5 text-[#4A6FA5]" />
                       <span>{selectedArticle.readTime}</span>
                     </div>
                   )}
@@ -282,16 +282,16 @@ export default function NewsFeed() {
               </div>
 
               {/* Modal Body */}
-              <div className="p-6 overflow-y-auto flex-1 space-y-5 text-slate-700 dark:text-slate-300 text-sm leading-relaxed custom-scrollbar">
+              <div className="p-6 overflow-y-auto flex-1 space-y-5 text-[#0B1E2D] text-sm leading-relaxed custom-scrollbar">
                 
                 {/* Official Callout Box */}
-                <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 p-4 rounded-2xl flex items-start gap-3">
-                  <div className="p-2 bg-emerald-600 text-white rounded-xl shrink-0">
+                <div className="bg-[#EEF6FC] border border-[#274C77]/20 p-4 rounded-2xl flex items-start gap-3">
+                  <div className="p-2 bg-[#274C77] text-white rounded-xl shrink-0">
                     <Newspaper className="h-5 w-5" />
                   </div>
                   <div className="text-xs space-y-1">
-                    <span className="font-bold text-emerald-950 dark:text-emerald-200 uppercase tracking-wide block">Executive Summary</span>
-                    <p className="text-emerald-900 dark:text-emerald-300 leading-normal">
+                    <span className="font-bold text-[#0B1E2D] uppercase tracking-wide block">Executive Summary</span>
+                    <p className="text-[#274C77] leading-normal font-medium">
                       {selectedArticle.snippet || selectedArticle.title}
                     </p>
                   </div>
@@ -300,32 +300,32 @@ export default function NewsFeed() {
                 {/* Formatted Article Body */}
                 <div className="space-y-4 pt-2">
                   {(selectedArticle.content || selectedArticle.snippet || '').split('\n\n').map((paragraph, idx) => (
-                    <p key={idx} className="leading-relaxed text-slate-800 dark:text-slate-200 text-sm">
+                    <p key={idx} className="leading-relaxed text-[#0B1E2D] text-sm">
                       {paragraph}
                     </p>
                   ))}
                 </div>
 
                 {/* Directive Compliance Notice */}
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-4 mt-6 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                <div className="border-t border-[#274C77]/15 pt-4 mt-6 text-xs text-[#274C77]/80 flex items-center justify-between">
                   <span>Authorized by GES Public Relations & Communications Directorate</span>
-                  <span className="font-mono text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">VERIFIED CIRCULAR</span>
+                  <span className="font-mono text-[10px] bg-[#EEF6FC] text-[#274C77] font-bold px-2 py-0.5 rounded border border-[#274C77]/20">VERIFIED CIRCULAR</span>
                 </div>
               </div>
 
               {/* Modal Footer Controls */}
-              <div className="p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <div className="p-4 bg-[#EEF6FC]/60 border-t border-[#274C77]/15 flex flex-wrap items-center justify-between gap-3 shrink-0">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handlePrintArticle(selectedArticle)}
-                    className="py-2 px-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+                    className="py-2 px-3.5 bg-white border border-[#274C77]/20 hover:bg-[#EEF6FC] text-[#0B1E2D] text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer"
                   >
-                    <Printer className="h-3.5 w-3.5 text-slate-500" />
+                    <Printer className="h-3.5 w-3.5 text-[#274C77]" />
                     Print / Save Circular
                   </button>
                   <button
                     onClick={() => handleCopyArticle(selectedArticle)}
-                    className="py-2 px-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer"
+                    className="py-2 px-3.5 bg-white border border-[#274C77]/20 hover:bg-[#EEF6FC] text-[#0B1E2D] text-xs font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer"
                   >
                     {copied ? (
                       <>
@@ -334,7 +334,7 @@ export default function NewsFeed() {
                       </>
                     ) : (
                       <>
-                        <Share2 className="h-3.5 w-3.5 text-slate-500" />
+                        <Share2 className="h-3.5 w-3.5 text-[#274C77]" />
                         Copy Text
                       </>
                     )}
@@ -344,7 +344,7 @@ export default function NewsFeed() {
                       href={selectedArticle.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-2 px-3.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold rounded-xl transition flex items-center gap-1.5 hover:bg-emerald-100"
+                      className="py-2 px-3.5 bg-[#EEF6FC] border border-[#274C77]/30 text-[#274C77] text-xs font-semibold rounded-xl transition flex items-center gap-1.5 hover:bg-[#DCEAF6]"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
                       Visit Portal
@@ -354,7 +354,7 @@ export default function NewsFeed() {
 
                 <button
                   onClick={() => setSelectedArticle(null)}
-                  className="py-2 px-5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer"
+                  className="py-2 px-5 bg-[#0B1E2D] hover:bg-[#13293D] text-white text-xs font-semibold rounded-xl transition cursor-pointer"
                 >
                   Close Article
                 </button>

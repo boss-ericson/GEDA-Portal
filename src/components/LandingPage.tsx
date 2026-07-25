@@ -10,6 +10,7 @@ const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&q=80&w=1920',
   'https://images.unsplash.com/photo-1544654803-b69140b285a1?auto=format&fit=crop&q=80&w=1920'
 ];
+
 import { 
   GraduationCap, 
   WifiOff, 
@@ -442,27 +443,27 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1c] text-slate-300 font-sans selection:bg-emerald-500/30 selection:text-emerald-200 overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#EEF6FC] text-[#13293D] font-sans selection:bg-[#274C77]/20 selection:text-[#0B1E2D] overflow-x-hidden relative">
       {/* Background Slideshow */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <AnimatePresence>
           <motion.img
             key={bgIndex}
             src={BACKGROUND_IMAGES[bgIndex]}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 0.15, scale: 1 }}
+            initial={{ opacity: 0, scale: 1.03 }}
+            animate={{ opacity: 0.08, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 2, ease: "easeInOut" }}
             className="absolute inset-0 w-full h-full object-cover"
             alt="Ghana School Children Background"
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1c]/80 via-[#0a0f1c]/60 to-[#0a0f1c]"></div>
+        <div className="absolute inset-0 bg-[#EEF6FC]/85"></div>
       </div>
 
       {/* Subtle Background Glows */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-[500px] bg-emerald-600/20 blur-[120px] rounded-full pointer-events-none z-0" />
-      <div className="fixed bottom-0 right-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-[500px] bg-[#DCEAF6] blur-[140px] rounded-full pointer-events-none z-0" />
+      <div className="fixed bottom-0 right-0 w-[500px] h-[500px] bg-[#4A6FA5]/10 blur-[140px] rounded-full pointer-events-none z-0" />
 
       {/* Upper Color Strip */}
       <div className="h-1 w-full flex relative z-50">
@@ -472,83 +473,78 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
       </div>
 
       {/* Hero Header */}
-      <header className="border-b border-white/5 bg-[#0a0f1c]/80 sticky top-0 z-40 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <header className="border-b border-[#274C77]/10 bg-white/80 sticky top-0 z-40 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-2 rounded-lg shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-              <GraduationCap className="h-5 w-5" />
+            <div className="bg-[#DCEAF6] border border-[#274C77]/15 text-[#0B1E2D] p-2.5 rounded-2xl shadow-sm">
+              <GraduationCap className="h-5 w-5 text-[#0B1E2D]" />
             </div>
             <div>
-              <span className="font-display font-bold text-lg tracking-tight text-white">GEDA Portal</span>
-              <span className="block text-[9px] font-mono uppercase tracking-widest text-emerald-400/80 font-medium">Ghana Ed-Admissions</span>
+              <span className="font-display font-extrabold text-lg tracking-tight text-[#0B1E2D]">GEDA Portal</span>
+              <span className="block text-[9px] font-mono uppercase tracking-widest text-[#274C77] font-semibold">Ghana Ed-Admissions</span>
             </div>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-400">
-            <a href="#features" className="hover:text-emerald-400 transition-colors">Features</a>
-            <a href="#register" className="hover:text-emerald-400 transition-colors">Register</a>
-            <a href="#login-portal" className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-1.5 rounded-full font-medium hover:bg-emerald-500/20 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.1)]">Sign In</a>
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#274C77]">
+            <a href="#features" className="hover:text-[#0B1E2D] transition-colors">Features</a>
+            <a href="#register" className="hover:text-[#0B1E2D] transition-colors">Register</a>
+            <a href="#login-portal" className="bg-[#0B1E2D] text-white px-5 py-2.5 rounded-full font-medium hover:bg-[#13293D] hover:-translate-y-0.5 transition-all shadow-sm">Sign In</a>
           </nav>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-24 lg:pt-28 lg:pb-32">
+      <section className="relative pt-8 pb-20 lg:pt-12 lg:pb-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-16 lg:gap-8 items-center">
+          <div className="grid lg:grid-cols-12 gap-12 items-start">
             
             {/* Left Column: Headline */}
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="lg:col-span-7 space-y-8"
+              transition={{ duration: 0.5 }}
+              className="lg:col-span-7 space-y-7 lg:pt-2"
             >
-              <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                <Globe className="h-4 w-4 text-emerald-400" />
-                <span className="text-xs font-semibold text-emerald-300 tracking-wide">Official Ghana Education Admission Framework</span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-display font-bold tracking-tight text-white leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-display font-extrabold tracking-tight text-[#0B1E2D] leading-[1.12]">
                 Modernize School Admissions, <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Online & Offline</span>
+                <span className="text-[#0B1E2D]">Online & Offline</span>
               </h1>
               
-              <p className="text-lg text-slate-400 max-w-2xl leading-relaxed">
+              <p className="text-lg text-[#274C77]/90 max-w-2xl leading-relaxed font-normal">
                 Empowering Ghanaian Primary and Secondary Schools to digitally register new students, verify Mobile Money payment plans, instantly issue official GES admission letters, and sync data seamlessly in regions with low connectivity.
               </p>
 
-              <div className="flex flex-wrap gap-3 pt-2">
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
-                  <CheckCircle2 className="h-4.5 w-4.5 text-emerald-400" />
+              <div className="flex flex-wrap gap-2.5 pt-2">
+                <div className="flex items-center gap-2 text-sm font-medium text-[#13293D] bg-white/90 border border-[#274C77]/15 px-4 py-2.5 rounded-2xl shadow-sm backdrop-blur-sm">
+                  <CheckCircle2 className="h-4.5 w-4.5 text-[#274C77]" />
                   <span>GES Roster Formats</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
-                  <WifiOff className="h-4.5 w-4.5 text-amber-400" />
+                <div className="flex items-center gap-2 text-sm font-medium text-[#13293D] bg-white/90 border border-[#274C77]/15 px-4 py-2.5 rounded-2xl shadow-sm backdrop-blur-sm">
+                  <WifiOff className="h-4.5 w-4.5 text-[#4A6FA5]" />
                   <span>Offline Registry Cache</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
-                  <Wallet className="h-4.5 w-4.5 text-cyan-400" />
+                <div className="flex items-center gap-2 text-sm font-medium text-[#13293D] bg-white/90 border border-[#274C77]/15 px-4 py-2.5 rounded-2xl shadow-sm backdrop-blur-sm">
+                  <Wallet className="h-4.5 w-4.5 text-[#274C77]" />
                   <span>MoMo Payment Tracker</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
-                  <CalendarCheck className="h-4.5 w-4.5 text-blue-400" />
+                <div className="flex items-center gap-2 text-sm font-medium text-[#13293D] bg-white/90 border border-[#274C77]/15 px-4 py-2.5 rounded-2xl shadow-sm backdrop-blur-sm">
+                  <CalendarCheck className="h-4.5 w-4.5 text-[#4A6FA5]" />
                   <span>Mark Attendance</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
-                  <ClipboardList className="h-4.5 w-4.5 text-purple-400" />
+                <div className="flex items-center gap-2 text-sm font-medium text-[#13293D] bg-white/90 border border-[#274C77]/15 px-4 py-2.5 rounded-2xl shadow-sm backdrop-blur-sm">
+                  <ClipboardList className="h-4.5 w-4.5 text-[#274C77]" />
                   <span>Record SBA</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-300 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
-                  <FileText className="h-4.5 w-4.5 text-emerald-400" />
+                <div className="flex items-center gap-2 text-sm font-medium text-[#13293D] bg-white/90 border border-[#274C77]/15 px-4 py-2.5 rounded-2xl shadow-sm backdrop-blur-sm">
+                  <FileText className="h-4.5 w-4.5 text-[#4A6FA5]" />
                   <span>Issue Report Cards</span>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <a href="#login-portal" className="inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-[#0a0f1c] px-6 py-3.5 rounded-xl font-semibold shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all group">
+                <a href="#login-portal" className="inline-flex items-center justify-center gap-2.5 bg-[#0B1E2D] hover:bg-[#13293D] text-white px-7 py-4 rounded-full font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all group text-sm">
                   Access School Dashboard <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </a>
-                <a href="#register" className="inline-flex items-center justify-center bg-white/5 hover:bg-white/10 text-white px-6 py-3.5 rounded-xl border border-white/10 transition-all font-medium backdrop-blur-sm">
+                <a href="#register" className="inline-flex items-center justify-center bg-[#DCEAF6] hover:bg-[#cbe2f3] text-[#0B1E2D] px-7 py-4 rounded-full border border-[#4A6FA5]/25 hover:-translate-y-0.5 transition-all font-semibold text-sm">
                   Register Your School
                 </a>
               </div>
@@ -556,33 +552,33 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
 
             {/* Right Column: Portal Gateway Selector */}
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
               className="lg:col-span-5 relative mt-6 lg:mt-0" 
               id="login-portal"
             >
-              <div className="bg-[#0f172a]/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6 sm:p-8 relative">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 rounded-t-2xl"></div>
-                <div className="absolute top-0 right-4 sm:right-8 transform -translate-y-1/2 bg-[#0a0f1c] text-emerald-400 font-mono font-semibold text-[10px] uppercase px-3 py-1 rounded-full border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)] z-10 whitespace-nowrap">
+              <div className="bg-white/90 backdrop-blur-xl rounded-3xl border border-[#274C77]/15 shadow-xl p-7 sm:p-9 relative">
+                <div className="absolute top-0 inset-x-0 h-1.5 bg-[#0B1E2D] rounded-t-3xl"></div>
+                <div className="absolute top-0 right-4 sm:right-8 transform -translate-y-1/2 bg-[#0B1E2D] text-white font-mono font-bold text-[10px] uppercase px-3.5 py-1 rounded-full shadow-sm z-10 whitespace-nowrap">
                   SCHOOL LOGIN PORTAL
                 </div>
                 
-                <h2 className="font-display font-bold text-2xl text-white mb-1 mt-2">Administrative Gateway</h2>
-                <p className="text-slate-400 text-sm mb-6">Select your role and sign in to access your school's private dashboard.</p>
+                <h2 className="font-display font-bold text-2xl text-[#0B1E2D] mb-1 mt-2">Administrative Gateway</h2>
+                <p className="text-[#274C77] text-sm mb-6 font-normal">Select your role and sign in to access your school's private dashboard.</p>
 
                 {/* Login Mode Toggle Tabs */}
-                <div className="grid grid-cols-2 gap-2 bg-[#0a0f1c] p-1.5 rounded-xl mb-6 text-xs font-semibold border border-white/5">
+                <div className="grid grid-cols-2 gap-2 bg-[#EEF6FC] p-1.5 rounded-2xl mb-6 text-xs font-semibold border border-[#274C77]/15">
                   <button
                     type="button"
                     onClick={() => {
                       setLoginMode('secure');
                       setLoginError('');
                     }}
-                    className={`py-2 text-center rounded-lg transition-all cursor-pointer ${
+                    className={`py-2.5 text-center rounded-xl transition-all cursor-pointer ${
                       loginMode === 'secure'
-                        ? 'bg-white/10 text-white shadow-sm'
-                        : 'text-slate-500 hover:text-slate-300'
+                        ? 'bg-[#0B1E2D] text-white shadow-sm font-semibold'
+                        : 'text-[#274C77] hover:text-[#0B1E2D]'
                     }`}
                   >
                     Secure School Login
@@ -593,10 +589,10 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                       setLoginMode('demo');
                       setLoginError('');
                     }}
-                    className={`py-2 text-center rounded-lg transition-all cursor-pointer ${
+                    className={`py-2.5 text-center rounded-xl transition-all cursor-pointer ${
                       loginMode === 'demo'
-                        ? 'bg-white/10 text-white shadow-sm'
-                        : 'text-slate-500 hover:text-slate-300'
+                        ? 'bg-[#0B1E2D] text-white shadow-sm font-semibold'
+                        : 'text-[#274C77] hover:text-[#0B1E2D]'
                     }`}
                   >
                     Quick Demo Access
@@ -604,7 +600,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                 </div>
 
                 {loginError && (
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-3 rounded-xl mb-6 text-sm flex items-start gap-2">
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 text-red-800 border border-red-200 px-4 py-3 rounded-xl mb-6 text-sm flex items-start gap-2 font-medium">
                     {loginError}
                   </motion.div>
                 )} 
@@ -613,7 +609,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                   {loginMode === 'secure' ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-5">
                       <div>
-                        <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">School Official Email</label>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-[#274C77] mb-2">School Official Email</label>
                         <div className="relative">
                           <input
                             type="email"
@@ -621,14 +617,14 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                             value={loginEmail}
                             onChange={(e) => setLoginEmail(e.target.value)}
                             placeholder="administrator@achimota.edu.gh"
-                            className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                            className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl px-4 py-3 text-[#0B1E2D] focus:outline-none focus:ring-2 focus:ring-[#274C77]/30 focus:border-[#274C77] text-sm transition-all placeholder:text-[#4A6FA5]/60"
                             required
                           />
                         </div>
                       </div>
                       <div>
                         <div className="flex justify-between items-center mb-2">
-                          <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Password</label>
+                          <label className="block text-[11px] font-bold uppercase tracking-wider text-[#274C77]">Password</label>
                           <button
                             type="button"
                             onClick={() => {
@@ -637,7 +633,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                               setForgotPasswordMsg('');
                               setForgotPasswordError('');
                             }}
-                            className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold hover:underline transition-colors cursor-pointer"
+                            className="text-xs text-[#274C77] hover:text-[#0B1E2D] font-bold hover:underline transition-colors cursor-pointer"
                           >
                             Forgot Password?
                           </button>
@@ -649,13 +645,13 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl pl-4 pr-11 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                            className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl pl-4 pr-11 py-3 text-[#0B1E2D] focus:outline-none focus:ring-2 focus:ring-[#274C77]/30 focus:border-[#274C77] text-sm transition-all placeholder:text-[#4A6FA5]/60"
                             required
                           />
                           <button
                             type="button"
                             onClick={() => setShowLoginPassword(!showLoginPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#274C77] hover:text-[#0B1E2D] transition-colors cursor-pointer p-1"
                             title={showLoginPassword ? "Hide password" : "Show password"}
                             aria-label={showLoginPassword ? "Hide password" : "Show password"}
                           >
@@ -666,26 +662,26 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                     </motion.div>
                   ) : (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                      <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3.5 text-xs">
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold mb-1">
-                          <ShieldCheck className="h-4 w-4" />
+                      <div className="bg-[#DCEAF6] border border-[#274C77]/20 rounded-2xl p-4 text-xs">
+                        <div className="flex items-center gap-2 text-[#0B1E2D] font-bold mb-1">
+                          <ShieldCheck className="h-4 w-4 text-[#274C77]" />
                           <span>Sandbox Environment</span>
                         </div>
-                        <p className="text-slate-300">
+                        <p className="text-[#13293D]">
                           Quick Demo Access provides instant sandbox evaluation strictly for <strong>GEDA School Complex</strong>.
                         </p>
-                        <p className="text-slate-400 text-[11px] mt-1">
+                        <p className="text-[#274C77] text-[11px] mt-1 font-medium">
                           All registered tenants are isolated and require official credentials under Secure School Login.
                         </p>
                       </div>
 
-                      <div className="bg-[#0a0f1c] border border-white/10 rounded-xl p-3.5 flex items-center justify-between">
+                      <div className="bg-[#EEF6FC] border border-[#274C77]/15 rounded-2xl p-4 flex items-center justify-between">
                         <div>
-                          <span className="text-[10px] uppercase font-bold text-slate-500 block">Demo Tenant</span>
-                          <span className="font-bold text-white text-sm">GEDA School Complex</span>
-                          <span className="text-[11px] text-slate-400 block">Greater Accra &bull; Accra Metropolitan</span>
+                          <span className="text-[10px] uppercase font-bold text-[#274C77] block">Demo Tenant</span>
+                          <span className="font-bold text-[#0B1E2D] text-sm">GEDA School Complex</span>
+                          <span className="text-[11px] text-[#274C77] block font-medium">Greater Accra &bull; Accra Metropolitan</span>
                         </div>
-                        <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono px-2 py-1 rounded-md font-semibold">
+                        <span className="bg-[#DCEAF6] text-[#0B1E2D] border border-[#274C77]/30 text-[10px] font-mono px-2.5 py-1 rounded-lg font-bold">
                           PUBLIC DEMO
                         </span>
                       </div>
@@ -693,17 +689,17 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                   )}
 
                   <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Role-Based Access Permission</label>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-[#274C77] mb-2">Role-Based Access Permission</label>
                     <div className="grid grid-cols-3 gap-2 mb-4">
                       {(['Admin', 'Staff', 'Teacher'] as Role[]).map((role) => (
                         <button
                           key={role}
                           type="button"
                           onClick={() => setSelectedRole(role)}
-                          className={`py-2 px-2 text-xs font-semibold rounded-xl border transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
+                          className={`py-2.5 px-2 text-xs font-bold rounded-xl border transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
                             selectedRole === role
-                              ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.1)]'
-                              : 'bg-[#0a0f1c] border-white/5 text-slate-500 dark:text-slate-400 hover:bg-white/5 hover:text-slate-300'
+                              ? 'bg-[#0B1E2D] border-[#0B1E2D] text-white shadow-sm'
+                              : 'bg-[#EEF6FC] border-[#274C77]/15 text-[#13293D] hover:bg-[#DCEAF6]'
                           }`}
                         >
                           {role === 'Admin' && <ShieldCheck className="h-4 w-4 mb-0.5" />}
@@ -718,7 +714,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                   <button
                     type="submit"
                     disabled={isLoggingIn}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-[#0a0f1c] font-bold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+                    className="w-full bg-[#0B1E2D] hover:bg-[#13293D] text-white font-bold py-3.5 px-4 rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed mt-2 text-sm"
                   >
                     {isLoggingIn ? 'Authenticating Gateway...' : 'Enter Dashboard'}
                     {!isLoggingIn && <ArrowRight className="h-4 w-4" />}
@@ -729,9 +725,9 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                       type="button"
                       onClick={handleGoogleLogin}
                       disabled={isLoggingIn}
-                      className="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed mt-3"
+                      className="w-full bg-white hover:bg-slate-50 text-[#0B1E2D] border border-[#274C77]/20 font-bold py-3.5 px-4 rounded-full transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed mt-3 text-sm"
                     >
-                      <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <svg className="h-5 w-5 mr-1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -748,40 +744,40 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-[#060913] relative border-t border-white/5">
+      <section id="features" className="py-24 bg-[#DCEAF6]/40 relative border-t border-b border-[#274C77]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl font-display font-bold text-white mb-4">Built for Ghana's Education Ecosystem</h2>
-            <p className="text-slate-400">A resilient platform designed to handle the realities of infrastructure while delivering modern administrative capabilities.</p>
+            <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-[#0B1E2D] mb-4">Built for Ghana's Education Ecosystem</h2>
+            <p className="text-[#274C77] text-base leading-relaxed">A resilient platform designed to handle the realities of infrastructure while delivering modern administrative capabilities.</p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <motion.div whileHover={{ y: -5 }} className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
-              <div className="bg-blue-500/10 text-blue-400 p-3 rounded-xl w-fit mb-5">
-                <Database className="h-6 w-6" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <motion.div whileHover={{ y: -4 }} className="bg-white/90 border border-[#274C77]/15 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all">
+              <div className="bg-[#EEF6FC] text-[#274C77] p-3.5 rounded-2xl w-fit mb-6 border border-[#274C77]/15">
+                <Database className="h-6 w-6 text-[#274C77]" />
               </div>
-              <h3 className="font-display font-semibold text-lg text-white mb-2">Offline-First Resilience</h3>
-              <p className="text-sm text-slate-400 leading-relaxed">
+              <h3 className="font-display font-bold text-xl text-[#0B1E2D] mb-3">Offline-First Resilience</h3>
+              <p className="text-sm text-[#274C77] leading-relaxed">
                 Continue registering students and recording payments even when the internet drops. Data syncs automatically when connection is restored.
               </p>
             </motion.div>
 
-            <motion.div whileHover={{ y: -5 }} className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
-              <div className="bg-emerald-500/10 text-emerald-400 p-3 rounded-xl w-fit mb-5">
-                <Wallet className="h-6 w-6" />
+            <motion.div whileHover={{ y: -4 }} className="bg-white/90 border border-[#274C77]/15 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all">
+              <div className="bg-[#EEF6FC] text-[#274C77] p-3.5 rounded-2xl w-fit mb-6 border border-[#274C77]/15">
+                <Wallet className="h-6 w-6 text-[#274C77]" />
               </div>
-              <h3 className="font-display font-semibold text-lg text-white mb-2">MoMo Payment Tracker</h3>
-              <p className="text-sm text-slate-400 leading-relaxed">
+              <h3 className="font-display font-bold text-xl text-[#0B1E2D] mb-3">MoMo Payment Tracker</h3>
+              <p className="text-sm text-[#274C77] leading-relaxed">
                 Track Mobile Money payments natively. Log transaction IDs and instantly generate receipts for parents paying via MTN MoMo or Telecel Cash.
               </p>
             </motion.div>
 
-            <motion.div whileHover={{ y: -5 }} className="bg-white/5 border border-white/10 p-6 rounded-2xl backdrop-blur-sm">
-              <div className="bg-purple-500/10 text-purple-400 p-3 rounded-xl w-fit mb-5">
-                <KeyRound className="h-6 w-6" />
+            <motion.div whileHover={{ y: -4 }} className="bg-white/90 border border-[#274C77]/15 p-8 rounded-3xl shadow-sm hover:shadow-md transition-all">
+              <div className="bg-[#EEF6FC] text-[#274C77] p-3.5 rounded-2xl w-fit mb-6 border border-[#274C77]/15">
+                <KeyRound className="h-6 w-6 text-[#274C77]" />
               </div>
-              <h3 className="font-display font-semibold text-lg text-white mb-2">Seamless SIS API Sync</h3>
-              <p className="text-sm text-slate-400 leading-relaxed">
+              <h3 className="font-display font-bold text-xl text-[#0B1E2D] mb-3">Seamless SIS API Sync</h3>
+              <p className="text-sm text-[#274C77] leading-relaxed">
                 Developer-ready secure REST endpoints. Extract rosters or register new records via authorized external Student Information Systems (SIS).
               </p>
             </motion.div>
@@ -790,28 +786,27 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
       </section>
 
       {/* School Registration Form Section */}
-      <section id="register" className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1c] to-[#060913]"></div>
+      <section id="register" className="py-24 relative overflow-hidden bg-[#EEF6FC]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 relative z-10">
-          <div className="bg-[#0f172a]/60 backdrop-blur-md rounded-3xl border border-white/10 p-8 sm:p-12 shadow-2xl">
+          <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-[#274C77]/15 p-8 sm:p-12 shadow-xl">
             <div className="text-center space-y-3 mb-10">
-              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-1.5 rounded-full text-xs font-semibold w-fit mx-auto uppercase tracking-wide">
+              <div className="bg-[#DCEAF6] border border-[#274C77]/20 text-[#0B1E2D] px-4 py-1.5 rounded-full text-xs font-bold w-fit mx-auto uppercase tracking-wide">
                 Add Your Institution
               </div>
-              <h2 className="font-display font-bold text-3xl text-white">Register a New School</h2>
-              <p className="text-slate-400 text-sm max-w-lg mx-auto">Create a dedicated, private tenant space for your school. You can immediately access its administrative backend upon submission.</p>
+              <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-[#0B1E2D]">Register a New School</h2>
+              <p className="text-[#274C77] text-sm max-w-lg mx-auto font-normal">Create a dedicated, private tenant space for your school. You can immediately access its administrative backend upon submission.</p>
             </div>
 
             {registerError && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-red-500/10 text-red-400 border border-red-500/20 px-5 py-4 rounded-xl mb-8 text-sm">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-red-50 text-red-800 border border-red-200 px-5 py-4 rounded-xl mb-8 text-sm font-medium">
                 {registerError}
               </motion.div>
             )}
 
             {registerSuccess && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-5 py-4 rounded-xl mb-8 text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#DCEAF6] text-[#0B1E2D] border border-[#274C77]/30 px-5 py-4 rounded-2xl mb-8 text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-medium">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-6 w-6 shrink-0" />
+                  <CheckCircle2 className="h-6 w-6 shrink-0 text-[#274C77]" />
                   <span>School registered successfully! We have automatically selected your school in the login portal.</span>
                 </div>
                 <button
@@ -821,7 +816,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                       onLogin(schoolToLogin, 'Admin', false);
                     }
                   }}
-                  className="bg-emerald-500 text-[#0a0f1c] font-bold px-4 py-2 rounded-lg text-xs whitespace-nowrap hover:bg-emerald-400 transition-colors cursor-pointer self-end sm:self-auto"
+                  className="bg-[#0B1E2D] text-white font-bold px-4 py-2.5 rounded-full text-xs whitespace-nowrap hover:bg-[#13293D] transition-colors cursor-pointer self-end sm:self-auto shadow-sm"
                 >
                   Enter Dashboard
                 </button>
@@ -830,60 +825,60 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
 
             <form onSubmit={handleRegister} autoComplete="off" className="grid sm:grid-cols-2 gap-6">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">School Official Name</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#274C77] mb-2">School Official Name</label>
                 <input
                   type="text"
                   autoComplete="off"
                   placeholder="e.g. Accra Methodist Basic School"
                   value={newSchoolName}
                   onChange={(e) => setNewSchoolName(e.target.value)}
-                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                  className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl px-4 py-3.5 text-[#0B1E2D] focus:outline-none focus:ring-2 focus:ring-[#274C77]/30 focus:border-[#274C77] text-sm transition-all placeholder:text-[#4A6FA5]/60"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">GES Regional Division</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#274C77] mb-2">GES Regional Division</label>
                 <select
                   value={newSchoolRegion}
                   onChange={(e) => setNewSchoolRegion(e.target.value)}
-                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all appearance-none"
+                  className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl px-4 py-3.5 text-[#0B1E2D] focus:outline-none focus:ring-2 focus:ring-[#274C77]/30 focus:border-[#274C77] text-sm transition-all appearance-none cursor-pointer"
                 >
                   {ghanaRegions.map((reg) => (
-                    <option key={reg} value={reg} className="bg-[#0f172a]">{reg}</option>
+                    <option key={reg} value={reg} className="bg-white text-[#0B1E2D]">{reg}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Municipal District</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#274C77] mb-2">Municipal District</label>
                 <input
                   type="text"
                   autoComplete="off"
                   placeholder="e.g. Kumasi Metro"
                   value={newSchoolDistrict}
                   onChange={(e) => setNewSchoolDistrict(e.target.value)}
-                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                  className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl px-4 py-3.5 text-[#0B1E2D] focus:outline-none focus:ring-2 focus:ring-[#274C77]/30 focus:border-[#274C77] text-sm transition-all placeholder:text-[#4A6FA5]/60"
                   required
                 />
               </div>
 
-              <div className="sm:col-span-2 border-t border-white/5 pt-6 mt-2">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-5">Official Administrator Account Credentials</h3>
+              <div className="sm:col-span-2 border-t border-[#274C77]/15 pt-6 mt-2">
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0B1E2D] mb-5">Official Administrator Account Credentials</h3>
               </div>
               
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">School Contact/Login Email</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#274C77] mb-2">School Contact/Login Email</label>
                 <input
                   type="email"
                   autoComplete="off"
                   placeholder="e.g. admin@school.edu.gh"
                   value={newSchoolEmail}
                   onChange={(e) => setNewSchoolEmail(e.target.value)}
-                  className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                  className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl px-4 py-3.5 text-[#0B1E2D] focus:outline-none focus:ring-2 focus:ring-[#274C77]/30 focus:border-[#274C77] text-sm transition-all placeholder:text-[#4A6FA5]/60"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Administrator Password *</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#274C77] mb-2">Administrator Password *</label>
                 <div className="relative">
                   <input
                     type={showRegisterPassword ? "text" : "password"}
@@ -891,14 +886,14 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                     placeholder="•••••••• (min 6 chars)"
                     value={newSchoolPassword}
                     onChange={(e) => setNewSchoolPassword(e.target.value)}
-                    className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl pl-4 pr-11 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                    className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl pl-4 pr-11 py-3.5 text-[#0B1E2D] focus:outline-none focus:ring-2 focus:ring-[#274C77]/30 focus:border-[#274C77] text-sm transition-all placeholder:text-[#4A6FA5]/60"
                     minLength={6}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#274C77] hover:text-[#0B1E2D] transition-colors cursor-pointer p-1"
                     title={showRegisterPassword ? "Hide password" : "Show password"}
                     aria-label={showRegisterPassword ? "Hide password" : "Show password"}
                   >
@@ -908,7 +903,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Repeat / Confirm Password *</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#274C77] mb-2">Repeat / Confirm Password *</label>
                 <div className="relative">
                   <input
                     type={showRegisterConfirmPassword ? "text" : "password"}
@@ -916,14 +911,14 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                     placeholder="•••••••• (repeat password)"
                     value={newSchoolConfirmPassword}
                     onChange={(e) => setNewSchoolConfirmPassword(e.target.value)}
-                    className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl pl-4 pr-11 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 text-sm transition-all placeholder:text-slate-600 dark:text-slate-400"
+                    className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl pl-4 pr-11 py-3.5 text-[#0B1E2D] focus:outline-none focus:ring-2 focus:ring-[#274C77]/30 focus:border-[#274C77] text-sm transition-all placeholder:text-[#4A6FA5]/60"
                     minLength={6}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#274C77] hover:text-[#0B1E2D] transition-colors cursor-pointer p-1"
                     title={showRegisterConfirmPassword ? "Hide password" : "Show password"}
                     aria-label={showRegisterConfirmPassword ? "Hide password" : "Show password"}
                   >
@@ -931,8 +926,8 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                   </button>
                 </div>
                 {newSchoolConfirmPassword.length > 0 && (
-                  <p className={`text-[11px] font-medium mt-1.5 flex items-center gap-1 ${
-                    newSchoolPassword === newSchoolConfirmPassword ? 'text-emerald-400' : 'text-red-400'
+                  <p className={`text-[11px] font-bold mt-2 flex items-center gap-1 ${
+                    newSchoolPassword === newSchoolConfirmPassword ? 'text-emerald-700' : 'text-red-600'
                   }`}>
                     {newSchoolPassword === newSchoolConfirmPassword ? (
                       <>
@@ -947,13 +942,11 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                 )}
               </div>
 
-              
-
               <div className="sm:col-span-2 pt-4">
                 <button
                   type="submit"
                   disabled={isRegistering}
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#0a0f1c] font-bold py-4 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full bg-[#0B1E2D] hover:bg-[#13293D] text-white font-bold py-4 px-4 rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed text-sm"
                 >
                   {isRegistering ? 'Provisioning School Space...' : 'Register Institution & Create Admin Account'}
                 </button>
@@ -964,61 +957,62 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#090d16] text-white py-12 border-t border-slate-700">
+      <footer className="bg-white text-[#0B1E2D] py-14 border-t border-[#274C77]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <div className="flex items-center justify-center gap-2.5 text-white text-xl font-extrabold">
-            <GraduationCap className="h-7 w-7 text-emerald-400" />
-            <span className="font-display tracking-tight text-white">GEDA Portal — Ghana Ed-Admissions</span>
+          <div className="flex items-center justify-center gap-2.5 text-[#0B1E2D] text-xl font-extrabold">
+            <GraduationCap className="h-7 w-7 text-[#0B1E2D]" />
+            <span className="font-display tracking-tight text-[#0B1E2D]">GEDA Portal — Ghana Ed-Admissions</span>
           </div>
-          <p className="text-sm max-w-xl mx-auto text-slate-100 font-normal leading-relaxed">
+          <p className="text-sm max-w-xl mx-auto text-[#0B1E2D] font-medium leading-relaxed">
             Providing resilient, multi-tenant digital administration services for schools across the Republic of Ghana.
           </p>
-          <div className="pt-6 border-t border-slate-700 max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white font-semibold">
-            <div className="text-slate-100">
+          <div className="pt-6 border-t border-[#274C77]/20 max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold">
+            <div className="text-[#0B1E2D] font-medium">
               &copy; {new Date().getFullYear()} GEDA Ghana. Compliant with Ghana Education Service (GES) data standards.
             </div>
-            <div className="text-emerald-300 font-bold bg-emerald-950 border border-emerald-400 px-4 py-2 rounded-full flex items-center gap-2">
+            <div className="text-[#0B1E2D] font-bold bg-[#EEF6FC] border border-[#274C77]/30 px-4 py-2 rounded-full flex items-center gap-2 shadow-sm">
               <span>Developed &copy; BossITSolutions</span>
             </div>
           </div>
         </div>
       </footer>
+
       {/* Forgot Password Modal */}
       {showForgotPasswordModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0f172a] border border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-5">
+        <div className="fixed inset-0 z-50 bg-[#0B1E2D]/60 backdrop-blur-md flex items-center justify-center p-4">
+          <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white border border-[#274C77]/20 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative space-y-5">
             <button 
               onClick={() => { setShowForgotPasswordModal(false); setForgotPasswordMsg(''); setForgotPasswordError(''); }}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 transition cursor-pointer"
+              className="absolute top-4 right-4 text-[#274C77] hover:text-[#0B1E2D] p-2 transition cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
 
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-emerald-400 font-bold text-lg font-display">
-                <KeyRound className="h-5 w-5" />
+              <div className="flex items-center gap-2 text-[#0B1E2D] font-bold text-lg font-display">
+                <KeyRound className="h-5 w-5 text-[#274C77]" />
                 <span>Account Password Recovery</span>
               </div>
-              <p className="text-slate-400 text-xs">Enter your registered email address to receive password recovery instructions or reset information.</p>
+              <p className="text-[#274C77] text-xs font-normal">Enter your registered email address to receive password recovery instructions or reset information.</p>
             </div>
 
             {forgotPasswordError && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-xs flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+              <div className="bg-red-50 border border-red-200 text-red-800 p-3.5 rounded-xl text-xs flex items-start gap-2 font-medium">
+                <AlertCircle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
                 <span>{forgotPasswordError}</span>
               </div>
             )}
 
             {forgotPasswordMsg ? (
-              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-4 rounded-xl text-xs space-y-3">
-                <div className="flex items-center gap-2 font-bold text-emerald-400">
-                  <CheckCircle2 className="h-4 w-4" />
+              <div className="bg-[#DCEAF6] border border-[#274C77]/30 text-[#0B1E2D] p-4 rounded-2xl text-xs space-y-3 font-medium">
+                <div className="flex items-center gap-2 font-bold text-[#0B1E2D]">
+                  <CheckCircle2 className="h-4 w-4 text-[#274C77]" />
                   <span>Request Processed</span>
                 </div>
-                <p className="leading-relaxed text-slate-200">{forgotPasswordMsg}</p>
+                <p className="leading-relaxed text-[#13293D]">{forgotPasswordMsg}</p>
                 <button
                   onClick={() => { setShowForgotPasswordModal(false); setForgotPasswordMsg(''); }}
-                  className="w-full bg-emerald-500 text-slate-950 font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-400 transition cursor-pointer mt-2"
+                  className="w-full bg-[#0B1E2D] text-white font-bold py-2.5 rounded-full text-xs hover:bg-[#13293D] transition cursor-pointer mt-2 shadow-sm"
                 >
                   Return to Portal Login
                 </button>
@@ -1026,28 +1020,28 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
             ) : (
               <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Registered Email Address</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-[#274C77] mb-1.5">Registered Email Address</label>
                   <input
                     type="email"
                     placeholder="e.g. admin@school.edu.gh or teacher@school.edu.gh"
                     value={forgotPasswordEmail}
                     onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                    className="w-full bg-[#0a0f1c] border border-white/10 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    className="w-full bg-[#EEF6FC] border border-[#274C77]/20 rounded-xl px-4 py-3 text-[#0B1E2D] text-xs focus:outline-none focus:ring-2 focus:ring-[#274C77]/30"
                     required
                   />
                 </div>
 
-                <div className="bg-slate-900/60 border border-white/5 p-3 rounded-xl text-[11px] text-slate-400 space-y-1">
-                  <span className="font-semibold text-slate-300 block">&bull; School Administrators:</span>
+                <div className="bg-[#EEF6FC] border border-[#274C77]/15 p-3.5 rounded-2xl text-[11px] text-[#274C77] space-y-1 font-normal">
+                  <span className="font-bold text-[#0B1E2D] block">&bull; School Administrators:</span>
                   <p>Recovery credentials dispatched via verified school contact channel.</p>
-                  <span className="font-semibold text-slate-300 block pt-1">&bull; Registered Teachers:</span>
+                  <span className="font-bold text-[#0B1E2D] block pt-1">&bull; Registered Teachers:</span>
                   <p>Password resets are handled securely by your School Administrator via generated Password Slips.</p>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmittingForgotPassword}
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="w-full bg-[#0B1E2D] hover:bg-[#13293D] text-white font-bold py-3 rounded-full text-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-sm"
                 >
                   {isSubmittingForgotPassword ? 'Checking Recovery Records...' : 'Submit Password Reset Request'}
                   <ArrowRight className="h-4 w-4" />

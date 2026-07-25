@@ -28,12 +28,12 @@ export default function AnalyticsCenter({ school, students, isOffline }: { schoo
   return (
     <div className="p-4 md:p-6 space-y-6">
       <header className="mb-6">
-        <h2 className="text-xl font-display font-bold text-slate-900 dark:text-white">School Analytics</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Overview of academic performance and enrollment trends</p>
+        <h2 className="text-xl font-display font-bold text-[#0B1E2D]">School Analytics</h2>
+        <p className="text-sm text-[#274C77]/80">Overview of academic performance and enrollment trends</p>
       </header>
 
       {loading ? (
-        <div className="flex justify-center py-20"><div className="animate-pulse text-slate-400">Loading analytics data...</div></div>
+        <div className="flex justify-center py-20"><div className="animate-pulse text-[#274C77]">Loading analytics data...</div></div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <EnrollmentGrowthChart students={students} />
@@ -64,19 +64,19 @@ function EnrollmentGrowthChart({ students }: { students: Student[] }) {
   }, [students]);
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
-      <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-4">Enrollment Growth</h3>
+    <div className="bg-white p-6 rounded-3xl border border-[#274C77]/20 shadow-xs">
+      <h3 className="font-display font-bold text-[#0B1E2D] text-sm mb-4">Enrollment Growth</h3>
       <div className="w-full h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 20, right: 20, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-            <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#274C77" opacity={0.15} />
+            <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#274C77' }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#274C77' }} />
             <Tooltip 
-              cursor={{ fill: 'rgba(245, 158, 11, 0.1)' }} 
-              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              cursor={{ fill: 'rgba(39, 76, 119, 0.08)' }} 
+              contentStyle={{ borderRadius: '12px', border: '1px solid rgba(39,76,119,0.2)', boxShadow: '0 4px 12px rgba(11,30,45,0.08)', backgroundColor: '#FFFFFF', color: '#0B1E2D' }}
             />
-            <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="count" fill="#274C77" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -110,18 +110,18 @@ function PerformanceTrendsChart({ records }: { records: AcademicRecord[] }) {
   }, [records]);
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
-      <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-4">Performance Trends over Terms</h3>
+    <div className="bg-white p-6 rounded-3xl border border-[#274C77]/20 shadow-xs">
+      <h3 className="font-display font-bold text-[#0B1E2D] text-sm mb-4">Performance Trends over Terms</h3>
       <div className="w-full h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 20, right: 20, bottom: 5, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-            <XAxis dataKey="term" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} angle={-15} textAnchor="end" />
-            <YAxis domain={[0, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#274C77" opacity={0.15} />
+            <XAxis dataKey="term" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#274C77' }} angle={-15} textAnchor="end" />
+            <YAxis domain={[0, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#274C77' }} />
             <Tooltip 
-              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              contentStyle={{ borderRadius: '12px', border: '1px solid rgba(39,76,119,0.2)', boxShadow: '0 4px 12px rgba(11,30,45,0.08)', backgroundColor: '#FFFFFF', color: '#0B1E2D' }}
             />
-            <Line type="monotone" dataKey="avgScore" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
+            <Line type="monotone" dataKey="avgScore" stroke="#13293D" strokeWidth={3} dot={{ fill: '#274C77', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -155,19 +155,19 @@ function SubjectScoreDistributionChart({ records }: { records: AcademicRecord[] 
   }, [records]);
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-4 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none">
-      <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-4">Subject-wise Aggregate Score Distributions</h3>
+    <div className="bg-white p-6 rounded-3xl border border-[#274C77]/20 shadow-xs">
+      <h3 className="font-display font-bold text-[#0B1E2D] text-sm mb-4">Subject-wise Aggregate Score Distributions</h3>
       <div className="w-full h-72">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-            <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748b' }} angle={-15} textAnchor="end" />
-            <YAxis domain={[0, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#274C77" opacity={0.15} />
+            <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#274C77' }} angle={-15} textAnchor="end" />
+            <YAxis domain={[0, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#274C77' }} />
             <Tooltip 
-              cursor={{ fill: 'rgba(56, 189, 248, 0.1)' }} 
-              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              cursor={{ fill: 'rgba(39, 76, 119, 0.08)' }} 
+              contentStyle={{ borderRadius: '12px', border: '1px solid rgba(39,76,119,0.2)', boxShadow: '0 4px 12px rgba(11,30,45,0.08)', backgroundColor: '#FFFFFF', color: '#0B1E2D' }}
             />
-            <Bar dataKey="avgScore" fill="#38bdf8" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="avgScore" fill="#4A6FA5" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

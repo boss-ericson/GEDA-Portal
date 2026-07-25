@@ -36,9 +36,10 @@ interface LandingPageProps {
   schools: School[];
   onLogin: (school: School, role: Role, isDemo?: boolean, user?: any) => void;
   onRegisterSchool: (name: string, region: string, district: string, email: string, password: string) => Promise<{ success: boolean; school?: School; error?: string }>;
+  sessionExpiredNotice?: string | null;
 }
 
-export default function LandingPage({ schools, onLogin, onRegisterSchool }: LandingPageProps) {
+export default function LandingPage({ schools, onLogin, onRegisterSchool, sessionExpiredNotice }: LandingPageProps) {
   const [bgIndex, setBgIndex] = useState(0);
 
   useEffect(() => {
@@ -599,6 +600,16 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                   </button>
                 </div>
 
+                {sessionExpiredNotice && (
+                  <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="bg-amber-50 text-amber-900 border border-amber-200 px-4 py-3 rounded-xl mb-6 text-sm flex items-start gap-2.5 font-medium">
+                    <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-xs leading-snug">{sessionExpiredNotice}</p>
+                      <p className="text-[11px] text-amber-800/80 mt-0.5">Your login form has been cleared for security.</p>
+                    </div>
+                  </motion.div>
+                )}
+
                 {loginError && (
                   <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 text-red-800 border border-red-200 px-4 py-3 rounded-xl mb-6 text-sm flex items-start gap-2 font-medium">
                     {loginError}
@@ -641,7 +652,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool }: Land
                         <div className="relative">
                           <input
                             type={showLoginPassword ? "text" : "password"}
-                            autoComplete="current-password"
+                            autoComplete="new-password"
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
                             placeholder="••••••••"

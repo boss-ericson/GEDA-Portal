@@ -5,7 +5,7 @@ import Dashboard from './components/Dashboard';
 import SuperAdminDashboard from './components/SuperAdminDashboard';
 import { School, Role } from './types';
 import { collection, getDocs, doc, setDoc, addDoc } from 'firebase/firestore';
-import { db } from './lib/firebase';
+import { db, auth } from './lib/firebase';
 
 export default function App() {
   const [schools, setSchools] = useState<School[]>([]);
@@ -14,6 +14,9 @@ export default function App() {
   const [activeUser, setActiveUser] = useState<any>(null);
   const [isDemo, setIsDemo] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [landingKey, setLandingKey] = useState(0);
+  const [sessionExpiredNotice, setSessionExpiredNotice] = useState<string | null>(null);
+
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('geda_theme');
     if (saved) return saved === 'dark';
@@ -31,7 +34,6 @@ export default function App() {
   }, [isDark]);
 
   const toggleTheme = () => setIsDark(!isDark);
-  
 
   // Load registered schools on mount - Triggers sync
   useEffect(() => {
@@ -102,6 +104,46 @@ export default function App() {
     init();
   }, []);
 
+  // Inactivity & Session Expiry Management (30 minutes of inactivity auto-logout)
+  useEffect(() => {
+    if (!activeSchool) return;
+
+    const INACTIVITY_LIMIT_MS = 30 * 60 * 1000; // 30 mins
+
+    const resetInactivityTimer = () => {
+      sessionStorage.setItem('geda_last_activity', String(Date.now()));
+    };
+
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    activityEvents.forEach((event) => window.addEventListener(event, resetInactivityTimer, { passive: true }));
+
+    const interval = setInterval(() => {
+      const lastActivity = Number(sessionStorage.getItem('geda_last_activity') || Date.now());
+      if (Date.now() - lastActivity > INACTIVITY_LIMIT_MS) {
+        handleLogout('Session expired due to 30 minutes of inactivity. You have been logged out securely.');
+      }
+    }, 15000);
+
+    return () => {
+      activityEvents.forEach((event) => window.removeEventListener(event, resetInactivityTimer));
+      clearInterval(interval);
+    };
+  }, [activeSchool]);
+
+  // Tab & Window Session Expiry Check on Visibility Change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && activeSchool) {
+        const storedAuth = sessionStorage.getItem('geda_auth');
+        if (!storedAuth) {
+          handleLogout('Session expired or closed in another window. You have been logged out.');
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [activeSchool]);
+
   // Ensure touch events on mobile devices trigger focus on input fields immediately to summon the soft keyboard/keypad.
   useEffect(() => {
     const forceFocus = (e: Event) => {
@@ -130,15 +172,32 @@ export default function App() {
     setActiveRole(role);
     setActiveUser(user || null);
     setIsDemo(isDemoSession);
-    sessionStorage.setItem('geda_auth', JSON.stringify({ school, role, isDemo: isDemoSession, user: user || null }));
+    const now = Date.now();
+    sessionStorage.setItem('geda_auth', JSON.stringify({ school, role, isDemo: isDemoSession, user: user || null, loginTime: now }));
+    sessionStorage.setItem('geda_last_activity', String(now));
+    setSessionExpiredNotice(null);
   };
 
-  const handleLogout = () => {
+  const handleLogout = (reason?: string) => {
     setActiveSchool(null);
     setActiveRole('Admin');
     setActiveUser(null);
     setIsDemo(true);
     sessionStorage.removeItem('geda_auth');
+    sessionStorage.removeItem('geda_last_activity');
+    try {
+      if (auth && typeof auth.signOut === 'function') {
+        auth.signOut().catch(() => {});
+      }
+    } catch (e) {
+      console.warn("Signout error:", e);
+    }
+    if (reason) {
+      setSessionExpiredNotice(reason);
+    } else {
+      setSessionExpiredNotice(null);
+    }
+    setLandingKey((prev) => prev + 1);
   };
 
   const handleRoleChange = (newRole: Role) => {
@@ -246,6 +305,8 @@ export default function App() {
         />
       ) : (
         <LandingPage
+          key={landingKey}
+          sessionExpiredNotice={sessionExpiredNotice}
           schools={schools}
           onLogin={handleLogin}
           onRegisterSchool={handleRegisterSchool}

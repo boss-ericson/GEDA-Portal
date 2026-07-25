@@ -600,7 +600,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool, sessio
                   </button>
                 </div>
 
-                {sessionExpiredNotice && (
+                {sessionExpiredNotice && typeof sessionExpiredNotice === 'string' && (
                   <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="bg-amber-50 text-amber-900 border border-amber-200 px-4 py-3 rounded-xl mb-6 text-sm flex items-start gap-2.5 font-medium">
                     <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                     <div>

@@ -178,7 +178,7 @@ export default function App() {
     setSessionExpiredNotice(null);
   };
 
-  const handleLogout = (reason?: string) => {
+  const handleLogout = (reason?: unknown) => {
     setActiveSchool(null);
     setActiveRole('Admin');
     setActiveUser(null);
@@ -192,7 +192,7 @@ export default function App() {
     } catch (e) {
       console.warn("Signout error:", e);
     }
-    if (reason) {
+    if (typeof reason === 'string') {
       setSessionExpiredNotice(reason);
     } else {
       setSessionExpiredNotice(null);

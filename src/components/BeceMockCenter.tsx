@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { School, Student, BeceMockRecord, BeceSubjectScore, Role } from '../types';
+import { Skeleton } from './SkeletonLoader';
 import { 
   GraduationCap, Award, BarChart3, TrendingUp, TrendingDown, BookOpen, 
   PlusCircle, Search, Save, Download, Printer, FileSpreadsheet, Sparkles, 
@@ -885,7 +886,23 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#274C77]/15 text-xs">
-                  {filteredCandidates.map((student) => {
+                  {loading ? (
+                    Array.from({ length: 6 }).map((_, i) => (
+                      <tr key={i}>
+                        <td className="p-3">
+                          <div className="space-y-1">
+                            <Skeleton className="h-4 w-32" />
+                            <Skeleton className="h-3 w-20" />
+                          </div>
+                        </td>
+                        {Array.from({ length: 8 }).map((_, j) => (
+                          <td key={j} className="p-2 text-center">
+                            <Skeleton className="h-8 w-12 mx-auto rounded-lg" />
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : filteredCandidates.map((student) => {
                     const record = getRecordForStudent(student.id);
 
                     return (

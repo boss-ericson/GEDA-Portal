@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { School, Student, AcademicRecord } from '../types';
 import { Printer, Search, FileText, Download } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
+import { TableSkeleton } from './SkeletonLoader';
 
 interface Props {
   school: School;
@@ -273,7 +274,7 @@ export default function StudentTranscripts({ school, students }: Props) {
 
               <div className="flex-1 overflow-y-auto p-6">
                 {loading ? (
-                  <div className="flex justify-center items-center h-32 text-slate-500 dark:text-slate-400">Loading records...</div>
+                  <TableSkeleton rows={4} cols={4} />
                 ) : records.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-64 text-center bg-slate-50 dark:bg-slate-950 rounded-2xl border border-dashed border-slate-300 dark:border-slate-600">
                     <FileText className="h-10 w-10 text-slate-300 mb-2" />

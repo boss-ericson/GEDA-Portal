@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { School, Student, AcademicRecord, SubjectScore, Role } from '../types';
 import { Award, PlusCircle, Printer, Search, RefreshCw, ChevronDown, ChevronRight, FileText, Download, Lock, ShieldCheck } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
+import { Skeleton } from './SkeletonLoader';
 
 interface AcademicCenterProps {
   school: School;
@@ -893,7 +894,27 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {classStudents.map(student => {
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <tr key={i}>
+                        <td className="py-3 px-4">
+                          <div className="space-y-1">
+                            <Skeleton className="h-4 w-36" />
+                            <Skeleton className="h-3 w-20" />
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <Skeleton className="h-5 w-16 mx-auto rounded-md" />
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <Skeleton className="h-7 w-12 rounded-lg" />
+                            <Skeleton className="h-7 w-12 rounded-lg" />
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : classStudents.map(student => {
                     const hasRecord = records.some(r => r.studentId === student.id);
                     return (
                       <tr key={student.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 dark:bg-slate-950/50">

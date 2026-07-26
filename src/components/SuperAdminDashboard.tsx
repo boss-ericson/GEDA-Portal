@@ -3,6 +3,7 @@ import { School } from '../types';
 import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ShieldAlert, LogOut, CheckCircle2, Search, Power, PowerOff, Building2, Users, Bell } from 'lucide-react';
+import { Skeleton } from './SkeletonLoader';
 
 interface SchoolWithStats extends School {
   studentCount: number;
@@ -270,9 +271,31 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
               </thead>
               <tbody className="divide-y divide-slate-800">
                 {loading ? (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-slate-400">Loading tenants...</td>
-                  </tr>
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i}>
+                      <td className="py-4 px-5">
+                        <div className="space-y-1.5">
+                          <Skeleton className="h-4 w-40 bg-slate-800" />
+                          <Skeleton className="h-3 w-28 bg-slate-800/60" />
+                        </div>
+                      </td>
+                      <td className="py-4 px-5">
+                        <Skeleton className="h-4 w-28 bg-slate-800" />
+                      </td>
+                      <td className="py-4 px-5 text-right">
+                        <Skeleton className="h-4 w-12 ml-auto bg-slate-800" />
+                      </td>
+                      <td className="py-4 px-5 text-center">
+                        <Skeleton className="h-5 w-16 mx-auto rounded-full bg-slate-800" />
+                      </td>
+                      <td className="py-4 px-5 text-center">
+                        <Skeleton className="h-5 w-20 mx-auto rounded-full bg-slate-800" />
+                      </td>
+                      <td className="py-4 px-5 text-center">
+                        <Skeleton className="h-8 w-24 mx-auto rounded-xl bg-slate-800" />
+                      </td>
+                    </tr>
+                  ))
                 ) : filteredSchools.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="py-8 text-center text-slate-500 dark:text-slate-400">No matching tenants found.</td>

@@ -18,6 +18,7 @@ import PastStudents from './PastStudents';
 import BillingComponent from './BillingComponent';
 import AcademicHistoryArchive from './AcademicHistoryArchive';
 import { ParentNoticeHub } from './ParentNoticeHub';
+import { Skeleton, StatCardSkeleton, ChartWidgetSkeleton, TableSkeleton, MetricsCenterSkeleton, StudentRegistrySkeleton, GenericWidgetSkeleton } from './SkeletonLoader';
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, setDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { 
@@ -2127,6 +2128,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
           {/* TAB 1: EXECUTIVE OVERVIEW METRICS CENTER */}
           {activeTab === 'overview' && role !== 'Teacher' && (
+            isLoading ? (
+              <MetricsCenterSkeleton />
+            ) : (
             <div className="space-y-6 fade-in">
               {/* EXECUTIVE COMMAND BANNER */}
               <div className="bg-white text-[#0B1E2D] rounded-3xl p-6 sm:p-8 border border-[#274C77]/20 shadow-xs space-y-6">
@@ -2698,10 +2702,13 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
               </div>
 
             </div>
-          )}
+          ))}
 
           {/* TAB 2: STUDENT REGISTRY */}
           {activeTab === 'roster' && (
+            isLoading ? (
+              <StudentRegistrySkeleton />
+            ) : (
             <div className="space-y-6 fade-in">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
@@ -2940,7 +2947,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 </div>
               </div>
             </div>
-          )}
+          ))}
 
           {/* TAB: ANALYTICS */}
           {activeTab === 'analytics' && role !== 'Teacher' && (
@@ -2949,6 +2956,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
           {/* TAB: CLASSES */}
           {activeTab === 'classes' && (
+            isLoading ? (
+              <GenericWidgetSkeleton title="Loading Classes & Roster..." />
+            ) : (
             <div className="space-y-6 fade-in">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
@@ -3015,7 +3025,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 })}
               </div>
             </div>
-          )}
+          ))}
 
           {/* TAB: ACADEMIC CENTER */}
           {activeTab === 'academic' && (
@@ -3414,6 +3424,9 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
           {/* TAB 4: MOMO PAYMENTS LEDGER */}
           {activeTab === 'payments' && (
+            isLoading ? (
+              <TableSkeleton rows={6} cols={5} />
+            ) : (
             <div className="space-y-6 fade-in">
               <div>
                 <h2 className="text-2xl font-display font-bold text-slate-950 dark:text-white">Localized Payment Tracking (Momo Verification)</h2>
@@ -3724,10 +3737,13 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 </div>
               )}
             </div>
-          )}
+          ))}
 
           {/* TAB 5: AUTOMATED BACKUPS */}
           {activeTab === 'backups' && (
+            isLoading ? (
+              <TableSkeleton rows={5} cols={4} />
+            ) : (
             <div className="space-y-6 fade-in">
               <div>
                 <h2 className="text-2xl font-display font-bold text-slate-950 dark:text-white">Secure Automated Data Backups</h2>
@@ -3832,7 +3848,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                 </div>
               )}
             </div>
-          )}
+          ))}
 
           {/* TAB 6: DEVELOPER API INTEGRATION */}
           {activeTab === 'api' && (
@@ -4338,9 +4354,25 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                         </thead>
                         <tbody>
                           {loadingTeachers ? (
-                            <tr>
-                              <td colSpan={5} className="py-8 text-center text-slate-400 font-mono">Loading teachers list...</td>
-                            </tr>
+                            Array.from({ length: 4 }).map((_, i) => (
+                              <tr key={i} className="border-b border-slate-50">
+                                <td className="py-3">
+                                  <Skeleton className="h-4 w-36" />
+                                </td>
+                                <td className="py-3">
+                                  <Skeleton className="h-4 w-32" />
+                                </td>
+                                <td className="py-3">
+                                  <Skeleton className="h-4 w-24" />
+                                </td>
+                                <td className="py-3">
+                                  <Skeleton className="h-4 w-20" />
+                                </td>
+                                <td className="py-3 text-right">
+                                  <Skeleton className="h-7 w-16 ml-auto rounded-lg" />
+                                </td>
+                              </tr>
+                            ))
                           ) : teachers.length === 0 ? (
                             <tr>
                               <td colSpan={5} className="py-8 text-center text-slate-400 font-mono">No teachers registered yet. Create one on the left.</td>

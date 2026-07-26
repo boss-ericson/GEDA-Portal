@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { School, Student, AttendanceRecord } from '../types';
 import { CheckCircle2, XCircle, Clock, Save, RefreshCw } from 'lucide-react';
+import { Skeleton } from './SkeletonLoader';
 
 interface AttendanceTrackerProps {
   school: School;
@@ -317,7 +318,31 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {classStudents.map(student => {
+                {loading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <tr key={i}>
+                      <td className="py-3 px-4 text-center">
+                        <Skeleton className="h-4 w-4 mx-auto rounded" />
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-8 w-8 rounded-full" />
+                          <Skeleton className="h-4 w-36" />
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <Skeleton className="h-6 w-20 mx-auto rounded-full" />
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex justify-end gap-1.5">
+                          <Skeleton className="h-7 w-16 rounded-lg" />
+                          <Skeleton className="h-7 w-16 rounded-lg" />
+                          <Skeleton className="h-7 w-16 rounded-lg" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : classStudents.map(student => {
                   const record = attendance[student.id];
                   const isCurrentRecord = record && record.date === date;
                   return (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { School, Student, AcademicRecord, Payment, AttendanceRecord } from '../types';
+import { TableSkeleton } from './SkeletonLoader';
 import { 
   Archive, 
   Calendar, 
@@ -454,7 +455,11 @@ export default function AcademicHistoryArchive({
         </button>
       </div>
 
-      {/* SUB-VIEW 1: ARCHIVED ACADEMIC ASSESSMENTS */}
+      {isLoading ? (
+        <TableSkeleton rows={6} cols={6} />
+      ) : (
+        <>
+          {/* SUB-VIEW 1: ARCHIVED ACADEMIC ASSESSMENTS */}
       {activeSubView === 'academics' && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
           <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
@@ -668,6 +673,8 @@ export default function AcademicHistoryArchive({
             </div>
           )}
         </div>
+      )}
+      </>
       )}
 
       {/* STUDENT ARCHIVED REPORT CARD MODAL */}

@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 
 interface LandingPageProps {
+  key?: string | number;
   schools: School[];
   onLogin: (school: School, role: Role, isDemo?: boolean, user?: any) => void;
   onRegisterSchool: (name: string, region: string, district: string, email: string, password: string) => Promise<{ success: boolean; school?: School; error?: string }>;

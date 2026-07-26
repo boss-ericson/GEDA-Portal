@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { School, Student, AcademicRecord } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
+import { AnalyticsCenterSkeleton } from './SkeletonLoader';
 
 export default function AnalyticsCenter({ school, students, isOffline }: { school: School, students: Student[], isOffline: boolean }) {
   const [records, setRecords] = useState<AcademicRecord[]>([]);
@@ -25,6 +26,10 @@ export default function AnalyticsCenter({ school, students, isOffline }: { schoo
     fetchAllRecords();
   }, [school.id, isOffline]);
 
+  if (loading) {
+    return <AnalyticsCenterSkeleton />;
+  }
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       <header className="mb-6">
@@ -32,17 +37,13 @@ export default function AnalyticsCenter({ school, students, isOffline }: { schoo
         <p className="text-sm text-[#274C77]/80">Overview of academic performance and enrollment trends</p>
       </header>
 
-      {loading ? (
-        <div className="flex justify-center py-20"><div className="animate-pulse text-[#274C77]">Loading analytics data...</div></div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <EnrollmentGrowthChart students={students} />
-          <PerformanceTrendsChart records={records} />
-          <div className="lg:col-span-2">
-            <SubjectScoreDistributionChart records={records} />
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <EnrollmentGrowthChart students={students} />
+        <PerformanceTrendsChart records={records} />
+        <div className="lg:col-span-2">
+          <SubjectScoreDistributionChart records={records} />
         </div>
-      )}
+      </div>
     </div>
   );
 }

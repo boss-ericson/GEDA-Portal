@@ -344,17 +344,17 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl border border-slate-800">
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#0B1E2D] via-[#13293D] to-[#274C77] rounded-2xl p-6 text-white shadow-xl border border-[#274C77]/30">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-semibold mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#274C77]/40 border border-[#A3CEF1]/30 text-[#A3CEF1] text-xs font-semibold mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-[#A3CEF1]" />
               <span>Parent-Teacher Bridge & Student Recognition Hub</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">
               Parent Broadcast & Character Badges
             </h1>
-            <p className="text-xs text-slate-300 max-w-2xl mt-1 leading-relaxed">
+            <p className="text-xs text-[#EEF6FC]/80 max-w-2xl mt-1 leading-relaxed">
               Dispatch instant SMS & WhatsApp notices to parents, award GES conduct & character badges, and issue printable Parent Access Slips.
             </p>
           </div>
@@ -362,7 +362,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition shadow-lg cursor-pointer"
+              className="bg-[#274C77] hover:bg-[#13293D] text-white font-medium px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition shadow-md border border-[#A3CEF1]/20 cursor-pointer"
             >
               <Printer className="w-4 h-4" />
               <span>Print Access Slip</span>
@@ -371,13 +371,13 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 mt-6 border-t border-slate-800 pt-4">
+        <div className="flex flex-wrap gap-2 mt-6 border-t border-[#274C77]/40 pt-4">
           <button
             onClick={() => setActiveTab('broadcast')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
               activeTab === 'broadcast'
-                ? 'bg-amber-500 text-slate-950 shadow-md font-bold'
-                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white'
+                ? 'bg-[#274C77] text-white shadow-md font-bold border border-[#A3CEF1]/30'
+                : 'bg-[#13293D]/60 text-[#EEF6FC]/80 hover:bg-[#13293D] hover:text-white'
             }`}
           >
             <MessageSquare className="w-4 h-4" />
@@ -388,8 +388,8 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
             onClick={() => setActiveTab('badges')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
               activeTab === 'badges'
-                ? 'bg-amber-500 text-slate-950 shadow-md font-bold'
-                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white'
+                ? 'bg-[#274C77] text-white shadow-md font-bold border border-[#A3CEF1]/30'
+                : 'bg-[#13293D]/60 text-[#EEF6FC]/80 hover:bg-[#13293D] hover:text-white'
             }`}
           >
             <Award className="w-4 h-4" />
@@ -400,8 +400,8 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
             onClick={() => setActiveTab('portal_slip')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer ${
               activeTab === 'portal_slip'
-                ? 'bg-amber-500 text-slate-950 shadow-md font-bold'
-                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white'
+                ? 'bg-[#274C77] text-white shadow-md font-bold border border-[#A3CEF1]/30'
+                : 'bg-[#13293D]/60 text-[#EEF6FC]/80 hover:bg-[#13293D] hover:text-white'
             }`}
           >
             <QrCode className="w-4 h-4" />
@@ -417,7 +417,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
           <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl text-indigo-600 dark:text-indigo-400">
+                <div className="p-2 bg-[#EEF6FC] dark:bg-[#13293D] rounded-xl text-[#274C77] dark:text-[#A3CEF1]">
                   <Smartphone className="w-5 h-5" />
                 </div>
                 <div>
@@ -485,7 +485,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                 <select
                   value={broadcastAudience}
                   onChange={(e) => setBroadcastAudience(e.target.value as any)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#274C77]"
                 >
                   <option value="All Parents">All Parents ({students.length})</option>
                   <option value="Class-Specific">Class Specific</option>
@@ -502,7 +502,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                   <select
                     value={selectedClass}
                     onChange={(e) => setSelectedClass(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#274C77]"
                   >
                     {uniqueClasses.map(cls => (
                       <option key={cls} value={cls}>{cls}</option>
@@ -523,7 +523,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                       onClick={() => setBroadcastChannel(channel)}
                       className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-semibold border transition cursor-pointer text-center ${
                         broadcastChannel === channel
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow'
+                          ? 'bg-[#274C77] text-white border-[#274C77] shadow-xs'
                           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }`}
                     >
@@ -546,7 +546,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                 placeholder="e.g. End of Term Report Card Availability"
                 value={broadcastTitle}
                 onChange={(e) => setBroadcastTitle(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#274C77]"
               />
             </div>
 
@@ -562,7 +562,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                 placeholder="Type your notice message here..."
                 value={broadcastMessage}
                 onChange={(e) => setBroadcastMessage(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#274C77]"
               />
             </div>
 
@@ -577,7 +577,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
             {/* Action Buttons */}
             <div className="flex items-center justify-between pt-2">
               <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-indigo-500" />
+                <Shield className="w-3.5 h-3.5 text-[#274C77] dark:text-[#A3CEF1]" />
                 <span>Sender ID: <b>{school.slug ? school.slug.toUpperCase().slice(0, 11) : 'GES-BASIC'}</b></span>
               </div>
 
@@ -585,7 +585,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                 type="button"
                 onClick={handleSendBroadcast}
                 disabled={isSending || !broadcastTitle || !broadcastMessage}
-                className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center gap-2 transition shadow-md cursor-pointer"
+                className="bg-[#274C77] hover:bg-[#13293D] disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center gap-2 transition shadow-md cursor-pointer"
               >
                 {isSending ? (
                   <>
@@ -607,7 +607,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
             <div>
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-indigo-500" />
+                  <MessageSquare className="w-4 h-4 text-[#274C77] dark:text-[#A3CEF1]" />
                   <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">Broadcast History Log</h3>
                 </div>
                 <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-semibold text-slate-600 dark:text-slate-400">
@@ -671,7 +671,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
           {/* Award Badge Panel */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="p-2 bg-amber-50 dark:bg-amber-950/50 rounded-xl text-amber-600 dark:text-amber-400">
+              <div className="p-2 bg-[#EEF6FC] dark:bg-[#13293D] rounded-xl text-[#274C77] dark:text-[#A3CEF1]">
                 <Award className="w-5 h-5" />
               </div>
               <div>
@@ -688,7 +688,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
               <select
                 value={badgeStudentId}
                 onChange={(e) => setBadgeStudentId(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#274C77]"
               >
                 {students.map(s => (
                   <option key={s.id} value={s.id}>
@@ -716,7 +716,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                       onClick={() => setBadgeType(key)}
                       className={`p-2.5 rounded-xl border text-left transition flex items-center gap-2 cursor-pointer ${
                         isSelected
-                          ? `${cfg.bg} ${cfg.border} ring-1 ring-amber-500`
+                          ? `${cfg.bg} ${cfg.border} ring-1 ring-[#274C77]`
                           : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
                       }`}
                     >
@@ -741,7 +741,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                 placeholder="Specific commendation reason (e.g. Exhibited exemplary leadership during school cleanup)"
                 value={badgeReason}
                 onChange={(e) => setBadgeReason(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#274C77]"
               />
             </div>
 
@@ -755,7 +755,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
             <button
               type="button"
               onClick={handleAwardBadge}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-md cursor-pointer"
+              className="w-full bg-[#274C77] hover:bg-[#13293D] text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-md cursor-pointer"
             >
               <Award className="w-4 h-4" />
               <span>Confer Badge & Send Praise Note</span>
@@ -778,7 +778,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                     placeholder="Search student..."
                     value={badgeSearchQuery}
                     onChange={(e) => setBadgeSearchQuery(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 w-36 sm:w-44"
+                    className="pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#274C77] w-36 sm:w-44"
                   />
                 </div>
 
@@ -861,7 +861,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
           {/* Selector Panel */}
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
-              <QrCode className="w-5 h-5 text-indigo-500" />
+              <QrCode className="w-5 h-5 text-[#274C77] dark:text-[#A3CEF1]" />
               <div>
                 <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">Parent Slip Generator</h2>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">Generate printable verification slip & parent access portal card</p>
@@ -876,7 +876,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
               <select
                 value={slipStudentId}
                 onChange={(e) => setSlipStudentId(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-[#274C77]"
               >
                 {students.map(s => (
                   <option key={s.id} value={s.id}>
@@ -888,7 +888,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
 
             <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
               <div className="font-bold text-slate-900 dark:text-slate-100">Parent Portal Direct Link</div>
-              <div className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 break-all p-2 bg-white dark:bg-slate-900 rounded-lg border">
+              <div className="text-[11px] font-mono text-[#274C77] dark:text-[#A3CEF1] break-all p-2 bg-white dark:bg-slate-900 rounded-lg border">
                 https://school.ges.gov.gh/portal/{selectedSlipStudent?.admissionNo?.toLowerCase() || 'std-101'}
               </div>
               <button
@@ -906,7 +906,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
 
             <button
               onClick={() => window.print()}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-md cursor-pointer"
+              className="w-full bg-[#274C77] hover:bg-[#13293D] text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-md cursor-pointer"
             >
               <Printer className="w-4 h-4" />
               <span>Print Official Parent Access Slip</span>
@@ -958,16 +958,16 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                 </div>
 
                 {/* Key Academic Dates */}
-                <div className="grid grid-cols-2 gap-4 text-xs bg-indigo-50/50 dark:bg-indigo-950/20 p-4 rounded-xl border border-indigo-200/60 dark:border-indigo-800/60">
+                <div className="grid grid-cols-2 gap-4 text-xs bg-[#EEF6FC]/70 dark:bg-[#13293D]/30 p-4 rounded-xl border border-[#274C77]/20 dark:border-[#274C77]/40">
                   <div>
-                    <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Vacation Date</div>
+                    <div className="text-[10px] font-bold text-[#274C77] dark:text-[#A3CEF1] uppercase">Vacation Date</div>
                     <div className="font-bold text-slate-900 dark:text-slate-100">
                       {school.vacationDate ? new Date(school.vacationDate).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '2026-08-10'}
                     </div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase">Next Term Begins</div>
-                    <div className="font-bold text-indigo-700 dark:text-indigo-300">
+                    <div className="text-[10px] font-bold text-[#274C77] dark:text-[#A3CEF1] uppercase">Next Term Begins</div>
+                    <div className="font-bold text-[#274C77] dark:text-[#A3CEF1]">
                       {school.nextTermBegins ? new Date(school.nextTermBegins).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : (school.reopeningDate ? new Date(school.reopeningDate).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '2026-09-08')}
                     </div>
                   </div>

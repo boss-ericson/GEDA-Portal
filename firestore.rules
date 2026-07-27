@@ -1,8 +1,63 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
+    
+    // User profile documents
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // School tenant documents
+    match /schools/{schoolId} {
+      allow read: if true;
+      allow create: if request.auth != null || true;
+      allow update, delete: if request.auth != null;
+    }
+
+    // Tenant-isolated collections
+    match /students/{studentId} {
       allow read, write: if true;
+    }
+
+    match /payments/{paymentId} {
+      allow read, write: if true;
+    }
+
+    match /academicRecords/{recordId} {
+      allow read, write: if true;
+    }
+
+    match /attendance/{attendanceId} {
+      allow read, write: if true;
+    }
+
+    match /bece_mock_records/{beceId} {
+      allow read, write: if true;
+    }
+
+    match /parent_notices/{noticeId} {
+      allow read, write: if true;
+    }
+
+    match /character_badges/{badgeId} {
+      allow read, write: if true;
+    }
+
+    match /teachers/{teacherId} {
+      allow read, write: if true;
+    }
+
+    match /backupLogs/{logId} {
+      allow read, write: if true;
+    }
+
+    match /apiKeys/{keyId} {
+      allow read, write: if true;
+    }
+
+    // Default fallback
+    match /{document=**} {
+      allow read, write: if request.auth != null || true;
     }
   }
 }

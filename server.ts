@@ -940,6 +940,58 @@ As an expert Ghanaian NaCCA Curriculum Specialist & Master AI Assistant, answer 
       res.json(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })));
     } catch (e: any) { res.status(500).json({ error: e.message }); }
   });
+
+  // --- PARENT NOTICES ---
+  app.get("/api/v1/parent-notices", async (req, res) => {
+    try {
+      const schoolId = (req.query.schoolId as string) || "";
+      if (!schoolId) {
+        return res.json([]);
+      }
+      const snapshot = await getDocs(query(collection(getDb(), "parent_notices"), where("schoolId", "==", schoolId)));
+      const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      items.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      res.json(items);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.post("/api/v1/parent-notices", async (req, res) => {
+    try {
+      const notice = req.body;
+      notice.timestamp = notice.timestamp || new Date().toISOString();
+      if (!notice.schoolId) {
+        return res.status(400).json({ error: "Missing schoolId for tenant isolation" });
+      }
+      const docRef = await addDoc(collection(getDb(), "parent_notices"), notice);
+      res.status(201).json({ ...notice, id: docRef.id });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  // --- CHARACTER BADGES ---
+  app.get("/api/v1/character-badges", async (req, res) => {
+    try {
+      const schoolId = (req.query.schoolId as string) || "";
+      if (!schoolId) {
+        return res.json([]);
+      }
+      const snapshot = await getDocs(query(collection(getDb(), "character_badges"), where("schoolId", "==", schoolId)));
+      const items = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      items.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      res.json(items);
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
+
+  app.post("/api/v1/character-badges", async (req, res) => {
+    try {
+      const badge = req.body;
+      badge.date = badge.date || new Date().toISOString().split('T')[0];
+      if (!badge.schoolId) {
+        return res.status(400).json({ error: "Missing schoolId for tenant isolation" });
+      }
+      const docRef = await addDoc(collection(getDb(), "character_badges"), badge);
+      res.status(201).json({ ...badge, id: docRef.id });
+    } catch (e: any) { res.status(500).json({ error: e.message }); }
+  });
   
   app.post("/api/v1/api-keys", async (req, res) => {
     try {

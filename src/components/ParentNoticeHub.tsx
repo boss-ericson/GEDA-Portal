@@ -5,6 +5,9 @@ import {
   Share2, FileText, Calendar, Clock, Star, Trophy, Heart, Zap, UserCheck, Eye, Copy
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { Skeleton } from './SkeletonLoader';
 import { School, Student, ParentBroadcastNotice, CharacterBadge } from '../types';
 
 interface ParentNoticeHubProps {
@@ -93,59 +96,10 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
   const [broadcastSuccess, setBroadcastSuccess] = useState('');
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-  // Broadcast history state
-  const [broadcasts, setBroadcasts] = useState<ParentBroadcastNotice[]>([
-    {
-      id: 'notif-001',
-      schoolId: school.id,
-      title: 'End of Term 2 Fee Payment & Reopening Notice',
-      message: `Dear Parent, Term 2 at ${school.name} ends on ${school.vacationDate || '2026-08-10'}. Next Term begins on ${school.nextTermBegins || school.reopeningDate || '2026-09-08'}. Kindly settle all outstanding fees. Thank you!`,
-      targetAudience: 'All Parents',
-      channel: 'SMS Broadcast',
-      sentBy: userName || 'School Admin',
-      timestamp: new Date().toISOString(),
-      recipientsCount: students.length || 120,
-      status: 'Delivered'
-    },
-    {
-      id: 'notif-002',
-      schoolId: school.id,
-      title: 'Terminal Report Cards & PTA Meeting',
-      message: `Greetings! Terminal Report Cards for ${school.academicTerm || 'First'} Term (${school.academicYear || '2026/2027'}) are ready for collection at the school office. General PTA Meeting holds this Friday at 10:00 AM.`,
-      targetAudience: 'All Parents',
-      channel: 'WhatsApp Notice',
-      sentBy: userName || 'Head Teacher',
-      timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
-      recipientsCount: students.length || 120,
-      status: 'Delivered'
-    }
-  ]);
-
-  // Character Badges State
-  const [badges, setBadges] = useState<CharacterBadge[]>([
-    {
-      id: 'bdg-1',
-      studentId: students[0]?.id || 'st-1',
-      schoolId: school.id,
-      badgeType: 'Punctuality',
-      awardedBy: 'Head Teacher',
-      date: new Date().toISOString().split('T')[0],
-      reason: 'First student to arrive for 3 consecutive weeks',
-      academicYear: school.academicYear || '2026/2027',
-      academicTerm: school.academicTerm || 'First'
-    },
-    {
-      id: 'bdg-2',
-      studentId: students[0]?.id || 'st-1',
-      schoolId: school.id,
-      badgeType: 'Academic Excellence',
-      awardedBy: 'Class Facilitator',
-      date: new Date().toISOString().split('T')[0],
-      reason: 'Top score in Mathematics & Integrated Science assessment',
-      academicYear: school.academicYear || '2026/2027',
-      academicTerm: school.academicTerm || 'First'
-    }
-  ]);
+  // Broadcast history state & Character Badges state with tenant isolation
+  const [broadcasts, setBroadcasts] = useState<ParentBroadcastNotice[]>([]);
+  const [badges, setBadges] = useState<CharacterBadge[]>([]);
+  const [isLoadingNotices, setIsLoadingNotices] = useState<boolean>(true);
 
   const [badgeStudentId, setBadgeStudentId] = useState<string>(students[0]?.id || '');
   const [badgeType, setBadgeType] = useState<CharacterBadge['badgeType']>('Punctuality');
@@ -158,10 +112,95 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
   const [slipStudentId, setSlipStudentId] = useState<string>(students[0]?.id || '');
   const [slipSearch, setSlipSearch] = useState<string>('');
 
+  // Tenant Isolation Fetcher
   useEffect(() => {
-    if (students.length > 0 && !badgeStudentId) {
-      setBadgeStudentId(students[0].id);
-      setSlipStudentId(students[0].id);
+    if (!school?.id) return;
+    let isMounted = true;
+    setIsLoadingNotices(true);
+
+    const loadTenantNoticesAndBadges = async () => {
+      const noticeKey = `geda_parent_notices_${school.id}`;
+      const badgeKey = `geda_character_badges_${school.id}`;
+
+      // Try local cache first for instant feedback
+      const cachedN = localStorage.getItem(noticeKey);
+      const cachedB = localStorage.getItem(badgeKey);
+
+      let initialNotices: ParentBroadcastNotice[] = [];
+      let initialBadges: CharacterBadge[] = [];
+
+      if (cachedN) {
+        try { initialNotices = JSON.parse(cachedN); } catch (e) { console.error(e); }
+      }
+      if (cachedB) {
+        try { initialBadges = JSON.parse(cachedB); } catch (e) { console.error(e); }
+      }
+
+      if (isMounted) {
+        setBroadcasts(initialNotices);
+        setBadges(initialBadges);
+      }
+
+      try {
+        // Query Firestore for strictly this school's parent notices
+        const noticesQ = query(collection(db, 'parent_notices'), where('schoolId', '==', school.id));
+        const noticesSnap = await getDocs(noticesQ);
+        const remoteNotices = noticesSnap.docs.map(doc => ({ ...doc.data(), id: doc.id } as ParentBroadcastNotice));
+
+        // Query Firestore for strictly this school's character badges
+        const badgesQ = query(collection(db, 'character_badges'), where('schoolId', '==', school.id));
+        const badgesSnap = await getDocs(badgesQ);
+        const remoteBadges = badgesSnap.docs.map(doc => ({ ...doc.data(), id: doc.id } as CharacterBadge));
+
+        remoteNotices.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        remoteBadges.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        if (isMounted) {
+          setBroadcasts(remoteNotices);
+          setBadges(remoteBadges);
+          localStorage.setItem(noticeKey, JSON.stringify(remoteNotices));
+          localStorage.setItem(badgeKey, JSON.stringify(remoteBadges));
+        }
+      } catch (err) {
+        console.warn("Firestore notice fetch failed, attempting API fallback...", err);
+        try {
+          const resN = await fetch(`/api/v1/parent-notices?schoolId=${school.id}`);
+          if (resN.ok) {
+            const apiNotices = await resN.json();
+            if (isMounted && Array.isArray(apiNotices)) {
+              setBroadcasts(apiNotices);
+              localStorage.setItem(noticeKey, JSON.stringify(apiNotices));
+            }
+          }
+          const resB = await fetch(`/api/v1/character-badges?schoolId=${school.id}`);
+          if (resB.ok) {
+            const apiBadges = await resB.json();
+            if (isMounted && Array.isArray(apiBadges)) {
+              setBadges(apiBadges);
+              localStorage.setItem(badgeKey, JSON.stringify(apiBadges));
+            }
+          }
+        } catch (apiErr) {
+          console.error("API fallback failed:", apiErr);
+        }
+      } finally {
+        if (isMounted) setIsLoadingNotices(false);
+      }
+    };
+
+    loadTenantNoticesAndBadges();
+
+    return () => { isMounted = false; };
+  }, [school.id]);
+
+  useEffect(() => {
+    if (students.length > 0) {
+      if (!badgeStudentId || !students.some(s => s.id === badgeStudentId)) {
+        setBadgeStudentId(students[0].id);
+      }
+      if (!slipStudentId || !students.some(s => s.id === slipStudentId)) {
+        setSlipStudentId(students[0].id);
+      }
     }
   }, [students]);
 
@@ -201,36 +240,52 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
     }
   };
 
-  const handleSendBroadcast = () => {
+  const handleSendBroadcast = async () => {
     if (!broadcastTitle.trim() || !broadcastMessage.trim()) return;
     setIsSending(true);
     setBroadcastSuccess('');
 
-    setTimeout(() => {
-      const newNotice: ParentBroadcastNotice = {
-        id: 'notif-' + Date.now(),
-        schoolId: school.id,
-        title: broadcastTitle,
-        message: broadcastMessage,
-        targetAudience: broadcastAudience,
-        targetClass: broadcastAudience === 'Class-Specific' ? selectedClass : undefined,
-        channel: broadcastChannel,
-        sentBy: userName || 'School Admin',
-        timestamp: new Date().toISOString(),
-        recipientsCount: validPhoneCount || targetStudents.length,
-        status: 'Delivered'
-      };
+    const newNotice: ParentBroadcastNotice = {
+      id: 'notif-' + Date.now(),
+      schoolId: school.id,
+      title: broadcastTitle,
+      message: broadcastMessage,
+      targetAudience: broadcastAudience,
+      targetClass: broadcastAudience === 'Class-Specific' ? selectedClass : undefined,
+      channel: broadcastChannel,
+      sentBy: userName || 'School Admin',
+      timestamp: new Date().toISOString(),
+      recipientsCount: validPhoneCount || targetStudents.length,
+      status: 'Delivered'
+    };
 
-      setBroadcasts([newNotice, ...broadcasts]);
-      setIsSending(false);
-      setBroadcastSuccess(`Broadcast successfully dispatched to ${validPhoneCount} parent phone numbers via ${broadcastChannel}!`);
-      setBroadcastTitle('');
-      setBroadcastMessage('');
-      setTimeout(() => setBroadcastSuccess(''), 5000);
-    }, 1200);
+    const updated = [newNotice, ...broadcasts];
+    setBroadcasts(updated);
+    localStorage.setItem(`geda_parent_notices_${school.id}`, JSON.stringify(updated));
+
+    try {
+      await addDoc(collection(db, 'parent_notices'), newNotice);
+    } catch (err) {
+      console.warn("Firestore notice add failed, resorting to API fallback:", err);
+      try {
+        await fetch('/api/v1/parent-notices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newNotice)
+        });
+      } catch (apiErr) {
+        console.error("API post notice error:", apiErr);
+      }
+    }
+
+    setIsSending(false);
+    setBroadcastSuccess(`Broadcast successfully dispatched to ${validPhoneCount || targetStudents.length} parent phone numbers via ${broadcastChannel}!`);
+    setBroadcastTitle('');
+    setBroadcastMessage('');
+    setTimeout(() => setBroadcastSuccess(''), 5000);
   };
 
-  const handleAwardBadge = () => {
+  const handleAwardBadge = async () => {
     if (!badgeStudentId) return;
     const student = students.find(s => s.id === badgeStudentId);
     if (!student) return;
@@ -247,7 +302,25 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
       academicTerm: school.academicTerm || 'First'
     };
 
-    setBadges([newBadge, ...badges]);
+    const updatedBadges = [newBadge, ...badges];
+    setBadges(updatedBadges);
+    localStorage.setItem(`geda_character_badges_${school.id}`, JSON.stringify(updatedBadges));
+
+    try {
+      await addDoc(collection(db, 'character_badges'), newBadge);
+    } catch (err) {
+      console.warn("Firestore badge add failed, resorting to API fallback:", err);
+      try {
+        await fetch('/api/v1/character-badges', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newBadge)
+        });
+      } catch (apiErr) {
+        console.error("API post badge error:", apiErr);
+      }
+    }
+
     setBadgeReason('');
     setBadgeSuccess(`Successfully awarded "${BADGE_CONFIGS[badgeType].label}" badge to ${student.fullName}!`);
     setTimeout(() => setBadgeSuccess(''), 4000);
@@ -543,28 +616,41 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
               </div>
 
               <div className="space-y-3 mt-3 max-h-[460px] overflow-y-auto pr-1">
-                {broadcasts.map((b, idx) => (
-                  <div 
-                    key={b.id}
-                    className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1.5 relative group"
-                  >
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{b.title}</span>
-                      <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
-                        {b.status}
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed font-sans">
-                      "{b.message}"
-                    </p>
-
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-200/50 dark:border-slate-800/50">
-                      <span>{b.targetAudience} ({b.recipientsCount} guardians)</span>
-                      <span>{new Date(b.timestamp).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
-                    </div>
+                {isLoadingNotices ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-20 w-full rounded-xl" />
+                    <Skeleton className="h-20 w-full rounded-xl" />
+                    <Skeleton className="h-20 w-full rounded-xl" />
                   </div>
-                ))}
+                ) : broadcasts.length === 0 ? (
+                  <div className="text-center py-10 text-slate-400 space-y-2">
+                    <MessageSquare className="w-7 h-7 mx-auto text-slate-300 dark:text-slate-700" />
+                    <p className="text-xs">No notice broadcasts sent yet for {school.name}.</p>
+                  </div>
+                ) : (
+                  broadcasts.map((b) => (
+                    <div 
+                      key={b.id}
+                      className="p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-1.5 relative group"
+                    >
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{b.title}</span>
+                        <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                          {b.status}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed font-sans">
+                        "{b.message}"
+                      </p>
+
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-200/50 dark:border-slate-800/50">
+                        <span>{b.targetAudience} ({b.recipientsCount} guardians)</span>
+                        <span>{new Date(b.timestamp).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -711,10 +797,15 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
 
             {/* Badges Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-1">
-              {filteredBadgesList.length === 0 ? (
+              {isLoadingNotices ? (
+                <>
+                  <Skeleton className="h-28 w-full rounded-2xl" />
+                  <Skeleton className="h-28 w-full rounded-2xl" />
+                </>
+              ) : filteredBadgesList.length === 0 ? (
                 <div className="col-span-full text-center py-12 text-slate-400 space-y-2">
                   <Award className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-700" />
-                  <p className="text-xs">No character badges awarded yet for this filter.</p>
+                  <p className="text-xs">No character badges awarded yet for {school.name}.</p>
                 </div>
               ) : (
                 filteredBadgesList.map(b => {

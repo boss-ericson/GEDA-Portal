@@ -123,6 +123,48 @@
           "condition": "request.auth != null && exists(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)) && get(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)).data.userId == request.auth.uid"
         }
       ]
+    },
+    {
+      "name": "parent_notices",
+      "path": "parent_notices/{noticeId}",
+      "schema": {
+        "schoolId": "string",
+        "title": "string",
+        "message": "string",
+        "targetAudience": "string",
+        "targetClass": "string?",
+        "channel": "string",
+        "sentBy": "string",
+        "timestamp": "string",
+        "recipientsCount": "number",
+        "status": "string"
+      },
+      "rules": [
+        {
+          "operations": ["read", "write"],
+          "condition": "request.auth != null && exists(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)) && get(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)).data.userId == request.auth.uid"
+        }
+      ]
+    },
+    {
+      "name": "character_badges",
+      "path": "character_badges/{badgeId}",
+      "schema": {
+        "schoolId": "string",
+        "studentId": "string",
+        "badgeType": "string",
+        "awardedBy": "string",
+        "date": "string",
+        "reason": "string",
+        "academicYear": "string",
+        "academicTerm": "string"
+      },
+      "rules": [
+        {
+          "operations": ["read", "write"],
+          "condition": "request.auth != null && exists(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)) && get(/databases/$(database)/documents/schools/$(request.resource.data.schoolId)).data.userId == request.auth.uid"
+        }
+      ]
     }
   ]
 }

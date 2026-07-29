@@ -344,12 +344,12 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-[#0B1E2D] via-[#13293D] to-[#274C77] rounded-2xl p-6 text-white shadow-xl border border-[#274C77]/30">
+      <div className="relative overflow-hidden bg-[#0B1E2D] rounded-2xl p-6 text-white shadow-xs border border-[#13293D]">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#274C77]/40 border border-[#A3CEF1]/30 text-[#A3CEF1] text-xs font-semibold mb-2">
-              <Sparkles className="w-3.5 h-3.5 text-[#A3CEF1]" />
-              <span>Parent-Teacher Bridge & Student Recognition Hub</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#13293D] border border-[#274C77]/40 text-[#DCEAF6] text-xs font-semibold mb-2">
+              <Smartphone className="w-3.5 h-3.5 text-[#A3CEF1]" />
+              <span>Parent-Teacher Bridge & Conduct Registry</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-white">
               Parent Broadcast & Character Badges

@@ -4130,11 +4130,11 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                             onClick={() => setNewTeacherGender('Female')}
                             className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-semibold border transition cursor-pointer flex items-center justify-center gap-1.5 ${
                               newTeacherGender === 'Female'
-                                ? 'bg-[#8B5CF6] text-white border-[#8B5CF6] shadow-xs'
+                                ? 'bg-[#4A6FA5] text-white border-[#4A6FA5] shadow-xs'
                                 : 'bg-[#EEF6FC]/60 text-[#274C77] border-[#274C77]/20 hover:border-[#274C77]/40'
                             }`}
                           >
-                            <span className="w-2 h-2 rounded-full bg-[#8B5CF6]"></span> Female
+                            <span className="w-2 h-2 rounded-full bg-[#4A6FA5]"></span> Female
                           </button>
                         </div>
                       </div>
@@ -4295,8 +4295,8 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                           <span className="bg-[#13293D]/10 text-[#13293D] border border-[#13293D]/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
                             <span className="w-2 h-2 rounded-full bg-[#13293D]"></span> {teacherMaleCount} Male ({teachers.length > 0 ? Math.round((teacherMaleCount / teachers.length) * 100) : 0}%)
                           </span>
-                          <span className="bg-[#8B5CF6]/10 text-[#7C3AED] border border-[#8B5CF6]/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-[#8B5CF6]"></span> {teacherFemaleCount} Female ({teachers.length > 0 ? Math.round((teacherFemaleCount / teachers.length) * 100) : 0}%)
+                          <span className="bg-[#4A6FA5]/10 text-[#274C77] border border-[#4A6FA5]/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-[#4A6FA5]"></span> {teacherFemaleCount} Female ({teachers.length > 0 ? Math.round((teacherFemaleCount / teachers.length) * 100) : 0}%)
                           </span>
                         </div>
                       </div>
@@ -4310,7 +4310,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                             title={`Male Teachers: ${teacherMaleCount}`}
                           ></div>
                           <div 
-                            className="h-full bg-[#8B5CF6] rounded-r-full transition-all duration-500" 
+                            className="h-full bg-[#4A6FA5] rounded-r-full transition-all duration-500" 
                             style={{ width: `${teachers.length > 0 ? (teacherFemaleCount / teachers.length) * 100 : 50}%` }}
                             title={`Female Teachers: ${teacherFemaleCount}`}
                           ></div>

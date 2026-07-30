@@ -586,28 +586,30 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool, sessio
       </section>
 
       {/* Core Features Cards Section */}
-      <section className="py-20 relative border-t border-[#274C77]/10">
-        <div className="absolute inset-0">
-          <img 
-            src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1920" 
-            alt="Ghanaian Classroom Background" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-[#0B1E2D]/80"></div>
-        </div>
+      <section className="pb-8 lg:pb-12 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-[#274C77]/20 py-16 lg:py-20">
+            <div className="absolute inset-0">
+              <img 
+                src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=1920" 
+                alt="Ghanaian Classroom Background" 
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-[#0B1E2D]/85 backdrop-blur-sm"></div>
+            </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-14 space-y-4">
-            <h2 className="text-3xl md:text-4xl font-display font-extrabold text-white tracking-tight">
-              Powerful Tools for School Administration
-            </h2>
-            <p className="text-slate-300 text-base md:text-lg leading-relaxed">
-              Everything you need to run your school efficiently, built with the specific needs of Ghanaian educators in mind.
-            </p>
-          </div>
+            <div className="relative z-10 px-4 sm:px-8 lg:px-12">
+              <div className="text-center max-w-3xl mx-auto mb-14 space-y-4">
+                <h2 className="text-3xl md:text-4xl font-display font-extrabold text-white tracking-tight">
+                  Powerful Tools for School Administration
+                </h2>
+                <p className="text-slate-300 text-base md:text-lg leading-relaxed">
+                  Everything you need to run your school efficiently, built with the specific needs of Ghanaian educators in mind.
+                </p>
+              </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Feature 1 */}
             <motion.div 
               whileHover={{ y: -5 }}
@@ -703,6 +705,8 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool, sessio
                 </p>
               </div>
             </motion.div>
+          </div>
+            </div>
           </div>
         </div>
       </section>

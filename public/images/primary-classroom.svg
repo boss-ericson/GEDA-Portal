@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wallGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDFBF7"/>
+      <stop offset="100%" stop-color="#F5EFE6"/>
+    </linearGradient>
+    <linearGradient id="floorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E2D7C5"/>
+      <stop offset="100%" stop-color="#C2B299"/>
+    </linearGradient>
+    <linearGradient id="boardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background Room -->
+  <rect width="1200" height="550" fill="url(#wallGrad)"/>
+  <rect y="550" width="1200" height="250" fill="url(#floorGrad)"/>
+  <line x1="0" y1="550" x2="1200" y2="550" stroke="#B8A890" stroke-width="3"/>
+
+  <!-- Left Wall: School Crest & Motto -->
+  <g transform="translate(180, 110)" filter="url(#shadow)">
+    <!-- Crest Shield -->
+    <path d="M0,0 L40,0 C40,25 35,50 20,60 C5,50 0,25 0,0 Z" fill="#0B1E2D" stroke="#DCEAF6" stroke-width="2"/>
+    <path d="M10,10 L30,10 C30,22 26,38 20,44 C14,38 10,22 10,10 Z" fill="none" stroke="#F59E0B" stroke-width="1.5"/>
+    <text x="20" y="32" font-family="sans-serif" font-weight="bold" font-size="12" fill="#FFFFFF" text-anchor="middle">GES</text>
+    
+    <!-- Motto Text -->
+    <text x="60" y="26" font-family="Georgia, serif" font-weight="bold" font-size="28" fill="#0B1E2D">Excellence Today,</text>
+    <text x="60" y="56" font-family="Georgia, serif" font-weight="bold" font-size="28" fill="#1E3A8A">Leaders Tomorrow</text>
+  </g>
+
+  <!-- Globe & Bookshelf in Middle Background -->
+  <g transform="translate(520, 200)" filter="url(#shadow)">
+    <!-- Bookshelf -->
+    <rect x="0" y="80" width="180" height="150" fill="#D9A86C" rx="4"/>
+    <rect x="10" y="90" width="160" height="60" fill="#B8864E"/>
+    <rect x="10" y="160" width="160" height="60" fill="#B8864E"/>
+    <!-- Books -->
+    <rect x="20" y="100" width="12" height="45" fill="#EF4444"/>
+    <rect x="34" y="105" width="10" height="40" fill="#3B82F6"/>
+    <rect x="46" y="98" width="14" height="47" fill="#10B981"/>
+    <rect x="62" y="102" width="12" height="43" fill="#F59E0B"/>
+    <rect x="100" y="170" width="15" height="45" fill="#8B5CF6"/>
+    <rect x="117" y="168" width="12" height="47" fill="#EC4899"/>
+
+    <!-- Globe on Shelf -->
+    <circle cx="90" cy="45" r="28" fill="#60A5FA"/>
+    <path d="M70,45 C80,30 100,30 110,45 C100,60 80,60 70,45 Z" fill="#34D399" opacity="0.8"/>
+    <path d="M90,17 C90,17 80,35 90,73" stroke="#1D4ED8" stroke-width="2" fill="none"/>
+    <rect x="85" y="73" width="10" height="8" fill="#475569"/>
+    <path d="M75,81 L105,81" stroke="#334155" stroke-width="4"/>
+  </g>
+
+  <!-- Right Wall: Large Blue Bulletin Board "Be Kind Be Focused Be Your Best" -->
+  <g transform="translate(730, 80)" filter="url(#shadow)">
+    <!-- Board Frame -->
+    <rect x="0" y="0" width="430" height="240" fill="#D9A86C" rx="6" stroke="#B8864E" stroke-width="4"/>
+    <rect x="10" y="10" width="410" height="220" fill="url(#boardGrad)" rx="3"/>
+    
+    <!-- Top Header Banner -->
+    <text x="70" y="36" font-family="sans-serif" font-weight="900" font-size="16" fill="#FFFFFF">Be Kind</text>
+    <circle cx="150" cy="31" r="3" fill="#F59E0B"/>
+    <text x="175" y="36" font-family="sans-serif" font-weight="900" font-size="16" fill="#FFFFFF">Be Focused</text>
+    <circle cx="280" cy="31" r="3" fill="#F59E0B"/>
+    <text x="305" y="36" font-family="sans-serif" font-weight="900" font-size="16" fill="#FFFFFF">Be Your Best</text>
+
+    <!-- 4 Poster Cards -->
+    <!-- Card 1 -->
+    <rect x="20" y="55" width="90" height="155" fill="#FFFFFF" rx="4"/>
+    <rect x="25" y="60" width="80" height="20" fill="#E0F2FE" rx="2"/>
+    <text x="65" y="74" font-family="sans-serif" font-weight="bold" font-size="8" fill="#0369A1" text-anchor="middle">FAITH &amp; AIM</text>
+    <text x="65" y="105" font-family="sans-serif" font-size="8" fill="#1E293B" text-anchor="middle">I can do all</text>
+    <text x="65" y="118" font-family="sans-serif" font-size="8" fill="#1E293B" text-anchor="middle">things through</text>
+    <text x="65" y="131" font-family="sans-serif" font-weight="bold" font-size="8" fill="#1D4ED8" text-anchor="middle">Christ Who</text>
+    <text x="65" y="144" font-family="sans-serif" font-size="8" fill="#1E293B" text-anchor="middle">strengthens me.</text>
+
+    <!-- Card 2 -->
+    <rect x="120" y="55" width="90" height="155" fill="#FFFFFF" rx="4"/>
+    <rect x="125" y="60" width="80" height="20" fill="#FEF3C7" rx="2"/>
+    <text x="165" y="74" font-family="sans-serif" font-weight="bold" font-size="8" fill="#B45309" text-anchor="middle">MOTIVATION</text>
+    <text x="165" y="105" font-family="sans-serif" font-weight="bold" font-size="9" fill="#D97706" text-anchor="middle">Dream Big.</text>
+    <text x="165" y="122" font-family="sans-serif" font-weight="bold" font-size="9" fill="#B45309" text-anchor="middle">Work Hard.</text>
+    <text x="165" y="139" font-family="sans-serif" font-weight="bold" font-size="9" fill="#78350F" text-anchor="middle">Stay Focused.</text>
+
+    <!-- Card 3 -->
+    <rect x="220" y="55" width="90" height="155" fill="#FFFFFF" rx="4"/>
+    <rect x="225" y="60" width="80" height="20" fill="#FCE7F3" rx="2"/>
+    <text x="265" y="74" font-family="sans-serif" font-weight="bold" font-size="8" fill="#BE185D" text-anchor="middle">DISCIPLINE</text>
+    <text x="265" y="105" font-family="sans-serif" font-size="8" fill="#1E293B" text-anchor="middle">Discipline is</text>
+    <text x="265" y="118" font-family="sans-serif" font-size="8" fill="#1E293B" text-anchor="middle">the bridge between</text>
+    <text x="265" y="133" font-family="sans-serif" font-weight="bold" font-size="8" fill="#9D174D" text-anchor="middle">goals &amp; accomplishment</text>
+
+    <!-- Card 4 -->
+    <rect x="320" y="55" width="90" height="155" fill="#FFFFFF" rx="4"/>
+    <rect x="325" y="60" width="80" height="20" fill="#DCFCE7" rx="2"/>
+    <text x="365" y="74" font-family="sans-serif" font-weight="bold" font-size="8" fill="#15803D" text-anchor="middle">GROWTH</text>
+    <text x="365" y="105" font-family="sans-serif" font-size="8" fill="#1E293B" text-anchor="middle">Mistakes are</text>
+    <text x="365" y="120" font-family="sans-serif" font-weight="bold" font-size="8" fill="#166534" text-anchor="middle">proof that you</text>
+    <text x="365" y="135" font-family="sans-serif" font-size="8" fill="#1E293B" text-anchor="middle">are trying.</text>
+  </g>
+
+  <!-- Students at Desks in Foreground -->
+  
+  <!-- Desk 1 (Foreground Center) -->
+  <g transform="translate(420, 480)" filter="url(#shadow)">
+    <!-- Desk Frame -->
+    <rect x="0" y="40" width="360" height="160" fill="#EAB308" rx="8" stroke="#CA8A04" stroke-width="3"/>
+    <rect x="10" y="50" width="340" height="140" fill="#FEF08A" rx="4"/>
+    <rect x="20" y="200" width="20" height="120" fill="#475569"/>
+    <rect x="320" y="200" width="20" height="120" fill="#475569"/>
+
+    <!-- Open Exercise Book -->
+    <rect x="60" y="70" width="240" height="100" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" rx="4"/>
+    <line x1="180" y1="70" x2="180" y2="170" stroke="#CBD5E1" stroke-width="2"/>
+    <!-- Lined Notebook Text -->
+    <line x1="75" y1="90" x2="165" y2="90" stroke="#E2E8F0" stroke-width="2"/>
+    <line x1="75" y1="105" x2="165" y2="105" stroke="#E2E8F0" stroke-width="2"/>
+    <line x1="75" y1="120" x2="165" y2="120" stroke="#E2E8F0" stroke-width="2"/>
+    <line x1="195" y1="90" x2="285" y2="90" stroke="#E2E8F0" stroke-width="2"/>
+    <line x1="195" y1="105" x2="285" y2="105" stroke="#E2E8F0" stroke-width="2"/>
+
+    <!-- Textbook "PRIMARY MATHEMATICS 2" on desk -->
+    <g transform="translate(200, 110)">
+      <rect x="0" y="0" width="120" height="70" fill="#0284C7" rx="3" stroke="#0369A1" stroke-width="2"/>
+      <rect x="5" y="5" width="110" height="40" fill="#22C55E" rx="2"/>
+      <text x="60" y="22" font-family="sans-serif" font-weight="900" font-size="8" fill="#FFFFFF" text-anchor="middle">PRIMARY</text>
+      <text x="60" y="34" font-family="sans-serif" font-weight="900" font-size="9" fill="#FFFFFF" text-anchor="middle">MATHEMATICS</text>
+      <circle cx="100" cy="58" r="8" fill="#F59E0B"/>
+      <text x="100" y="62" font-family="sans-serif" font-weight="bold" font-size="10" fill="#0B1E2D" text-anchor="middle">2</text>
+    </g>
+
+    <!-- Student Figure (Center Pupil) -->
+    <!-- Hair & Head -->
+    <circle cx="180" cy="-20" r="32" fill="#1C1917"/>
+    <!-- Skin Tone -->
+    <circle cx="180" cy="-10" r="28" fill="#582F0E"/>
+    <!-- Yellow Shirt Uniform -->
+    <path d="M130,20 Q180,10 230,20 L245,70 L115,70 Z" fill="#FACC15"/>
+    <!-- Plaid Tie -->
+    <path d="M174,18 L186,18 L183,60 L177,60 Z" fill="#1E3A8A"/>
+    <line x1="174" y1="30" x2="186" y2="30" stroke="#166534" stroke-width="2"/>
+    <line x1="174" y1="45" x2="186" y2="45" stroke="#F59E0B" stroke-width="2"/>
+    <!-- Hands holding Pen -->
+    <ellipse cx="140" cy="75" rx="12" ry="8" fill="#582F0E"/>
+    <ellipse cx="210" cy="75" rx="12" ry="8" fill="#582F0E"/>
+    <line x1="210" y1="75" x2="190" y2="90" stroke="#2563EB" stroke-width="3"/>
+  </g>
+
+  <!-- Left & Right Background Students -->
+  <g transform="translate(100, 420)">
+    <rect x="0" y="40" width="220" height="120" fill="#EAB308" rx="6"/>
+    <circle cx="110" cy="-10" r="26" fill="#582F0E"/>
+    <path d="M70,18 Q110,10 150,18 L160,50 L60,50 Z" fill="#FACC15"/>
+    <rect x="40" y="50" width="140" height="70" fill="#FFFFFF" rx="2"/>
+  </g>
+
+  <g transform="translate(880, 420)">
+    <rect x="0" y="40" width="220" height="120" fill="#EAB308" rx="6"/>
+    <circle cx="110" cy="-10" r="26" fill="#422006"/>
+    <path d="M70,18 Q110,10 150,18 L160,50 L60,50 Z" fill="#FACC15"/>
+    <rect x="40" y="50" width="140" height="70" fill="#FFFFFF" rx="2"/>
+  </g>
+
+  <!-- Overlay Watermark Badge -->
+  <g transform="translate(40, 730)">
+    <rect x="0" y="0" width="340" height="40" fill="#0B1E2D" opacity="0.9" rx="20"/>
+    <text x="20" y="25" font-family="sans-serif" font-weight="bold" font-size="12" fill="#FACC15">GHANA BASIC EDUCATION CLASSROOM</text>
+  </g>
+</svg>

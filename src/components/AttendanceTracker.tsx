@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { School, Student, AttendanceRecord } from '../types';
 import { CheckCircle2, XCircle, Clock, Save, RefreshCw } from 'lucide-react';
@@ -196,7 +197,7 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
     } catch (e) {}
 
     if (isOffline) {
-      alert(`Attendance saved locally (${recordsToSave.length} records). Will sync when online.`);
+      toast.success(`Attendance saved locally (${recordsToSave.length} records). Will sync when online.`);
       setSaving(false);
       return;
     }
@@ -208,14 +209,14 @@ export default function AttendanceTracker({ school, students, isOffline, user, r
         body: JSON.stringify({ schoolId: school.id, records: recordsToSave })
       });
       if (res.ok) {
-        alert(`Attendance saved successfully for ${activeClass} (${recordsToSave.length} records)`);
+        toast.success(`Attendance saved successfully for ${activeClass} (${recordsToSave.length} records)`);
         fetchAttendance(date);
       } else {
-        alert('Failed to save attendance on server. Stored locally.');
+        toast.error('Failed to save attendance on server. Stored locally.');
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to connect to server. Attendance stored locally.');
+      toast.error('Failed to connect to server. Attendance stored locally.');
     } finally {
       setSaving(false);
     }

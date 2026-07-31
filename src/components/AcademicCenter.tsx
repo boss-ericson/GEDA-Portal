@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { School, Student, AcademicRecord, SubjectScore, Role } from '../types';
 import { Award, PlusCircle, Printer, Search, RefreshCw, ChevronDown, ChevronRight, FileText, Download, Lock, ShieldCheck } from 'lucide-react';
@@ -265,7 +266,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
     e.preventDefault();
     if (!editRecord) return;
     if (isOffline) {
-      alert('Cannot save academic records in offline mode.');
+      toast.error('Cannot save academic records in offline mode.');
       return;
     }
     setIsSaving(true);
@@ -290,11 +291,11 @@ export default function AcademicCenter({ school, students, isOffline, user, role
         setSelectedStudent(null);
       } else {
         const errData = await res.json().catch(() => ({}));
-        alert(`Failed to save: ${errData.error || res.statusText}`);
+        toast.error(`Failed to save: ${errData.error || res.statusText}`);
       }
     } catch (err: any) {
       console.error(err);
-      alert(`Network error: ${err.message}`);
+      toast.error(`Network error: ${err.message}`);
     } finally {
       setIsSaving(false);
     }

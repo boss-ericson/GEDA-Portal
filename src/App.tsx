@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
+import { Toaster } from 'sonner';
 import LandingPage from './components/LandingPage';
 import Dashboard from './components/Dashboard';
 import SuperAdminDashboard from './components/SuperAdminDashboard';
@@ -284,6 +285,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+      <Toaster position="top-right" richColors closeButton expand={false} />
       <button
         onClick={toggleTheme}
         className="fixed bottom-6 right-6 z-[9999] p-3 rounded-full shadow-2xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:scale-105 transition-transform"

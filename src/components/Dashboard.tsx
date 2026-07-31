@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -691,7 +692,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     if (!file || !editingStudent) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Please upload a valid image file.');
+      toast.info('Please upload a valid image file.');
       return;
     }
 
@@ -830,7 +831,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
     if (!editingStudent) return;
     
     if (isOffline) {
-      alert("Editing students is only available when online.");
+      toast.info("Editing students is only available when online.");
       return;
     }
 
@@ -845,7 +846,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         setStudents(prev => prev.map(s => s.id === editingStudent.id ? data : s));
         setEditingStudent(null);
       } else {
-        alert(data.error || 'Failed to update student');
+        toast.error(data.error || 'Failed to update student');
       }
     } catch (err) {
       try {
@@ -853,14 +854,14 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         setStudents(prev => prev.map(s => s.id === editingStudent.id ? editingStudent : s));
         setEditingStudent(null);
       } catch (fbErr) {
-        alert('Network and database error while updating student.');
+        toast.error('Network and database error while updating student.');
       }
     }
   };
 
   const handleDeleteStudent = async (id: string) => {
     if (isOffline) {
-      alert("Deleting students is only available when online.");
+      toast.info("Deleting students is only available when online.");
       return;
     }
 
@@ -874,7 +875,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         setIsDeletingStudent(null);
       } else {
         const data = await res.json();
-        alert(data.error || 'Failed to delete student');
+        toast.error(data.error || 'Failed to delete student');
       }
     } catch (err) {
       try {
@@ -888,7 +889,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
           await updateDoc(schoolRef, { studentCount: Math.max(0, currentCount - 1) });
         }
       } catch (fbErr) {
-        alert('Network and database error while deleting student.');
+        toast.error('Network and database error while deleting student.');
       }
     }
   };
@@ -1152,11 +1153,11 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
         setSuccessMsg(`Academic indicators and attendance recorded for ${gradeStudent.fullName}.`);
         setTimeout(() => setSuccessMsg(''), 4000);
       } else {
-        alert("Failed to save academic records. Please try again.");
+        toast.error("Failed to save academic records. Please try again.");
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to connect to backend to save academic records.");
+      toast.error("Failed to connect to backend to save academic records.");
     }
   };
 
@@ -1288,13 +1289,13 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const handleExportTeachersPdf = (singleTeacher?: any) => {
     const listToExport = singleTeacher ? [singleTeacher] : teachers;
     if (!listToExport || listToExport.length === 0) {
-      alert('No teacher accounts found to export.');
+      toast.info('No teacher accounts found to export.');
       return;
     }
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-      alert('Please allow popups to download or print the Teacher Credentials PDF.');
+      toast.info('Please allow popups to download or print the Teacher Credentials PDF.');
       return;
     }
 
@@ -1889,7 +1890,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
               <button
                 onClick={() => {
-                  alert("AI Center will be available to you soon");
+                  toast.info("AI Center will be available to you soon");
                   handleTabChange('ai-center');
                 }}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition cursor-pointer ${
@@ -3067,14 +3068,14 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                     body: JSON.stringify({ studentIds, targetClass })
                   });
                   if (res.ok) {
-                    alert('Students promoted successfully!');
+                    toast.success('Students promoted successfully!');
                     fetchData();
                   } else {
-                    alert('Failed to promote students.');
+                    toast.error('Failed to promote students.');
                   }
                 } catch (err) {
                   console.error(err);
-                  alert('Error promoting students. Check connection.');
+                  toast.error('Error promoting students. Check connection.');
                 }
               }} 
             />

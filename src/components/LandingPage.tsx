@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { School, Role } from '../types';
@@ -213,7 +214,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool, sessio
         setRegisterError('');
 
         // Note: we can also show a message to the user that a verification email was sent.
-        alert('Registration successful! A verification email has been sent to your email address.');
+        toast.success('Registration successful! A verification email has been sent to your email address.');
 
         // Smooth scroll to login card
         document.getElementById('login-portal')?.scrollIntoView({ behavior: 'smooth' });
@@ -442,7 +443,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool, sessio
             }
           } catch (fbErr) {
             console.error('Firebase fallback failed:', fbErr);
-            alert("Database not configured. Please use 'admin@gedaschool.edu.gh' to try the demo.");
+            toast.info("Database not configured. Please use 'admin@gedaschool.edu.gh' to try the demo.");
             setIsLoggingIn(false);
             return;
           }

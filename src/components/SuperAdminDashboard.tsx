@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { School } from '../types';
 import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
@@ -181,10 +182,10 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
       } catch (apiErr) {}
 
       setSchools(prev => prev.map(s => s.id === schoolId ? { ...s, billingNotice: message } : s));
-      alert('Notice sent successfully to the school dashboard.');
+      toast.success('Notice sent successfully to the school dashboard.');
     } catch (err) {
       console.error('Network error while sending notice');
-      alert('Network error while sending notice.');
+      toast.error('Network error while sending notice.');
     }
   };
 

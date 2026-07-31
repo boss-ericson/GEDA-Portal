@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import React from 'react';
 import { Lock, Clock, Info } from 'lucide-react';
 import { School, Student, Role } from '../types';
@@ -11,7 +12,7 @@ interface AICenterProps {
 
 export default function AICenter({ school }: AICenterProps) {
   const handleShowNotice = () => {
-    alert("AI Center will be available to you soon");
+    toast.info("AI Center will be available to you soon");
   };
 
   return (

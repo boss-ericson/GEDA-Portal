@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { School, Student, AcademicRecord } from '../types';
 import { X, Printer, Calendar, BookOpen, Award, Download } from 'lucide-react';
@@ -238,7 +239,7 @@ export default function StudentHistoryModal({ school, student, onClose }: Props)
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to generate report card.');
+      toast.error('Failed to generate report card.');
     }
   };
 return (

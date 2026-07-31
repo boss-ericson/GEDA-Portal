@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import React, { useState, useEffect } from 'react';
 import { 
   MessageSquare, Send, Award, QrCode, Phone, Users, Shield, CheckCircle2, 
@@ -895,7 +896,7 @@ export const ParentNoticeHub: React.FC<ParentNoticeHubProps> = ({
                 type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(`https://school.ges.gov.gh/portal/${selectedSlipStudent?.admissionNo?.toLowerCase() || 'std-101'}`);
-                  alert('Parent Portal link copied to clipboard!');
+                  toast.success('Parent Portal link copied to clipboard!');
                 }}
                 className="w-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 py-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-center gap-1.5 transition cursor-pointer"
               >

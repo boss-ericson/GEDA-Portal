@@ -19,6 +19,13 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
   const [search, setSearch] = useState('');
   const [, setError] = useState('');
 
+  const isDemoSchool = (school: { id?: string; name?: string }) => {
+    if (!school) return false;
+    const idMatch = school.id === 'geda-school-complex';
+    const nameMatch = school.name?.toLowerCase().includes('geda school complex') || school.name?.toLowerCase().includes('geda demo');
+    return idMatch || nameMatch;
+  };
+
   const fetchSchools = async () => {
     setLoading(true);
     try {
@@ -202,16 +209,18 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
     s.region?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const revenueGeneratingSchools = schools.filter(s => !isDemoSchool(s));
   const totalStudents = schools.reduce((sum, s) => sum + (s.studentCount || 0), 0);
-  const totalPaidStudents = schools.reduce((sum, s) => sum + (s.paidStudentCount || 0), 0);
-  const totalUnpaidStudents = schools.reduce((sum, s) => sum + Math.max(0, (s.studentCount || 0) - (s.paidStudentCount || 0)), 0);
+  const totalPaidStudentsForRevenue = revenueGeneratingSchools.reduce((sum, s) => sum + (s.paidStudentCount || 0), 0);
+  const totalUnpaidStudentsForRevenue = revenueGeneratingSchools.reduce((sum, s) => sum + Math.max(0, (s.studentCount || 0) - (s.paidStudentCount || 0)), 0);
+  
   const activeSchoolsCount = schools.filter(s => s.status !== 'Deactivated').length;
   const deactivatedSchoolsCount = schools.length - activeSchoolsCount;
 
   // Blaze Plan Pricing (GHS 10 per student)
   const PRICE_PER_STUDENT = 10;
-  const totalRevenueCollected = totalPaidStudents * PRICE_PER_STUDENT;
-  const totalPendingRevenue = totalUnpaidStudents * PRICE_PER_STUDENT;
+  const totalRevenueCollected = totalPaidStudentsForRevenue * PRICE_PER_STUDENT;
+  const totalPendingRevenue = totalUnpaidStudentsForRevenue * PRICE_PER_STUDENT;
 
   return (
     <div className="min-h-[100dvh] bg-slate-950 text-slate-300 font-sans overflow-x-hidden">
@@ -255,15 +264,16 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
                 {totalRevenueCollected.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div className="flex items-center gap-1.5 mt-1 text-[11px] font-medium text-slate-400">
-                <span className="text-emerald-400 font-semibold">{totalPaidStudents} Paid Students</span>
+                <span className="text-emerald-400 font-semibold">{totalPaidStudentsForRevenue} Paid Students</span>
                 <span>•</span>
                 <span>GHS {PRICE_PER_STUDENT}.00/student</span>
               </div>
+              <p className="text-[10px] text-slate-500 mt-1 italic">Excludes demo space (GEDA School Complex)</p>
             </div>
             {totalPendingRevenue > 0 ? (
               <div className="pt-2 border-t border-slate-800/80 text-[11px] text-amber-400 flex items-center justify-between font-medium">
                 <span>Pending: GHS {totalPendingRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                <span className="text-slate-500">({totalUnpaidStudents} unpaid)</span>
+                <span className="text-slate-500">({totalUnpaidStudentsForRevenue} unpaid)</span>
               </div>
             ) : (
               <div className="pt-2 border-t border-slate-800/80 text-[11px] text-emerald-400/90 flex items-center gap-1 font-medium">
@@ -312,15 +322,15 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
                 {totalStudents}
               </div>
               <div className="flex items-center gap-1.5 mt-1 text-[11px] font-medium text-slate-400">
-                <span className="text-emerald-400 font-semibold">{totalPaidStudents} Paid</span>
+                <span className="text-emerald-400 font-semibold">{totalPaidStudentsForRevenue} Paid</span>
                 <span>•</span>
-                <span className="text-amber-400 font-semibold">{totalUnpaidStudents} Unpaid</span>
+                <span className="text-amber-400 font-semibold">{totalUnpaidStudentsForRevenue} Unpaid</span>
               </div>
             </div>
             <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 flex justify-between">
               <span>Paid Capacity:</span>
               <span className="font-semibold text-emerald-400">
-                {totalStudents > 0 ? Math.round((totalPaidStudents / totalStudents) * 100) : 0}% Covered
+                {totalStudents > 0 ? Math.round((totalPaidStudentsForRevenue / totalStudents) * 100) : 0}% Covered
               </span>
             </div>
           </div>
@@ -431,15 +441,19 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
                 ) : (
                   filteredSchools.map((school) => {
                     const isActive = school.status !== 'Deactivated';
+                    const isDemo = isDemoSchool(school);
                     const unpaidCount = Math.max(0, school.studentCount - (school.paidStudentCount || 0));
-                    const schoolRevenue = (school.paidStudentCount || 0) * PRICE_PER_STUDENT;
+                    const schoolRevenue = isDemo ? 0 : (school.paidStudentCount || 0) * PRICE_PER_STUDENT;
 
                     return (
                       <tr key={school.id} className="hover:bg-slate-800/40 transition">
                         {/* School Name & ID */}
                         <td className="py-3 px-4">
-                          <div className="font-semibold text-white max-w-[180px] lg:max-w-[240px] truncate" title={school.name}>
+                          <div className="font-semibold text-white max-w-[180px] lg:max-w-[240px] truncate flex items-center gap-1.5" title={school.name}>
                             {school.name}
+                            {isDemo && (
+                              <span className="text-[9px] bg-slate-800 text-slate-400 font-mono px-1.5 py-0.5 rounded border border-slate-700 shrink-0">Demo</span>
+                            )}
                           </div>
                           <div className="text-[10px] font-mono text-slate-500 truncate" title={school.id}>
                             {school.id}
@@ -461,14 +475,21 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
                           <span className="font-semibold text-white">{school.studentCount}</span>
                           <span className="text-slate-600 mx-1">/</span>
                           <span className="font-medium text-emerald-400" title="Paid Students">{school.paidStudentCount || 0} paid</span>
-                          {unpaidCount > 0 && (
+                          {!isDemo && unpaidCount > 0 && (
                             <span className="block text-[10px] text-amber-400 font-sans font-medium">({unpaidCount} unpaid)</span>
                           )}
                         </td>
 
                         {/* Revenue Generated */}
                         <td className="py-3 px-4 text-right font-mono text-xs font-bold text-emerald-400">
-                          GHS {schoolRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          {isDemo ? (
+                            <div>
+                              <span className="text-slate-400">GHS 0.00</span>
+                              <span className="block text-[9px] font-sans font-medium text-slate-500 uppercase tracking-tight">(Demo - Exempt)</span>
+                            </div>
+                          ) : (
+                            `GHS ${schoolRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                          )}
                         </td>
 
                         {/* Status Badge */}
@@ -506,7 +527,7 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
                               onClick={() => handleSendNotice(school.id, unpaidCount)}
                               className="p-1.5 rounded-lg text-amber-400 hover:bg-slate-800 hover:text-amber-300 transition cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed"
                               title={unpaidCount > 0 ? `Send Billing Notice for ${unpaidCount} unpaid students` : 'All students paid for'}
-                              disabled={unpaidCount <= 0}
+                              disabled={unpaidCount <= 0 || isDemo}
                             >
                               <Bell className="h-4 w-4" />
                             </button>
@@ -555,16 +576,20 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
             ) : (
               filteredSchools.map((school) => {
                 const isActive = school.status !== 'Deactivated';
+                const isDemo = isDemoSchool(school);
                 const unpaidCount = Math.max(0, school.studentCount - (school.paidStudentCount || 0));
-                const schoolRevenue = (school.paidStudentCount || 0) * PRICE_PER_STUDENT;
+                const schoolRevenue = isDemo ? 0 : (school.paidStudentCount || 0) * PRICE_PER_STUDENT;
 
                 return (
                   <div key={school.id} className="p-4 space-y-3 hover:bg-slate-800/30 transition">
                     {/* Top Row: School Name & Status Badges */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-white text-sm leading-snug truncate" title={school.name}>
+                        <h3 className="font-semibold text-white text-sm leading-snug truncate flex items-center gap-1.5" title={school.name}>
                           {school.name}
+                          {isDemo && (
+                            <span className="text-[9px] bg-slate-800 text-slate-400 font-mono px-1.5 py-0.5 rounded border border-slate-700 shrink-0">Demo</span>
+                          )}
                         </h3>
                         <p className="text-[10px] font-mono text-slate-500 mt-0.5 truncate">ID: {school.id}</p>
                       </div>
@@ -621,7 +646,11 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
                       <div className="pt-1.5 border-t border-slate-800/60">
                         <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-medium">Revenue</span>
                         <span className="text-emerald-400 font-bold font-mono block mt-0.5">
-                          GHS {schoolRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          {isDemo ? (
+                            <span className="text-slate-400 text-xs">GHS 0.00 <span className="text-[9px] font-sans text-slate-500 font-normal">(Demo)</span></span>
+                          ) : (
+                            `GHS ${schoolRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                          )}
                         </span>
                       </div>
                     </div>
@@ -638,7 +667,7 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
                       
                       <button
                         onClick={() => handleSendNotice(school.id, unpaidCount)}
-                        disabled={unpaidCount <= 0}
+                        disabled={unpaidCount <= 0 || isDemo}
                         className="py-2 px-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
                         title="Send Notice"
                       >

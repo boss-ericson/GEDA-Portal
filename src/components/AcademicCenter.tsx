@@ -884,9 +884,9 @@ export default function AcademicCenter({ school, students, isOffline, user, role
             </div>
           </div>
 
-          <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="w-full overflow-x-auto -mx-4 sm:mx-0">
             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-              <table className="min-w-full divide-y divide-slate-100 text-left text-sm">
+              <table className="w-full min-w-max divide-y divide-slate-100 text-left text-sm">
                 <thead className="bg-slate-50 dark:bg-slate-950 text-slate-400 uppercase font-mono text-[9px] sm:text-[10px]">
                   <tr>
                     <th className="py-2.5 px-2 sm:py-3 sm:px-4">Student Name</th>
@@ -1003,7 +1003,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
             
             {/* Modal Body / Form */}
             <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0 overflow-hidden bg-slate-50/70 dark:bg-slate-950/70">
-              <div className="flex flex-col flex-1 min-h-0 p-4 sm:p-5 gap-3.5 overflow-y-auto">
+              <div className="w-full flex flex-col flex-1 min-h-0 p-3 sm:p-5 gap-3.5 overflow-y-auto overflow-x-hidden">
                 
                 {/* SBA Formula Guide Banner */}
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-3.5 py-2 flex items-center gap-2.5 text-xs text-amber-900 dark:text-amber-200 shrink-0">
@@ -1014,19 +1014,19 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                 </div>
 
                 {/* Score Sheet Table Container */}
-                <div className="w-full border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 shadow-xs overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse min-w-[700px]">
+                <div className="w-full border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900 shadow-xs overflow-x-auto max-w-full">
+                  <table className="w-full text-left text-xs border-collapse min-w-[710px]">
                     <thead className="bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 text-[11px] uppercase font-bold tracking-wider sticky top-0 z-20 border-b border-slate-200 dark:border-slate-800">
                       <tr>
-                        <th className="py-2.5 px-3 border-r border-slate-200 dark:border-slate-800 w-[26%]">Subject</th>
-                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 w-[9%] text-center" title="Class Assessment Task 1 (Max 15)">CAT 1<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
-                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 w-[9%] text-center" title="Group Work (Max 15)">Grp Work<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
-                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 w-[9%] text-center" title="Class Assessment Task 2 (Max 15)">CAT 2<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
-                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 w-[9%] text-center" title="Project Work (Max 15)">Project<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
-                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 bg-amber-500/10 w-[9.5%] text-center text-amber-800 dark:text-amber-300">SBA<br/><span className="text-[9px] font-normal">(50%)</span></th>
-                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 w-[10%] text-center" title="Exam Score (Max 100)">Exam<br/><span className="text-[9px] text-slate-400 font-normal">(100)</span></th>
-                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 bg-amber-500/10 w-[9.5%] text-center text-amber-800 dark:text-amber-300">Exam<br/><span className="text-[9px] font-normal">(50%)</span></th>
-                        <th className="py-2 px-1.5 border-slate-200 dark:border-slate-800 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white w-[12%] text-center">Total<br/><span className="text-[9px] font-normal">(100%)</span></th>
+                        <th className="py-2.5 px-3 border-r border-slate-200 dark:border-slate-800 min-w-[140px]">Subject</th>
+                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 min-w-[70px] text-center" title="Class Assessment Task 1 (Max 15)">CAT 1<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 min-w-[70px] text-center" title="Group Work (Max 15)">Grp Work<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 min-w-[70px] text-center" title="Class Assessment Task 2 (Max 15)">CAT 2<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 min-w-[70px] text-center" title="Project Work (Max 15)">Project<br/><span className="text-[9px] text-slate-400 font-normal">(15)</span></th>
+                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 bg-amber-500/10 min-w-[70px] text-center text-amber-800 dark:text-amber-300">SBA<br/><span className="text-[9px] font-normal">(50%)</span></th>
+                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 min-w-[70px] text-center" title="Exam Score (Max 100)">Exam<br/><span className="text-[9px] text-slate-400 font-normal">(100)</span></th>
+                        <th className="py-2 px-1.5 border-r border-slate-200 dark:border-slate-800 bg-amber-500/10 min-w-[70px] text-center text-amber-800 dark:text-amber-300">Exam<br/><span className="text-[9px] font-normal">(50%)</span></th>
+                        <th className="py-2 px-1.5 border-slate-200 dark:border-slate-800 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white min-w-[80px] text-center">Total<br/><span className="text-[9px] font-normal">(100%)</span></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -1049,7 +1049,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                                 pattern="[0-9]*" 
                                 value={score.cat1 ?? ''} 
                                 onChange={e => handleScoreChange(idx, 'cat1', e.target.value)} 
-                                className="w-full h-8 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
+                                className="w-full h-9 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
                               />
                             </td>
                             <td className="p-1 border-r border-slate-100 dark:border-slate-800">
@@ -1060,7 +1060,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                                 pattern="[0-9]*" 
                                 value={score.groupWork ?? ''} 
                                 onChange={e => handleScoreChange(idx, 'groupWork', e.target.value)} 
-                                className="w-full h-8 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
+                                className="w-full h-9 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
                               />
                             </td>
                             <td className="p-1 border-r border-slate-100 dark:border-slate-800">
@@ -1071,7 +1071,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                                 pattern="[0-9]*" 
                                 value={score.cat2 ?? ''} 
                                 onChange={e => handleScoreChange(idx, 'cat2', e.target.value)} 
-                                className="w-full h-8 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
+                                className="w-full h-9 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
                               />
                             </td>
                             <td className="p-1 border-r border-slate-100 dark:border-slate-800">
@@ -1082,7 +1082,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                                 pattern="[0-9]*" 
                                 value={score.projectWork ?? ''} 
                                 onChange={e => handleScoreChange(idx, 'projectWork', e.target.value)} 
-                                className="w-full h-8 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
+                                className="w-full h-9 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
                               />
                             </td>
                             <td className="py-2 px-1 border-r border-slate-100 dark:border-slate-800 bg-amber-50/70 dark:bg-amber-950/30 text-center font-bold text-amber-900 dark:text-amber-300 text-xs sm:text-sm">
@@ -1096,7 +1096,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                                 pattern="[0-9]*" 
                                 value={score.exam ?? ''} 
                                 onChange={e => handleScoreChange(idx, 'exam', e.target.value)} 
-                                className="w-full h-8 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
+                                className="w-full h-9 text-center text-xs font-bold border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none p-1 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:text-slate-400" 
                               />
                             </td>
                             <td className="py-2 px-1 border-r border-slate-100 dark:border-slate-800 bg-amber-50/70 dark:bg-amber-950/30 text-center font-bold text-amber-900 dark:text-amber-300 text-xs sm:text-sm">

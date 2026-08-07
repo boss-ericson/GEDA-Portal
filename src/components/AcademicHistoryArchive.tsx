@@ -474,8 +474,8 @@ export default function AcademicHistoryArchive({
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left text-xs min-w-max">
               <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 uppercase text-[10px] font-bold border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="py-3 px-4">Admit No</th>
@@ -574,8 +574,8 @@ export default function AcademicHistoryArchive({
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left text-xs min-w-max">
               <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 uppercase text-[10px] font-bold border-b border-slate-200 dark:border-slate-800">
                 <tr>
                   <th className="py-3 px-4">Student Name</th>

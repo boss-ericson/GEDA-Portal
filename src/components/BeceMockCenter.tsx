@@ -852,7 +852,7 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
               <p className="text-xs text-[#274C77]/80 mt-1">Register students in JHS 3 or switch the class filter above.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="w-full overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[1100px]">
                 <thead>
                   <tr className="bg-[#EEF6FC] text-[#0B1E2D] text-[11px] font-bold uppercase border-b border-[#274C77]/20">
@@ -1009,8 +1009,8 @@ export default function BeceMockCenter({ school, students, isOffline, user, role
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-max">
               <thead>
                 <tr className="bg-[#EEF6FC] text-[#0B1E2D] text-[11px] font-bold uppercase border-b border-[#274C77]/20">
                   <th className="p-3 w-12 text-center">Rank</th>

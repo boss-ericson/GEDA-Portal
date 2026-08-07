@@ -194,7 +194,7 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
   const totalStudents = schools.reduce((sum, s) => sum + (s.studentCount || 0), 0);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-300 font-sans">
+    <div className="min-h-[100dvh] bg-slate-950 text-slate-300 font-sans">
       <header className="bg-slate-900 border-b border-slate-800 py-4 px-6 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <div className="bg-amber-500 text-slate-900 dark:text-white p-2 rounded">
@@ -257,8 +257,8 @@ export default function SuperAdminDashboard({ onLogout }: { onLogout: () => void
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left text-sm min-w-max">
               <thead className="bg-slate-950 text-slate-500 dark:text-slate-400 uppercase font-mono text-[10px]">
                 <tr>
                   <th className="py-3 px-5 border-b border-slate-800">School / Tenant ID</th>

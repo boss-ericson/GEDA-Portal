@@ -1659,7 +1659,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   } as React.CSSProperties : {};
 
   return (
-    <div className="h-screen max-h-screen overflow-hidden bg-slate-100 dark:bg-slate-800 flex flex-col font-sans text-slate-800 dark:text-slate-200" style={dynamicStyles}>
+    <div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-slate-100 dark:bg-slate-800 flex flex-col font-sans text-slate-800 dark:text-slate-200" style={dynamicStyles}>
 
       {/* Fixed Top Header Container */}
       <div className="shrink-0 z-30 bg-white dark:bg-slate-900 border-b border-[#274C77]/15 no-print shadow-2xs">
@@ -2627,8 +2627,8 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                     </button>
                   </div>
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                  <div className="w-full overflow-x-auto">
+                    <table className="w-full text-left text-sm min-w-max">
                       <thead className="bg-[#EEF6FC]/80 text-[#274C77] uppercase font-mono text-[10px] border-b border-[#274C77]/15">
                         <tr>
                           <th className="py-3.5 px-6 font-bold">Transaction Ref</th>
@@ -2787,8 +2787,8 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
               {/* ROSTER TABLE */}
               <div className="bg-white rounded-3xl border border-[#274C77]/20 shadow-xs overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
+                <div className="w-full overflow-x-auto">
+                  <table className="w-full text-left text-sm min-w-max">
                     <thead className="bg-[#EEF6FC]/80 text-[#274C77] uppercase font-mono text-[10px] border-b border-[#274C77]/15">
                       <tr>
                         <th className="py-3.5 px-6 font-bold">Admission Code</th>
@@ -3672,8 +3672,8 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                       </div>
 
                       {/* Table */}
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left text-xs">
+                      <div className="w-full overflow-x-auto">
+                        <table className="w-full text-left text-xs min-w-max">
                           <thead className="bg-slate-50 dark:bg-slate-950 text-slate-400 uppercase font-mono text-[9px] border-b border-slate-100 dark:border-slate-800">
                             <tr>
                               <th className="py-2.5 px-3">Transaction ID</th>
@@ -3807,8 +3807,8 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                       <p className="text-slate-400 text-xs">Physical backup records saved within this multi-tenant instance.</p>
                     </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
+                    <div className="w-full overflow-x-auto">
+                      <table className="w-full text-left text-xs min-w-max">
                         <thead className="bg-slate-50 dark:bg-slate-950 text-slate-400 uppercase font-mono text-[9px] border-b border-slate-100 dark:border-slate-800">
                           <tr>
                             <th className="py-2.5 px-3">File Name</th>
@@ -4342,8 +4342,8 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
                       )}
                     </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse text-xs">
+                    <div className="w-full overflow-x-auto">
+                      <table className="w-full text-left border-collapse text-xs min-w-max">
                         <thead>
                           <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 font-semibold">
                             <th className="py-2.5">Teacher Name</th>
@@ -5994,7 +5994,7 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
 
                     {/* Financial Statement Table */}
                     <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
-                      <table className="w-full text-left text-xs">
+                      <table className="w-full text-left text-xs min-w-max">
                         <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold uppercase text-[10px]">
                           <tr>
                             <th className="py-3 px-4">Fee Item / Description</th>

@@ -464,7 +464,7 @@ export default function LandingPage({ schools, onLogin, onRegisterSchool, sessio
   };
 
   return (
-    <div className="min-h-screen bg-[#EEF6FC] text-[#13293D] font-sans selection:bg-[#274C77]/20 selection:text-[#0B1E2D] overflow-x-hidden relative">
+    <div className="min-h-[100dvh] bg-[#EEF6FC] text-[#13293D] font-sans selection:bg-[#274C77]/20 selection:text-[#0B1E2D] overflow-x-hidden relative">
       {/* Background Slideshow */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <AnimatePresence>

@@ -271,7 +271,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center font-sans text-white">
+      <div className="min-h-[100dvh] bg-slate-900 flex flex-col items-center justify-center font-sans text-white">
         <div className="space-y-4 text-center">
           <div className="h-10 w-10 border-4 border-amber-400 border-t-green-700 rounded-full animate-spin mx-auto"></div>
           <div>
@@ -284,7 +284,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
+    <div className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200">
       <Toaster position="top-right" richColors closeButton expand={false} />
       <button
         onClick={toggleTheme}

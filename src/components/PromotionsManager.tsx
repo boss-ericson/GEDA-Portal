@@ -116,8 +116,8 @@ export default function PromotionsManager({ school, students, onPromote }: Promo
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <div className="w-full overflow-x-auto">
+            <table className="w-full text-left text-sm min-w-max">
               <thead className="bg-slate-50 dark:bg-slate-950 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-100 dark:border-slate-800">
                 <tr>
                   <th className="py-3 px-4 w-10 text-center">

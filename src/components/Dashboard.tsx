@@ -1647,8 +1647,12 @@ export default function Dashboard({ school, role, user, isDemo = true, onLogout,
   const admissionRate = totalStudents > 0 ? Math.round((admittedStudents / totalStudents) * 100) : 0;
   const classTeacherCount = teachers.filter((t: any) => t.isClassTeacher).length;
   const classTeacherCoverage = teachers.length > 0 ? Math.round((classTeacherCount / teachers.length) * 100) : 0;
-  const jhsStudentsCount = students.filter(s => s.department === 'JHS').length;
-  const primaryStudentsCount = students.filter(s => s.department === 'Primary').length;
+  const jhsStudentsCount = students.filter(s => s.classLevel && (s.classLevel.toUpperCase().includes('JHS') || s.classLevel.toUpperCase().includes('BASIC 7') || s.classLevel.toUpperCase().includes('BASIC 8') || s.classLevel.toUpperCase().includes('BASIC 9'))).length;
+  const maleStudentsCount = students.filter(s => s.gender === 'Male').length;
+  const femaleStudentsCount = students.filter(s => s.gender === 'Female').length;
+  const malePercentage = totalStudents > 0 ? (maleStudentsCount / totalStudents) * 100 : 0;
+  const femalePercentage = totalStudents > 0 ? (femaleStudentsCount / totalStudents) * 100 : 0;
+  const primaryStudentsCount = totalStudents - jhsStudentsCount;
 
   // End dynamic charts calculations
 

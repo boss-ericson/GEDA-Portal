@@ -54,6 +54,87 @@ const JHS_SUBJECTS = [
   "Career Technology", "French", "Ghanaian Language"
 ];
 
+
+
+function CustomDropdown({ label, options, value, onChange, disabled }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [customValue, setCustomValue] = useState('');
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.custom-dropdown-' + label.replace(/\s+/g, '-'))) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen, label]);
+
+  return (
+    <div className={"relative custom-dropdown-" + label.replace(/\s+/g, '-')}>
+      <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{label}</label>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full h-8 py-1 px-2.5 flex justify-between items-center text-left border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white cursor-pointer"
+      >
+        <span className="truncate">{value || `Select ${label}...`}</span>
+        <svg className="w-3 h-3 ml-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+      </button>
+      {isOpen && !disabled && (
+        <div className="absolute z-50 w-full bottom-full mb-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl overflow-hidden">
+          <div className="max-h-48 overflow-y-auto p-1">
+            {options.map(opt => (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => { onChange(opt); setIsOpen(false); }}
+                className={"w-full text-left px-2.5 py-1.5 text-xs rounded hover:bg-slate-100 dark:hover:bg-slate-700 " + (value === opt ? "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-medium" : "text-slate-700 dark:text-slate-300")}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+          <div className="border-t border-slate-200 dark:border-slate-700 p-2 bg-slate-50 dark:bg-slate-900/50 flex gap-1">
+            <input
+              type="text"
+              value={customValue}
+              onChange={e => setCustomValue(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (customValue.trim()) {
+                    onChange(customValue.trim());
+                    setCustomValue('');
+                    setIsOpen(false);
+                  }
+                }
+              }}
+              placeholder="Custom..."
+              className="w-full flex-1 min-w-0 h-7 px-2 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none focus:border-amber-500"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (customValue.trim()) {
+                  onChange(customValue.trim());
+                  setCustomValue('');
+                  setIsOpen(false);
+                }
+              }}
+              className="h-7 px-2 bg-amber-500 text-slate-950 font-medium text-xs rounded hover:bg-amber-600 transition-colors"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AcademicCenter({ school, students, isOffline, user, role }: AcademicCenterProps) {
   const isSchoolAdmin = role === 'Admin' || role === 'SuperAdmin';
   const [records, setRecords] = useState<AcademicRecord[]>([]);
@@ -965,9 +1046,9 @@ export default function AcademicCenter({ school, students, isOffline, user, role
 
       {/* MODAL: Edit Scores Pop-up */}
       {selectedStudent && editRecord && (
-        <div className="fixed inset-0 bg-slate-950/65 backdrop-blur-sm z-[100] flex items-center justify-center p-3 sm:p-5 md:p-6 animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-slate-950/65 backdrop-blur-sm z-[100] flex items-center justify-center p-0 sm:p-5 md:p-6 animate-in fade-in duration-200">
           <div 
-            className="relative w-full max-w-5xl max-h-[92vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-800 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+            className="relative w-full h-[100dvh] sm:h-auto sm:max-w-5xl max-h-[100dvh] sm:max-h-[92vh] bg-white dark:bg-slate-900 sm:rounded-2xl shadow-2xl border-0 sm:border border-slate-200/80 dark:border-slate-800 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -1003,7 +1084,7 @@ export default function AcademicCenter({ school, students, isOffline, user, role
             
             {/* Modal Body / Form */}
             <form onSubmit={handleSave} className="flex flex-col flex-1 min-h-0 overflow-hidden bg-slate-50/70 dark:bg-slate-950/70">
-              <div className="w-full flex flex-col flex-1 min-h-0 p-3 sm:p-5 gap-3.5 overflow-y-auto overflow-x-hidden">
+              <div className="w-full flex flex-col flex-1 min-h-0 p-0 sm:p-5 gap-3.5 overflow-y-auto overflow-x-hidden">
                 
                 {/* SBA Formula Guide Banner */}
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-3.5 py-2 flex items-center gap-2.5 text-xs text-amber-900 dark:text-amber-200 shrink-0">
@@ -1115,40 +1196,31 @@ export default function AcademicCenter({ school, students, isOffline, user, role
                 {/* Conduct, Attitude & Remarks Card */}
                 <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white dark:bg-slate-900 shrink-0 shadow-xs">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Attitude</label>
-                    <select 
-                      disabled={!isOtherFieldsEditable()}
-                      value={editRecord.attitude || ''} 
-                      onChange={e => setEditRecord({...editRecord, attitude: e.target.value})}
-                      className="w-full h-8 py-1 px-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    >
-                      <option value="">Select Attitude...</option>
-                      {ATTITUDES.map(a => <option key={a} value={a}>{a}</option>)}
-                    </select>
+                    <CustomDropdown 
+      label="Attitude" 
+      options={ATTITUDES} 
+      value={editRecord.attitude} 
+      onChange={(val) => setEditRecord({...editRecord, attitude: val})} 
+      disabled={!isOtherFieldsEditable()} 
+    />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Conduct</label>
-                    <select 
-                      disabled={!isOtherFieldsEditable()}
-                      value={editRecord.conduct || ''} 
-                      onChange={e => setEditRecord({...editRecord, conduct: e.target.value})}
-                      className="w-full h-8 py-1 px-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    >
-                      <option value="">Select Conduct...</option>
-                      {CONDUCTS.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
+                    <CustomDropdown 
+      label="Conduct" 
+      options={CONDUCTS} 
+      value={editRecord.conduct} 
+      onChange={(val) => setEditRecord({...editRecord, conduct: val})} 
+      disabled={!isOtherFieldsEditable()} 
+    />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Interest</label>
-                    <select 
-                      disabled={!isOtherFieldsEditable()}
-                      value={editRecord.interest || ''} 
-                      onChange={e => setEditRecord({...editRecord, interest: e.target.value})}
-                      className="w-full h-8 py-1 px-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
-                    >
-                      <option value="">Select Interest...</option>
-                      {INTERESTS.map(i => <option key={i} value={i}>{i}</option>)}
-                    </select>
+                    <CustomDropdown 
+      label="Interest" 
+      options={INTERESTS} 
+      value={editRecord.interest} 
+      onChange={(val) => setEditRecord({...editRecord, interest: val})} 
+      disabled={!isOtherFieldsEditable()} 
+    />
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Teacher Remarks</label>
